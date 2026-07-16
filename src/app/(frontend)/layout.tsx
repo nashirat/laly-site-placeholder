@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { fontVariables } from '@/app/(frontend)/components/Fonts'
+import Header from '@/components/Header'
 import './styles.css'
 
 export const metadata: Metadata = {
@@ -6,11 +8,13 @@ export const metadata: Metadata = {
   description: 'Laly Agency',
 }
 
-// ponytail: system font stack for now — swap to next/font brand faces when Figma lands
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen antialiased font-sans">{children}</body>
+    <html lang="en" className={fontVariables}>
+      <body className="relative min-h-screen antialiased font-sans">
+        <Header />
+        {children}
+      </body>
     </html>
   )
 }

@@ -1,4 +1,118 @@
 @import "tailwindcss";
 
-/* Design tokens (brand colors/fonts) go here once Figma lands.
-   @theme { --color-brand: ...; --font-sans: ...; } */
+@theme {
+  /* New Spirit (serif) = body/font-sans; Neue Haas Grotesk = headings/font-display */
+  --font-sans: var(--font-new-spirit), Georgia, serif;
+  --font-display: var(--font-neue-haas), system-ui, sans-serif;
+  /* Geist Mono = button/scramble labels (mono keeps the decrypt width-stable) */
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* Brand colors go here once Figma lands: @theme { --color-brand: ...; } */
+
+/* Masked per-letter reveal (see TextReveal.tsx) — char rises + un-squashes, line masks it. */
+@keyframes char-rise {
+  from {
+    transform: translateY(60%) scaleY(0.5);
+  }
+  to {
+    transform: translateY(0) scaleY(1);
+  }
+}
+.char-rise {
+  display: inline-block;
+  transform-origin: bottom;
+  animation: char-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; /* expo.out */
+}
+@media (prefers-reduced-motion: reduce) {
+  .char-rise {
+    animation: none;
+  }
+}
+
+/* Per-line masked slide-up (see LineReveal.tsx) — whole line rises behind its overflow-hidden mask. */
+@keyframes line-rise {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.line-rise {
+  display: inline-block;
+  animation: line-rise 1.2s cubic-bezier(0.22, 1, 0.36, 1) both; /* easeOutQuint — smoother/slower */
+}
+@media (prefers-reduced-motion: reduce) {
+  .line-rise {
+    animation: none;
+  }
+}
+
+/* Fade + slide-up entry (button). Same 0.9s/expo.out as the line reveal. Delay set inline. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-up {
+  animation: fade-up 1.2s cubic-bezier(0.22, 1, 0.36, 1) both; /* easeOutQuint — smoother/slower */
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
+}
+
+/* Masked slide-in from the right (menu items). Wrapper clips; inner slides translateX -> 0. */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(160px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.slide-in-right {
+  animation: slide-in-right 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(160px);
+  }
+}
+.slide-out-right {
+  animation: slide-out-right 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide-in-right,
+  .slide-out-right {
+    animation: none;
+  }
+}
+
+/* Opacity-only fade (carousel slides — no transform, so it won't fight Embla's loop transforms). */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.fade-in {
+  animation: fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    animation: none;
+  }
+}
