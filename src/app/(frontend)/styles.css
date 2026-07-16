@@ -14,6 +14,27 @@
 
 /* Brand colors go here once Figma lands: @theme { --color-brand: ...; } */
 
+/* Preloader curtain (see Preloader.tsx) — covers from first paint, then slides up off-screen.
+   `both` fill is load-bearing: the backwards fill holds the covering `from` state during the delay,
+   so there's no uncovered flash before the animation starts. Delay set inline (motion.ts). */
+@keyframes preloader-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+.preloader {
+  animation: preloader-up 1.2s cubic-bezier(0.83, 0, 0.17, 1) both; /* easeInOutQuint */
+}
+@media (prefers-reduced-motion: reduce) {
+  /* no curtain at all — animation:none would leave it parked over the page forever */
+  .preloader {
+    display: none;
+  }
+}
+
 /* Masked per-letter reveal (see TextReveal.tsx) — char rises + un-squashes, line masks it. */
 @keyframes char-rise {
   from {

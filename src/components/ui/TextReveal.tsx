@@ -10,13 +10,15 @@ export function TextReveal({
   text,
   as: Tag = 'h2',
   className = '',
+  delay = 0, // base offset (cascade position)
   stagger = 0.05, // seconds per char within a line
-  lineDelay = 0.25, // base offset added per line
+  lineDelay = 0.25, // offset added per line
 }: {
   lines?: string[] // explicit lines
   text?: string // CMS convenience: one string, split on newlines into lines
   as?: ElementType
   className?: string
+  delay?: number
   stagger?: number
   lineDelay?: number
 }) {
@@ -35,7 +37,7 @@ export function TextReveal({
                     <span
                       key={i}
                       className="char-rise"
-                      style={{ animationDelay: `${li * lineDelay + ci++ * stagger}s` }}
+                      style={{ animationDelay: `${delay + li * lineDelay + ci++ * stagger}s` }}
                     >
                       {ch}
                     </span>

@@ -1,8 +1,11 @@
 # reference repo — not part of this project
 /sia-cms
 
-# deps
+# deps — bun only; keep bun.lock committed, reject other package managers' lockfiles
 /node_modules
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
 
 # next
 /.next

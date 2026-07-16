@@ -3,9 +3,10 @@
 import AutoScroll from 'embla-carousel-auto-scroll'
 import useEmblaCarousel from 'embla-carousel-react'
 import { MediaImage } from '@/components/Media/Image'
+import { ENTRY_BASE } from '@/lib/motion'
 import type { MediaDoc } from '@/lib/types'
 
-const BASE_DELAY = 1.2 // cascade position (after the button at 1.0)
+const BASE_DELAY = ENTRY_BASE + 1.1 // cascade position (after the button at +0.9)
 const STAGGER = 0.05 // per-slide, left->right
 
 // Continuous auto-scrolling image strip (Embla + auto-scroll). Slides fade in (opacity only — no

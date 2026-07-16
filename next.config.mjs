@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // React Compiler (1.0) — auto-memoizes client components. Runs as a Babel pass, so it costs build
+  // time; needs babel-plugin-react-compiler installed.
+  experimental: {
+    reactCompiler: true,
+  },
   images: {
     // WebP/AVIF delivery via next/image — perf priority
     formats: ['image/avif', 'image/webp'],
