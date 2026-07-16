@@ -5,6 +5,9 @@ const nextConfig = {
   // time; needs babel-plugin-react-compiler installed.
   experimental: {
     reactCompiler: true,
+    // Inline the critical CSS and defer the rest — the stylesheet is otherwise render-blocking and
+    // sits at depth 2 of the critical path, gating the fonts behind it.
+    optimizeCss: true,
   },
   images: {
     // WebP/AVIF delivery via next/image — perf priority

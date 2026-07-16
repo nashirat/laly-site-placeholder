@@ -1,34 +1,29 @@
 import { Geist_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 
-// Self-hosted woff2 (converted from the ttf/otf under /public). Core weights only —
-// italics + ultra-thins skipped until a layout needs them.
-// ponytail: preload:false for now — enable selectively once we know above-the-fold weights.
+// Self-hosted woff2 (converted from the ttf/otf under /public).
+// ONLY the weights actually rendered are declared, because next/font preloads every declared src.
+// Declaring the unused ones forces a bad trade: preload:true would fetch 9 fonts up front, and
+// preload:false (the old setting) pushed the fonts to depth 3 of the critical path — discovered
+// only after the CSS parsed. One weight each means we can preload and still fetch the minimum.
+// Add a weight back the moment a component needs it; until then the browser never fetches it anyway.
+// ponytail: 2 weights, not a type system.
 
 /** Neue Haas Grotesk Display — headings/display. Exposed as --font-display in @theme. */
 export const neueHaas = localFont({
-  src: [
-    { path: '../../../../fonts/neue-haas-light.woff2', weight: '300', style: 'normal' },
-    { path: '../../../../fonts/neue-haas-regular.woff2', weight: '400', style: 'normal' },
-    { path: '../../../../fonts/neue-haas-medium.woff2', weight: '500', style: 'normal' },
-    { path: '../../../../fonts/neue-haas-bold.woff2', weight: '700', style: 'normal' },
-    { path: '../../../../fonts/neue-haas-black.woff2', weight: '900', style: 'normal' },
-  ],
+  src: [{ path: '../../../../fonts/neue-haas-medium.woff2', weight: '500', style: 'normal' }],
   display: 'swap',
-  preload: false,
+  preload: true,
   variable: '--font-neue-haas',
 })
 
-/** New Spirit Condensed — serif, body text. Exposed as --font-sans in @theme. */
+/** New Spirit Condensed — serif, body text. Exposed as --font-sans in @theme (body default). */
 export const newSpirit = localFont({
   src: [
     { path: '../../../../fonts/new-spirit-condensed-regular.woff2', weight: '400', style: 'normal' },
-    { path: '../../../../fonts/new-spirit-condensed-medium.woff2', weight: '500', style: 'normal' },
-    { path: '../../../../fonts/new-spirit-condensed-semibold.woff2', weight: '600', style: 'normal' },
-    { path: '../../../../fonts/new-spirit-condensed-bold.woff2', weight: '700', style: 'normal' },
   ],
   display: 'swap',
-  preload: false,
+  preload: true,
   variable: '--font-new-spirit',
 })
 
