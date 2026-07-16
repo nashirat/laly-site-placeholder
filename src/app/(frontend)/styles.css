@@ -6,6 +6,10 @@
   --font-display: var(--font-neue-haas), system-ui, sans-serif;
   /* Geist Mono = button/scramble labels (mono keeps the decrypt width-stable) */
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Big-screen breakpoints on top of the defaults (2xl stays 1536px). */
+  --breakpoint-3xl: 120rem; /* 1920px — FHD */
+  --breakpoint-4xl: 160rem; /* 2560px — QHD/ultrawide */
 }
 
 /* Brand colors go here once Figma lands: @theme { --color-brand: ...; } */

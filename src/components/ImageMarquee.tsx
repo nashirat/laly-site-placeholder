@@ -20,26 +20,28 @@ const STAGGER = 0.05 // per-slide, left->right
 // transform, so it won't fight Embla's loop transforms), staggered left->right. Fade is pure CSS
 // (fires at first paint, from the SSR'd markup) so it stays on the hero's single paint clock; Embla
 // just takes over scrolling once it hydrates.
+// Pause = press and hold (pointerDown), resume on release: stopOnMouseEnter off so hover does
+// nothing, stopOnInteraction off so the plugin re-plays once the drag settles instead of staying dead.
 export function ImageMarquee() {
   const [emblaRef] = useEmblaCarousel({ loop: true, dragFree: true, align: 'start' }, [
-    AutoScroll({ speed: 1.5, startDelay: 0, stopOnInteraction: false, stopOnMouseEnter: true }),
+    AutoScroll({ speed: 0.8, startDelay: 0, stopOnInteraction: false, stopOnMouseEnter: false }),
   ])
 
   return (
-    <div ref={emblaRef} className="overflow-hidden">
+    <div ref={emblaRef} className="cursor-grab overflow-hidden active:cursor-grabbing">
       <div className="flex">
         {SLIDES.map((img, i) => (
           <div
             key={i}
-            className="fade-in relative shrink-0 pl-4"
+            className="fade-in relative shrink-0 pl-4 3xl:pl-8"
             style={{ animationDelay: `${BASE_DELAY + i * STAGGER}s` }}
           >
             <Image
               src={img}
               alt=""
               placeholder="blur"
-              sizes="(max-width: 768px) 240px, 350px"
-              className="h-[240px] w-auto md:h-[340px]"
+              sizes="(max-width: 768px) 240px, (min-width: 1920px) 500px, 350px"
+              className="h-[240px] w-auto md:h-[340px] 3xl:h-[476px]"
             />
           </div>
         ))}

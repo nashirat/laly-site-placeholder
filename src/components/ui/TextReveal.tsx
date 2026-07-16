@@ -1,8 +1,9 @@
-import type { ElementType } from 'react'
+import { Fragment, type ElementType } from 'react'
 
 // Masked, per-letter slide-up reveal (karocrafts.com SplitText style) — pure CSS, so it's a server
-// component AND fires at first paint (before JS). That keeps the hero from sitting blank while the
-// page hydrates. The desc/button/carousel are JS-gated (they need it); the heading leads instantly.
+// component AND fires at first paint (before JS), which keeps the whole hero cascade on one clock.
+// The mask is per WORD, not per line: a word never wraps inside itself, so the reveal stays masked
+// at any viewport (a line mask leaks once the line wraps). Chars still stagger across the full line.
 // The `.char-rise` keyframe + reduced-motion opt-out live in styles.css.
 export function TextReveal({
   lines,
@@ -25,16 +26,23 @@ export function TextReveal({
       {rows.map((line, li) => {
         let ci = 0 // char index resets per line, so each line staggers from its own start
         return (
-          <span key={li} aria-hidden className="block overflow-hidden">
-            {[...line].map((ch, i) => {
-              if (ch === ' ') return ' '
-              const delay = li * lineDelay + ci++ * stagger
-              return (
-                <span key={i} className="char-rise" style={{ animationDelay: `${delay}s` }}>
-                  {ch}
+          <span key={li} aria-hidden className="block">
+            {line.split(' ').map((word, wi) => (
+              <Fragment key={wi}>
+                {wi > 0 && ' '}
+                <span className="inline-block overflow-hidden">
+                  {[...word].map((ch, i) => (
+                    <span
+                      key={i}
+                      className="char-rise"
+                      style={{ animationDelay: `${li * lineDelay + ci++ * stagger}s` }}
+                    >
+                      {ch}
+                    </span>
+                  ))}
                 </span>
-              )
-            })}
+              </Fragment>
+            ))}
           </span>
         )
       })}

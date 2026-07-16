@@ -12,7 +12,7 @@ import { useScramble } from '@/components/ui/ScrambleText'
 const SHELL_BASE =
   'inline-flex cursor-pointer items-center justify-center rounded-full px-2 py-1 ' +
   'shadow-[0_1px_2px_0_rgba(16,24,40,0.08)] transition-colors'
-const TYPE = 'font-mono text-base font-medium leading-[23px] whitespace-nowrap'
+const TYPE = 'font-mono text-base font-medium leading-[23px] whitespace-nowrap 3xl:text-lg 3xl:leading-[26px]'
 
 // variant changes ONLY the base look + the scramble flash color — not the hover text color.
 const VARIANTS = {

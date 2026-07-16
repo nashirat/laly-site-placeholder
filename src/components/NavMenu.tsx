@@ -44,7 +44,7 @@ export function NavMenu() {
             <span key={item.label} className="inline-block overflow-hidden">
               <a
                 href={item.href}
-                className={`inline-block font-mono text-base font-medium text-[#262626] ${
+                className={`inline-block font-mono text-base font-medium text-[#262626] 3xl:text-lg ${
                   closing ? 'slide-out-right' : 'slide-in-right'
                 }`}
                 /* enter: top->bottom; exit: bottom->top */
