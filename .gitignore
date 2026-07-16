@@ -1,0 +1,24 @@
+# reference repo — not part of this project
+/sia-cms
+
+# deps
+/node_modules
+
+# next
+/.next
+/out
+next-env.d.ts
+
+# local media uploads
+/media
+
+# env
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# misc
+*.tsbuildinfo
+.DS_Store
