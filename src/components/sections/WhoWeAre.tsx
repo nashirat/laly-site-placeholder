@@ -13,7 +13,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
   const { label, heading, description } = content
 
   return (
-    <section aria-label="Who we are" className="w-full bg-[#fffcf9] py-16 md:py-24 3xl:py-32">
+    <section aria-label="Who we are" className="w-full bg-[#fcf7f3] py-16 md:py-24 3xl:py-32">
       <InView className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
         <BracketLabel className="mb-5 w-44 text-[#4A4A4A] md:mb-6 md:w-56 3xl:mb-8 3xl:w-64">
           {label}
