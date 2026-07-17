@@ -10,14 +10,17 @@ import localFont from 'next/font/local'
 // ponytail: 3 faces, not a type system.
 
 /** Neue Haas Grotesk Display — headings/display. Exposed as --font-display in @theme.
- *  500 = the hero h1. 400 = every heading below the fold. Both preload (next/font can't preload a
- *  subset of the declared srcs), so the 400 costs ~25KB on the critical path for copy nobody sees
- *  until they scroll. Acceptable at two faces; if it shows up in Lighthouse, split 400 into its own
- *  localFont with preload:false — it's below the fold, so a late swap is invisible. */
+ *  500 = the hero h1. 400 = below-fold headings. 700 = the Contact section's GROW WITH US.
+ *  next/font can't preload a subset of the declared srcs, so all three preload and only the 500 is
+ *  above the fold — ~50KB of critical path for copy nobody sees until they scroll. This is the
+ *  weight where that stops being free: if Lighthouse flags it, split 400+700 into a second localFont
+ *  with preload:false and point the below-fold headings at its variable. Below the fold, a late swap
+ *  is invisible. Don't add a fourth without doing that first. */
 export const neueHaas = localFont({
   src: [
     { path: '../../../../fonts/neue-haas-regular.woff2', weight: '400', style: 'normal' },
     { path: '../../../../fonts/neue-haas-medium.woff2', weight: '500', style: 'normal' },
+    { path: '../../../../fonts/neue-haas-bold.woff2', weight: '700', style: 'normal' },
   ],
   display: 'swap',
   preload: true,

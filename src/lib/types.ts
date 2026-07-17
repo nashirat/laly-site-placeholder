@@ -42,6 +42,21 @@ export type StrategyContent = {
   description: string
 }
 
+// About Us block — cream ground, same label/heading/desc stack. The card below it becomes the team
+// carousel (one member at a time, prev/next arrows, name + role + "Our Story" link).
+export type AboutContent = {
+  label: string
+  heading: string
+  description: string
+}
+
+// Contact block — brand-pink ground, oversized display heading, two CTAs.
+export type ContactContent = {
+  label: string
+  heading: string
+  buttons: LinkField[]
+}
+
 // Header global.
 export type HeaderContent = {
   nav: Required<LinkField>[]

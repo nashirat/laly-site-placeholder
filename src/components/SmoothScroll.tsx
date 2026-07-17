@@ -3,7 +3,8 @@
 import Lenis from 'lenis'
 import { useEffect } from 'react'
 
-// Inertial scrolling. Renders nothing — it only drives Lenis' rAF loop for the page's lifetime.
+// Scroll behaviour for the whole app. Renders nothing: it pins the page to the top on load and
+// drives Lenis' rAF loop for the page's lifetime.
 //
 // Lenis animates real scrollTop rather than transforming a wrapper, so everything native keeps
 // working: IntersectionObserver still fires, and the <InView> gates need no proxy/sync shim.
@@ -13,6 +14,13 @@ import { useEffect } from 'react'
 // not constructing it at all also means no rAF loop and no wheel listeners for those users.
 export function SmoothScroll() {
   useEffect(() => {
+    // Browsers restore the last scroll offset on refresh. Wrong for this page: the preloader replays
+    // every load and the hero cascade fires at first paint, so a restored offset means the curtain
+    // lifts on a mid-page view with the hero already over. Above the reduced-motion bail on purpose
+    // — the reset isn't motion, it's correctness, and it has to happen either way.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+    window.scrollTo(0, 0)
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const lenis = new Lenis()

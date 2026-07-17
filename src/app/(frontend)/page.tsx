@@ -1,3 +1,5 @@
+import About from '@/components/sections/About'
+import Contact from '@/components/sections/Contact'
 import Hero from '@/components/sections/Hero'
 import Strategy from '@/components/sections/Strategy'
 import WhoWeAre from '@/components/sections/WhoWeAre'
@@ -11,6 +13,8 @@ export default function HomePage() {
       <Hero content={home.hero} />
       <WhoWeAre content={home.whoWeAre} />
       <Strategy content={home.strategy} />
+      <About content={home.about} />
+      <Contact content={home.contact} />
     </main>
   )
 }
