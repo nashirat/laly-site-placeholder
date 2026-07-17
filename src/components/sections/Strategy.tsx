@@ -35,7 +35,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="fade-up h-[300px] rounded-md bg-[#332E2B] md:h-[420px] 3xl:h-[500px]"
+              className="fade-up h-[300px] bg-[#332E2B] md:h-[420px] 3xl:h-[500px]"
               style={{ animationDelay: `${SECTION_DELAY.cards + i * SECTION_STEP}s` }}
             />
           ))}
