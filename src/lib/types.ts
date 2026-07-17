@@ -26,6 +26,22 @@ export type HeroContent = {
   slides: MediaDoc[]
 }
 
+// Who We Are block. `label` is the bracketed eyebrow — the brackets are CSS pseudos, so the CMS
+// value is the bare text ("WHO WE ARE"), never the punctuation.
+export type WhoWeAreContent = {
+  label: string
+  heading: string
+  description: string
+}
+
+// Strategy block — dark ground, same label/heading/desc stack as WhoWeAre. Identical shape today;
+// kept as its own type because the cards diverge (three service pillars vs two case studies).
+export type StrategyContent = {
+  label: string
+  heading: string
+  description: string
+}
+
 // Header global.
 export type HeaderContent = {
   nav: Required<LinkField>[]

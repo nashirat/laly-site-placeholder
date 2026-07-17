@@ -29,7 +29,10 @@ export function NavMenu({ items }: { items: HeaderContent['nav'] }) {
 
   return (
     <div className="relative">
-      <Button onClick={toggle}>MENU</Button>
+      {/* no scramble here — the toggle just tints on hover (transition-colors is in the shell base) */}
+      <Button onClick={toggle} scramble={false} className="hover:bg-black/5">
+        MENU
+      </Button>
 
       {state !== 'closed' && (
         <nav

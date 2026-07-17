@@ -5,13 +5,20 @@ import localFont from 'next/font/local'
 // ONLY the weights actually rendered are declared, because next/font preloads every declared src.
 // Declaring the unused ones forces a bad trade: preload:true would fetch 9 fonts up front, and
 // preload:false (the old setting) pushed the fonts to depth 3 of the critical path — discovered
-// only after the CSS parsed. One weight each means we can preload and still fetch the minimum.
+// only after the CSS parsed. Declaring the minimum means we can preload and still fetch the minimum.
 // Add a weight back the moment a component needs it; until then the browser never fetches it anyway.
-// ponytail: 2 weights, not a type system.
+// ponytail: 3 faces, not a type system.
 
-/** Neue Haas Grotesk Display — headings/display. Exposed as --font-display in @theme. */
+/** Neue Haas Grotesk Display — headings/display. Exposed as --font-display in @theme.
+ *  500 = the hero h1. 400 = every heading below the fold. Both preload (next/font can't preload a
+ *  subset of the declared srcs), so the 400 costs ~25KB on the critical path for copy nobody sees
+ *  until they scroll. Acceptable at two faces; if it shows up in Lighthouse, split 400 into its own
+ *  localFont with preload:false — it's below the fold, so a late swap is invisible. */
 export const neueHaas = localFont({
-  src: [{ path: '../../../../fonts/neue-haas-medium.woff2', weight: '500', style: 'normal' }],
+  src: [
+    { path: '../../../../fonts/neue-haas-regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../../../fonts/neue-haas-medium.woff2', weight: '500', style: 'normal' },
+  ],
   display: 'swap',
   preload: true,
   variable: '--font-neue-haas',

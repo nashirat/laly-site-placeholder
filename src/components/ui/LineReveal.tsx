@@ -14,7 +14,8 @@ export function LineReveal({
   as: Tag = 'p',
   className = '',
   delay = 0, // base offset (cascade position)
-  stagger = 0.03, // seconds between words
+  stagger = 0, // seconds between words. 0 = the paragraph rises as one — the default, matching
+  // TextReveal: the word-by-word wave is a hero flourish, not a house style. Hero opts in.
 }: {
   text: string
   as?: ElementType

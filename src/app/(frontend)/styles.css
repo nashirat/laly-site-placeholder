@@ -14,6 +14,26 @@
 
 /* Brand colors go here once Figma lands: @theme { --color-brand: ...; } */
 
+/* Lenis (see SmoothScroll.tsx) — inlined rather than importing lenis/dist/lenis.css, because
+   Tailwind v4 needs extra resolution config to @import out of node_modules and this is five rules.
+   Lenis stamps these classes on <html> itself. Check upstream if we ever bump major versions. */
+html.lenis,
+html.lenis body {
+  height: auto; /* a 100% height chain would trap the scroll Lenis needs to own */
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important; /* native smooth would fight Lenis for the same scrollTop */
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain; /* opt-out hook: nested scrollers (modals, code blocks) keep native */
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none; /* an iframe would swallow the wheel events mid-scroll */
+}
+
 /* Preloader curtain (see Preloader.tsx) — covers from first paint, then slides up off-screen.
    `both` fill is load-bearing: the backwards fill holds the covering `from` state during the delay,
    so there's no uncovered flash before the animation starts. Delay set inline (motion.ts). */
@@ -121,6 +141,103 @@
   .slide-in-right,
   .slide-out-right {
     animation: none;
+  }
+}
+
+/* Bracketed eyebrow label (see BracketLabel.tsx) — "[ WHO WE ARE ]", karocrafts' mechanic.
+   The brackets are ::before/::after pushed to the container's edges by flex justify-between, then
+   pulled back toward the middle by --x-translate (1 = stacked over the text, 0 = resting at the
+   edges). --ref-size is HALF the container width, so at 1 both brackets land on the centre; the
+   0.325em is the bracket glyph's own width, backed out so they meet flush instead of overlapping.
+   @property is what makes this work at all: an unregistered custom property is an untyped string
+   and won't interpolate — declaring it <number> lets a plain CSS transition tween it, so no JS
+   animation loop (they used GSAP for exactly this). */
+@property --x-translate {
+  syntax: "<number>";
+  /* MUST inherit: the value is set on the container but read by its ::before/::after. Pseudos only
+     see it by inheritance, so inherits:false pins them to initial-value and they never move. */
+  inherits: true;
+  initial-value: 1;
+}
+.bracket-label {
+  /* --ref-size is HALF the label's own width (each bracket travels centre -> its own edge). 50cqw
+     derives it from the element instead of taking it as a prop, so the caller just sets a normal
+     responsive width class and the travel follows. The pseudos are children of this container, so
+     cqw resolves against it — an element can't query itself, but its ::before/::after can. */
+  container-type: inline-size;
+  --ref-size: 50cqw;
+  --x-translate: 1;
+  white-space: pre; /* the space inside "[ " is meaningful — it's the gap */
+  transition: --x-translate 1s cubic-bezier(0.87, 0, 0.13, 1); /* expo.inOut */
+}
+.bracket-label::before,
+.bracket-label::after {
+  display: block; /* block pseudos = real flex items, so justify-between can spread them */
+}
+.bracket-label::before {
+  content: "[ ";
+  transform: translateX(calc(var(--x-translate) * (var(--ref-size) - 0.325em)));
+}
+.bracket-label::after {
+  content: " ]";
+  transform: translateX(calc(var(--x-translate) * (var(--ref-size) * -1 + 0.325em)));
+}
+/* The label text wipes up from nothing. clip-path does the masking in-place, so no extra
+   overflow-hidden wrapper — the inset bottom and the translate resolve in separate coordinate
+   spaces (clip first, then transform), which is why the two together read as a mask. */
+.bracket-label > * {
+  transform: translateY(100%);
+  clip-path: inset(0 0 100% 0);
+  transition:
+    transform 1s cubic-bezier(0.87, 0, 0.13, 1),
+    clip-path 1s cubic-bezier(0.87, 0, 0.13, 1);
+  transition-delay: 0.1s; /* text trails the brackets, same offset as theirs */
+}
+.reveal-gate.is-visible .bracket-label {
+  --x-translate: 0;
+}
+.reveal-gate.is-visible .bracket-label > * {
+  transform: translateY(0);
+  clip-path: inset(0 0 0 0);
+}
+
+/* Scroll gate (see InView.tsx). Below-fold sections hold their entry animations until the section
+   enters view; the inline animationDelay stagger is untouched and just starts counting late.
+   NOT animation-play-state: paused. A paused transform animation still gets a compositor layer, and
+   char-rise idles at scaleY(0.5) — so the glyph rasterizes at half height while you're scrolling
+   toward it, and the play-back stretches that stale bitmap. Pixelated text, only in gated sections
+   (the hero starts instantly, so it rasterizes at full scale and never shows it).
+   Dropping animation-name means no animation, no layer, nothing to rasterize early. visibility
+   replaces the `both` fill's job of hiding the from-state, since with no animation the char would
+   otherwise sit at its natural resting position, fully legible.
+   Free bonus: none -> char-rise restarts the animation from t=0, so the gate rewinds itself. */
+.reveal-gate:not(.is-visible) .char-rise,
+.reveal-gate:not(.is-visible) .line-rise,
+.reveal-gate:not(.is-visible) .fade-up,
+.reveal-gate:not(.is-visible) .fade-in {
+  animation-name: none;
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* the per-class rules already kill the animations; just don't leave the copy hidden */
+  .reveal-gate:not(.is-visible) .char-rise,
+  .reveal-gate:not(.is-visible) .line-rise,
+  .reveal-gate:not(.is-visible) .fade-up,
+  .reveal-gate:not(.is-visible) .fade-in {
+    visibility: visible;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* land on the resting state immediately — the hidden `from` is the base state here, so
+     transition:none alone would leave the text clipped away forever */
+  .bracket-label {
+    --x-translate: 0;
+    transition: none;
+  }
+  .bracket-label > * {
+    transform: none;
+    clip-path: none;
+    transition: none;
   }
 }
 

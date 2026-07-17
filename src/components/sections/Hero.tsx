@@ -29,6 +29,7 @@ export default function Hero({ content }: { content: HeroContent }) {
           as="h1"
           text={heading}
           delay={ENTRY_BASE}
+          stagger={0.05} /* per-char ripple — hero only; below the fold the line rises solid */
           lineDelay={0.2}
           className="font-display text-[40px] font-medium leading-none tracking-tight text-[#262626] md:text-7xl 3xl:text-8xl"
         />
