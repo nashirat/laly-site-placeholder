@@ -3,16 +3,15 @@
 import AutoScroll from 'embla-carousel-auto-scroll'
 import useEmblaCarousel from 'embla-carousel-react'
 import { MediaImage } from '@/components/Media/Image'
-import { ENTRY_BASE } from '@/lib/motion'
 import type { MediaDoc } from '@/lib/types'
 
-const BASE_DELAY = ENTRY_BASE + 1.1 // cascade position (after the button at +0.9)
+const BASE_DELAY = 0.6 // starts after the hero copy settles (button at .3 + .6s), counted from `entered`
 const STAGGER = 0.05 // per-slide, left->right
 
 // Continuous auto-scrolling image strip (Embla + auto-scroll). Slides fade in (opacity only — no
-// transform, so it won't fight Embla's loop transforms), staggered left->right. Fade is pure CSS
-// (fires at first paint, from the SSR'd markup) so it stays on the hero's single paint clock; Embla
-// just takes over scrolling once it hydrates.
+// transform, so it won't fight Embla's loop transforms), staggered left->right. The fade is gated on
+// <html class="entered"> (see .entry-fade in styles.css) so it waits for the preloader like the rest
+// of the hero; Embla takes over scrolling once it hydrates.
 // Pause = press and hold (pointerDown), resume on release: stopOnMouseEnter off so hover does
 // nothing, stopOnInteraction off so the plugin re-plays once the drag settles instead of staying dead.
 export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
@@ -29,7 +28,7 @@ export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
         {rendered.map((media, i) => (
           <div
             key={i}
-            className="fade-in relative shrink-0 pl-4 3xl:pl-8"
+            className="entry-fade relative shrink-0 pl-4 3xl:pl-8"
             style={{ animationDelay: `${BASE_DELAY + i * STAGGER}s` }}
           >
             <MediaImage

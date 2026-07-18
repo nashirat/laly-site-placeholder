@@ -2,14 +2,13 @@
 
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 
-// Scroll gate for a section's entry animations. The hero fires at first paint (it's on screen
-// already); everything below the fold hangs off one of these instead, or it would run and finish
-// while nobody was looking.
+// Scroll gate for a below-fold section's bracket label. The hero fires at first paint (it's on
+// screen already); the sections hang off one of these so the bracket wipe doesn't run and finish
+// while nobody's looking. It only toggles the .reveal-gate class (see styles.css); the bracket's
+// clip/translate transition rides off that.
 //
-// The child animations stay plain CSS with inline `animationDelay` — this only toggles a class
-// (see .reveal-gate in styles.css), so the whole stagger stays arithmetic and one observer drives
-// the section rather than one per component. Removing the class strips animation-name, which
-// rewinds the animations for free, so replay needs no bookkeeping here.
+// Fires ONCE: disconnect on the first intersection, no rearm. Replaying the reveal every time you
+// scroll back past a section read as tacky (team review), so once it's played it's done.
 export function InView({ children, className = '' }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -18,10 +17,10 @@ export function InView({ children, className = '' }: { children: ReactNode; clas
     const el = ref.current
     if (!el) return
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) setVisible(true)
-      // fully below the viewport again -> rearm. Leaving via the top is deliberately ignored:
-      // resetting there would re-run the section behind you on the way up.
-      else if (e.boundingClientRect.top > 0) setVisible(false)
+      if (e.isIntersecting) {
+        setVisible(true)
+        io.disconnect() // played once — never rearm
+      }
     })
     io.observe(el)
     return () => io.disconnect()

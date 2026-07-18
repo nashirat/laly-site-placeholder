@@ -55,49 +55,17 @@ html.lenis body {
   }
 }
 
-/* Masked per-letter reveal (see TextReveal.tsx) — char rises + un-squashes, line masks it. */
-@keyframes char-rise {
-  from {
-    transform: translateY(60%) scaleY(0.5);
-  }
-  to {
-    transform: translateY(0) scaleY(1);
-  }
-}
-.char-rise {
-  display: inline-block;
-  transform-origin: bottom;
-  animation: char-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; /* expo.out */
-}
-@media (prefers-reduced-motion: reduce) {
-  .char-rise {
-    animation: none;
-  }
-}
+/* Hero entry — gated on <html class="entered">, which the Preloader stamps at the curtain's
+   animationend (see Preloader.tsx). Not a delay: hero starts exactly when the preloader is done.
+   Per-element sequencing is a small inline animation-delay (0 / .15 / .3), counted from `entered`.
 
-/* Per-line masked slide-up (see LineReveal.tsx) — whole line rises behind its overflow-hidden mask. */
-@keyframes line-rise {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-.line-rise {
-  display: inline-block;
-  animation: line-rise 1.2s cubic-bezier(0.22, 1, 0.36, 1) both; /* easeOutQuint — smoother/slower */
-}
-@media (prefers-reduced-motion: reduce) {
-  .line-rise {
-    animation: none;
-  }
-}
-
-/* Fade + slide-up entry (button). Same 0.9s/expo.out as the line reveal. Delay set inline. */
+   fade-up = hero copy (heading/desc/button). Base sits AT the keyframe's from-state (opacity .5,
+   nudged down 12px) so attaching the animation causes no jump, and JS-dead degrades to half-visible
+   rather than blank. Starts half-visible on purpose: legible immediately, just settles (premium, not
+   "waiting for an animation" — team review). Quick 0.6s. */
 @keyframes fade-up {
   from {
-    opacity: 0;
+    opacity: 0.5;
     transform: translateY(12px);
   }
   to {
@@ -105,11 +73,38 @@ html.lenis body {
     transform: translateY(0);
   }
 }
-.fade-up {
-  animation: fade-up 1.2s cubic-bezier(0.22, 1, 0.36, 1) both; /* easeOutQuint — smoother/slower */
+.entry-copy {
+  opacity: 0.5;
+  transform: translateY(12px);
+}
+html.entered .entry-copy {
+  animation-name: fade-up;
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint */
+  animation-fill-mode: forwards;
+  /* animation-delay comes from each element's inline style */
+}
+/* .entry-fade = image-strip slides. Opacity only (no transform — it would fight Embla's loop
+   transforms), so base is opacity 0 (the strip is client-only anyway; JS-dead has no marquee). */
+.entry-fade {
+  opacity: 0;
+}
+html.entered .entry-fade {
+  animation-name: fade-in;
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: forwards;
 }
 @media (prefers-reduced-motion: reduce) {
-  .fade-up {
+  .entry-copy {
+    opacity: 1;
+    transform: none;
+  }
+  .entry-fade {
+    opacity: 1;
+  }
+  html.entered .entry-copy,
+  html.entered .entry-fade {
     animation: none;
   }
 }
@@ -201,32 +196,10 @@ html.lenis body {
   clip-path: inset(0 0 0 0);
 }
 
-/* Scroll gate (see InView.tsx). Below-fold sections hold their entry animations until the section
-   enters view; the inline animationDelay stagger is untouched and just starts counting late.
-   NOT animation-play-state: paused. A paused transform animation still gets a compositor layer, and
-   char-rise idles at scaleY(0.5) — so the glyph rasterizes at half height while you're scrolling
-   toward it, and the play-back stretches that stale bitmap. Pixelated text, only in gated sections
-   (the hero starts instantly, so it rasterizes at full scale and never shows it).
-   Dropping animation-name means no animation, no layer, nothing to rasterize early. visibility
-   replaces the `both` fill's job of hiding the from-state, since with no animation the char would
-   otherwise sit at its natural resting position, fully legible.
-   Free bonus: none -> char-rise restarts the animation from t=0, so the gate rewinds itself. */
-.reveal-gate:not(.is-visible) .char-rise,
-.reveal-gate:not(.is-visible) .line-rise,
-.reveal-gate:not(.is-visible) .fade-up,
-.reveal-gate:not(.is-visible) .fade-in {
-  animation-name: none;
-  visibility: hidden;
-}
-@media (prefers-reduced-motion: reduce) {
-  /* the per-class rules already kill the animations; just don't leave the copy hidden */
-  .reveal-gate:not(.is-visible) .char-rise,
-  .reveal-gate:not(.is-visible) .line-rise,
-  .reveal-gate:not(.is-visible) .fade-up,
-  .reveal-gate:not(.is-visible) .fade-in {
-    visibility: visible;
-  }
-}
+/* Scroll gate (see InView.tsx). The only thing gated below the fold is the bracket label — its
+   hidden state is its own base CSS (--x-translate:1 + the `.bracket-label > *` clip/translate
+   defaults above), released when InView adds .is-visible. Section copy renders static, so there's
+   nothing else here to hold back. */
 @media (prefers-reduced-motion: reduce) {
   /* land on the resting state immediately — the hidden `from` is the base state here, so
      transition:none alone would leave the text clipped away forever */
@@ -241,20 +214,13 @@ html.lenis body {
   }
 }
 
-/* Opacity-only fade (carousel slides — no transform, so it won't fight Embla's loop transforms). */
+/* Opacity-only fade keyframe — used by .entry-fade (image-strip slides). Opacity, not transform, so
+   it won't fight Embla's loop transforms. */
 @keyframes fade-in {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
-  }
-}
-.fade-in {
-  animation: fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .fade-in {
-    animation: none;
   }
 }

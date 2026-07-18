@@ -17,8 +17,8 @@ export type LinkField = {
   href?: string
 }
 
-// Hero block. Newlines in heading/description are the explicit line breaks the reveals animate on
-// (a Payload textarea field maps to this 1:1 — that's why TextReveal/LineReveal take `text`).
+// Hero block. The `\n` in heading is an explicit line break (split into block spans at render); a
+// Payload textarea field maps to this 1:1.
 export type HeroContent = {
   heading: string
   description: string

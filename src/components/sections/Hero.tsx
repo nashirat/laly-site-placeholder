@@ -1,8 +1,5 @@
 import { ImageMarquee } from '@/components/ImageMarquee'
 import { Button } from '@/components/ui/Button'
-import { LineReveal } from '@/components/ui/LineReveal'
-import { TextReveal } from '@/components/ui/TextReveal'
-import { ENTRY_BASE } from '@/lib/motion'
 import type { HeroContent } from '@/lib/types'
 
 // Home hero — first section. Cream full-viewport. The whole stack (copy + strip) is centered in the
@@ -11,10 +8,10 @@ import type { HeroContent } from '@/lib/types'
 // short viewports scroll instead of clipping.
 // Heading = Figma display/l: Neue Haas (font-display) 500 / 72px / 100% leading / center / #262626.
 // Desc = Figma body-2/xxl: New Spirit (font-sans) 400 / 28px / 125% leading / center / #4A4A4A.
-// Entry: everything is pure CSS (fires at first paint) so the whole cascade shares ONE clock and
-// stays aligned — no hydration offset. Offsets are relative to ENTRY_BASE (motion.ts), which is when
-// the preloader curtain starts lifting; without it the copy would animate hidden behind the curtain.
-// Timings stay code-side constants, not content — editors set copy, not stagger.
+// Entry: the copy is gated on <html class="entered">, stamped by the Preloader when the curtain
+// finishes lifting (see .entry-copy in styles.css / Preloader.tsx) — no delay guessing the curtain's
+// duration. Each element carries a small inline animationDelay (0 / .15 / .3s) counted from `entered`,
+// so heading → desc → button settle in sequence. Timings are code-side, not content.
 export default function Hero({ content }: { content: HeroContent }) {
   const { heading, description, button, slides } = content
 
@@ -24,27 +21,23 @@ export default function Hero({ content }: { content: HeroContent }) {
       className="flex min-h-[100dvh] w-full flex-col justify-center bg-[#fffcf9] pt-19"
     >
       <div className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
-        {/* mobile: same 2 lines, they just wrap to 4 rows (masks are per-word, so wrapping is fine) */}
-        <TextReveal
-          as="h1"
-          text={heading}
-          delay={ENTRY_BASE}
-          stagger={0.05} /* per-char ripple — hero only; below the fold the line rises solid */
-          lineDelay={0.2}
-          className="font-display text-[40px] font-medium leading-none tracking-tight text-[#262626] md:text-7xl 3xl:text-8xl"
-        />
-        <LineReveal
-          text={description}
-          delay={ENTRY_BASE + 0.4} /* accumulates after the heading's 2 lines (0, 0.2) */
-          stagger={0.03} /* per word -> 16 words land across 0.4..0.85, flowing down the wrap */
-          className="mx-auto mt-6 max-w-[616px] font-sans text-lg font-normal leading-[1.25] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
-        />
-        {/* button fades up last — pure CSS (fade-up), same paint clock as the rest. after desc's
-            last word (0.85) + a beat */}
-        <div
-          className="fade-up mt-10 flex justify-center md:mt-6"
-          style={{ animationDelay: `${ENTRY_BASE + 0.9}s` }}
+        {/* whole heading fades up as one — no per-letter ripple (reads tacky, team review). The
+            authored \n stays a hard break via block spans; on mobile each line wraps beneath it. */}
+        <h1 className="entry-copy font-display text-[40px] font-medium leading-none tracking-tight text-[#262626] md:text-7xl 3xl:text-8xl">
+          {heading.split('\n').map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </h1>
+        <p
+          className="entry-copy mx-auto mt-6 max-w-[616px] font-sans text-lg font-normal leading-[1.25] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
+          style={{ animationDelay: '0.15s' }}
         >
+          {description}
+        </p>
+        {/* button settles last — small offset from `entered`, not a stagger */}
+        <div className="entry-copy mt-10 flex justify-center md:mt-6" style={{ animationDelay: '0.3s' }}>
           <Button variant="primary" href={button.href}>
             {button.label}
           </Button>
