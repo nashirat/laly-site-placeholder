@@ -2,10 +2,10 @@
 
 import AutoScroll from 'embla-carousel-auto-scroll'
 import useEmblaCarousel from 'embla-carousel-react'
+import type { CSSProperties } from 'react'
 import { MediaImage } from '@/components/Media/Image'
 import type { MediaDoc } from '@/lib/types'
 
-const BASE_DELAY = 1.2 // starts shortly after button, counted from `preloading-done`
 const STAGGER = 0.05 // per-slide, left->right
 
 // Continuous auto-scrolling image strip (Embla + auto-scroll). Slides fade in (opacity only — no
@@ -29,7 +29,7 @@ export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
           <div
             key={i}
             className="entry-fade relative shrink-0 pl-4 3xl:pl-8"
-            style={{ animationDelay: `${BASE_DELAY + i * STAGGER}s` }}
+            style={{ '--slide-delay': `${i * STAGGER}s` } as CSSProperties}
           >
             <MediaImage
               media={media}

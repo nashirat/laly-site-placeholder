@@ -2,16 +2,15 @@
 
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 
-// Scroll gate for a below-fold section's bracket label. The hero fires at first paint (it's on
-// screen already); the sections hang off one of these so the bracket wipe doesn't run and finish
-// while nobody's looking. It only toggles the .reveal-gate class (see styles.css); the bracket's
-// clip/translate transition rides off that.
+// Scroll gate for below-fold sections. The wrapper observer releases bracket/text. Media gets its
+// own observer so card/photo placeholders can wait until 4% of the media block is visible.
 //
 // Fires ONCE: disconnect on the first intersection, no rearm. Replaying the reveal every time you
 // scroll back past a section read as tacky (team review), so once it's played it's done.
 export function InView({ children, className = '' }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
+  const [mediaVisible, setMediaVisible] = useState(false)
 
   useEffect(() => {
     const el = ref.current
@@ -26,8 +25,31 @@ export function InView({ children, className = '' }: { children: ReactNode; clas
     return () => io.disconnect()
   }, [])
 
+  useEffect(() => {
+    const el = ref.current?.querySelector('.section-media-reveal')
+    if (!el) return
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.intersectionRatio >= 0.04) {
+          setMediaVisible(true)
+          io.disconnect()
+        }
+      },
+      { threshold: 0.04 },
+    )
+
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   return (
-    <div ref={ref} className={`reveal-gate ${visible ? 'is-visible' : ''} ${className}`.trim()}>
+    <div
+      ref={ref}
+      className={`reveal-gate ${visible ? 'is-visible' : ''} ${
+        mediaVisible ? 'is-media-visible' : ''
+      } ${className}`.trim()}
+    >
       {children}
     </div>
   )

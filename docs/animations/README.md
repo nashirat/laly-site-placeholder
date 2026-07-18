@@ -2,7 +2,7 @@
 
 Every entry/reveal technique this project has used — current and archived — each documented in its own file with full source, so any of them can be re-implemented or swapped.
 
-**Why this exists:** we're going to build a **floating control panel** to A/B the reveal styles live and pick the best per surface (hero heading, body copy, section content). Each file below is self-contained enough to wire into that panel as one selectable option.
+**Why this exists:** we have a **floating control panel** to A/B the reveal styles live and pick the best per surface (hero heading, body copy, section content). Each file below is self-contained enough to wire into that panel as one selectable option.
 
 ## The variants
 
@@ -23,18 +23,16 @@ Every entry/reveal technique this project has used — current and archived — 
 
 A reveal technique (the *what*) is independent of the clock that triggers it (the *when*). The control panel should treat these as two separate dropdowns.
 
-## Suggested control-panel shape (for later)
+## Control-panel shape
 
-Two axes, per surface:
+Current implemented axes:
 
 ```
-Reveal:        [ char-rise | line-rise | fade-up | fade-in | static ]
-Orchestration: [ paint-clock | delay-cascade | event-gate | inview-gate ]
-Stagger:       [ 0 … 0.08s ]   (per char/word/item)
-Duration:      [ 0.3 … 1.2s ]
+Heading:  [ fade-up | letters | mix ]
+Sections: [ bracket + media | fade-up | brackets only ]
 ```
 
-Cleanest implementation: a client context holding the current selection, written to CSS custom properties / class names on `<html>`, so the existing CSS gates (`.entry-copy`, `.reveal-gate`, etc.) switch without re-rendering the sections. Persist to `localStorage` so a refresh keeps the choice.
+Implementation: `AnimationControlPanel` writes class names on `<html>` and persists to `localStorage`. Current scope is deliberately small: hero heading A/B plus section content levels. `mix` uses letter-by-letter heading, then fades desc and button together 0.3s after the heading starts, then carousel 0.6s after the heading starts. Default section mode keeps bracket animation and fades up only non-text content (`.section-media-reveal`) when 4% of that media block enters the viewport. Full fade-up includes text (`.section-text-reveal`) too, and text/media run together from the bracket wrapper observer after 0.4s. Brackets-only disables extra content motion.
 
 ## Design verdict so far
 

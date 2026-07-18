@@ -64,7 +64,7 @@ Team review flagged the old motion as tacky/not-skimmable. Current model, after 
 
 `src/lib/motion.ts` now holds only `PRELOADER_HOLD` (the curtain's one timing knob). `ENTRY_BASE`, `SECTION_DELAY`, `SECTION_STEP` were all deleted along with the old per-letter reveal components (`TextReveal`/`LineReveal` — gone).
 
-**Every animation technique this project has used — current and archived (char-rise, line-rise, fade-up, fade-in, bracket-label, static) plus the four orchestration models — is catalogued with full source in [`docs/animations/`](docs/animations/README.md).** The archived (deleted) ones are documented there so they can be re-tested, not lost. See [What's left](#whats-left) for the planned control panel that will A/B them.
+**Every animation technique this project has used — current and archived (char-rise, line-rise, fade-up, fade-in, bracket-label, static) plus the four orchestration models — is catalogued with full source in [`docs/animations/`](docs/animations/README.md).** The archived (deleted) ones are documented there so they can be re-tested, not lost. A small dev-only panel now A/Bs the main choices live.
 
 ---
 
@@ -86,7 +86,7 @@ Team review flagged the old motion as tacky/not-skimmable. Current model, after 
   - About → team carousel (member photo, name, role, prev/next arrows, "Our Story" button)
   - Contact → real team photo + social icons row (no assets yet)
 - **Contact heading** gets a bespoke animation later (currently static, reserved).
-- **Floating animation control panel** — a dev-only floating panel to switch reveal style (char-rise / line-rise / fade-up / fade-in / static) and orchestration (paint-clock / delay-cascade / event-gate / inview-gate) live, plus stagger/duration sliders, to pick the best per surface. All the options are documented in [`docs/animations/`](docs/animations/README.md), which includes a suggested panel shape (two dropdowns writing to `<html>` classes / CSS vars, persisted to `localStorage`).
+- **Floating animation control panel** — implemented as a dev-only fixed panel. It switches hero heading between whole-heading fade-up, letter-by-letter char-rise, and mix (letter heading, desc/button 0.3s later, carousel 0.6s later), and switches sections between bracket + media fade-up (default, 4% media intersection), full fade-up (text/media together from bracket wrapper after 0.4s), and brackets-only. It writes `<html>` classes and persists to `localStorage`.
 - **`/alternative` route** — parked. A second homepage variant to A/B the motion. User will spec it.
 - **Lighthouse re-check** of the font preload. Three Neue Haas weights (400/500/700) currently preload (~50KB critical path); only 500 is above the fold. If flagged, split 400/700 into a second `localFont` with `preload:false` (below-fold late swap is invisible). See the comment in `src/app/(frontend)/components/Fonts/index.tsx`.
 

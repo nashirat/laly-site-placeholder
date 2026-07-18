@@ -6,8 +6,7 @@ import type { ContactContent } from '@/lib/types'
 // "Contact" — brand-pink closing section. Oversized display heading with the team photo tucked
 // behind its right edge.
 //
-// Only the bracket animates (like every other section); heading/photo/CTAs render static. The
-// heading gets its own bespoke animation later — until then it just sits, no placeholder motion.
+// Bracket always animates like every other section. Dev panel can fade heading/photo/CTAs up.
 export default function Contact({ content }: { content: ContactContent }) {
   const { label, heading, buttons } = content
 
@@ -22,7 +21,7 @@ export default function Contact({ content }: { content: ContactContent }) {
         </BracketLabel>
 
         {/* the photo overlaps the heading's right edge, so they share a stacking context */}
-        <div className="relative">
+        <div className="section-media-reveal relative">
           <h2 className="relative z-10 font-display text-[64px] font-bold leading-[0.95] tracking-tight text-[#161616] md:text-[140px] 3xl:text-[180px]">
             {heading.split('\n').map((line) => (
               <span key={line} className="block">
@@ -35,7 +34,7 @@ export default function Contact({ content }: { content: ContactContent }) {
           <div className="relative z-0 mx-auto mt-6 h-[220px] w-[200px] rotate-2 bg-[#EFEDEA] md:absolute md:-top-4 md:right-0 md:mt-0 md:h-[330px] md:w-[280px] 3xl:h-[400px] 3xl:w-[340px]" />
         </div>
 
-        <div className="mt-10 flex justify-center gap-3 md:mt-12">
+        <div className="section-media-reveal mt-10 flex justify-center gap-3 md:mt-12">
           {/* no scramble — these are the page's closing CTAs; the decrypt reads as noise on the
               action you actually want clicked */}
           <Button variant="solid" scramble={false} href={buttons[0].href}>

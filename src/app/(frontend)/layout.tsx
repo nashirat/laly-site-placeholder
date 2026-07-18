@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { fontVariables } from '@/app/(frontend)/components/Fonts'
+import { AnimationControlPanel } from '@/components/AnimationControlPanel'
 import Header from '@/components/Header'
 import { Preloader } from '@/components/Preloader'
 import { SmoothScroll } from '@/components/SmoothScroll'
@@ -10,14 +12,22 @@ export const metadata: Metadata = {
   description: 'Laly Agency',
 }
 
+const isDevelopment = process.env.NODE_ENV === 'development'
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fontVariables} preloading`}>
+    <html lang="en" suppressHydrationWarning className={`${fontVariables} preloading`}>
       <body className="relative min-h-screen antialiased font-sans">
+        {isDevelopment ? (
+          <Script id="animation-controls" strategy="beforeInteractive">
+            {`try{var s=JSON.parse(localStorage.getItem('laly-animation-controls')||'{}');if(s.version!==3)s={};document.documentElement.classList.add('anim-heading-'+(s.heading==='letters'||s.heading==='mix'?s.heading:'fade'),'anim-sections-'+(s.sections==='fadeup'||s.sections==='brackets'?s.sections:'media'))}catch(e){document.documentElement.classList.add('anim-heading-fade','anim-sections-media')}`}
+          </Script>
+        ) : null}
         <SmoothScroll />
         <Preloader />
         <Header />
         {children}
+        {isDevelopment ? <AnimationControlPanel /> : null}
       </body>
     </html>
   )
