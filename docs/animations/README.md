@@ -32,7 +32,7 @@ Heading:  [ fade-up | letters | mix ]
 Sections: [ bracket + media | fade-up | brackets only ]
 ```
 
-Implementation: `AnimationControlPanel` writes class names on `<html>` and persists to `localStorage`. Current scope is deliberately small: hero heading A/B plus section content levels. `mix` uses letter-by-letter heading, then fades desc and button together 0.3s after the heading starts, then carousel 0.6s after the heading starts. Default section mode keeps bracket animation and fades up only non-text content (`.section-media-reveal`) when 4% of that media block enters the viewport. Full fade-up includes text (`.section-text-reveal`) too, and text/media run together from the bracket wrapper observer after 0.4s. Brackets-only disables extra content motion.
+Implementation: `AnimationControlPanel` writes class names on `<html>` and persists to `localStorage`. It is visible in production for designer review and draggable; panel position is saved too. Current scope is deliberately small: hero heading A/B plus section content levels. `mix` uses letter-by-letter heading, then fades desc and button together 0.3s after the heading starts, then carousel 0.6s after the heading starts. Default section mode keeps bracket animation and fades up only non-text content (`.section-media-reveal`) when 4% of that media block enters the viewport. Full fade-up includes text (`.section-text-reveal`) too, and text/media run together from the bracket wrapper observer after 0.4s. Brackets-only disables extra content motion.
 
 ## Design verdict so far
 

@@ -12,22 +12,18 @@ export const metadata: Metadata = {
   description: 'Laly Agency',
 }
 
-const isDevelopment = process.env.NODE_ENV === 'development'
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className={`${fontVariables} preloading`}>
       <body className="relative min-h-screen antialiased font-sans">
-        {isDevelopment ? (
-          <Script id="animation-controls" strategy="beforeInteractive">
-            {`try{var s=JSON.parse(localStorage.getItem('laly-animation-controls')||'{}');if(s.version!==3)s={};document.documentElement.classList.add('anim-heading-'+(s.heading==='letters'||s.heading==='mix'?s.heading:'fade'),'anim-sections-'+(s.sections==='fadeup'||s.sections==='brackets'?s.sections:'media'))}catch(e){document.documentElement.classList.add('anim-heading-fade','anim-sections-media')}`}
-          </Script>
-        ) : null}
+        <Script id="animation-controls" strategy="beforeInteractive">
+          {`try{var s=JSON.parse(localStorage.getItem('laly-animation-controls')||'{}');if(s.version!==3)s={};document.documentElement.classList.add('anim-heading-'+(s.heading==='letters'||s.heading==='mix'?s.heading:'fade'),'anim-sections-'+(s.sections==='fadeup'||s.sections==='brackets'?s.sections:'media'))}catch(e){document.documentElement.classList.add('anim-heading-fade','anim-sections-media')}`}
+        </Script>
         <SmoothScroll />
         <Preloader />
         <Header />
         {children}
-        {isDevelopment ? <AnimationControlPanel /> : null}
+        <AnimationControlPanel />
       </body>
     </html>
   )
