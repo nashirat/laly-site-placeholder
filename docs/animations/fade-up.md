@@ -5,26 +5,27 @@
 
 ## What it does
 
-The element fades from half-opacity while rising a few pixels: `opacity .5 → 1`, `translateY(12px) → 0`, over 0.6s. Starts **half-visible on purpose** — the copy is readable the instant it appears and just settles, rather than materializing from nothing (which reads as "waiting for an animation").
+The element fades in while rising a few pixels: `opacity 0 → 1`, `translateY(12px) → 0`, over 0.6s.
 
 ## The non-obvious bits
 
-- **Not on a delay — gated on `html.entered`.** The hero waits for the preloader curtain to finish (see [orchestration.md](orchestration.md)), then all `.entry-copy` elements animate. Per-element sequencing (heading → desc → button) is a small inline `animation-delay` (0 / .15 / .3s) counted from `entered`.
-- **Base state = the keyframe's from-state** (`opacity .5`, `translateY 12px`). So attaching the animation causes no jump, and if JS never runs the copy degrades to half-visible rather than blank.
+- **Gated on `html.preloading-done`.** This starts with curtain close. Heading waits 0.8s; description/button follow at `.15s` intervals. Curtain close lasts 1.2s.
+- **Base state = keyframe from-state** (`opacity 0`, `translateY 12px`), so attaching animation causes no jump.
 - `animation-fill-mode: forwards` holds the resting state (the base already covers the from-state, so backwards fill is unnecessary).
 
 ## CSS (current, gated form)
 
 ```css
 @keyframes fade-up {
-  from { opacity: 0.5; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1;   transform: translateY(0); }
 }
 .entry-copy {
-  opacity: 0.5;
+  opacity: 0;
   transform: translateY(12px);
 }
-html.entered .entry-copy {
+html.preloading-done .entry-copy,
+html.preloader-done .entry-copy {
   animation-name: fade-up;
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint */
@@ -33,7 +34,8 @@ html.entered .entry-copy {
 }
 @media (prefers-reduced-motion: reduce) {
   .entry-copy { opacity: 1; transform: none; }
-  html.entered .entry-copy { animation: none; }
+  html.preloading-done .entry-copy,
+  html.preloader-done .entry-copy { animation: none; }
 }
 ```
 

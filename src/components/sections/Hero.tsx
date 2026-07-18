@@ -8,10 +8,8 @@ import type { HeroContent } from '@/lib/types'
 // short viewports scroll instead of clipping.
 // Heading = Figma display/l: Neue Haas (font-display) 500 / 72px / 100% leading / center / #262626.
 // Desc = Figma body-2/xxl: New Spirit (font-sans) 400 / 28px / 125% leading / center / #4A4A4A.
-// Entry: the copy is gated on <html class="entered">, stamped by the Preloader when the curtain
-// finishes lifting (see .entry-copy in styles.css / Preloader.tsx) — no delay guessing the curtain's
-// duration. Each element carries a small inline animationDelay (0 / .15 / .3s) counted from `entered`,
-// so heading → desc → button settle in sequence. Timings are code-side, not content.
+// Entry: `preloading-done` starts the curtain close and hero sequence together. Heading waits 1s,
+// so it begins shortly before the 1.2s curtain close completes.
 export default function Hero({ content }: { content: HeroContent }) {
   const { heading, description, button, slides } = content
 
@@ -23,7 +21,10 @@ export default function Hero({ content }: { content: HeroContent }) {
       <div className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
         {/* whole heading fades up as one — no per-letter ripple (reads tacky, team review). The
             authored \n stays a hard break via block spans; on mobile each line wraps beneath it. */}
-        <h1 className="entry-copy font-display text-[40px] font-medium leading-none tracking-tight text-[#262626] md:text-7xl 3xl:text-8xl">
+        <h1
+          className="entry-copy font-display text-[40px] font-medium leading-none tracking-tight text-[#262626] md:text-7xl 3xl:text-8xl"
+          style={{ animationDelay: '0.8s' }}
+        >
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
@@ -32,12 +33,11 @@ export default function Hero({ content }: { content: HeroContent }) {
         </h1>
         <p
           className="entry-copy mx-auto mt-6 max-w-[616px] font-sans text-lg font-normal leading-[1.25] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
-          style={{ animationDelay: '0.15s' }}
+          style={{ animationDelay: '0.95s' }}
         >
           {description}
         </p>
-        {/* button settles last — small offset from `entered`, not a stagger */}
-        <div className="entry-copy mt-10 flex justify-center md:mt-6" style={{ animationDelay: '0.3s' }}>
+        <div className="entry-copy mt-10 flex justify-center md:mt-6" style={{ animationDelay: '1.1s' }}>
           <Button variant="primary" href={button.href}>
             {button.label}
           </Button>

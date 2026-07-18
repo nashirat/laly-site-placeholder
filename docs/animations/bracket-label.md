@@ -83,4 +83,4 @@ CMS value is the bare text (`"WHO WE ARE"`) — the `[ ]` are CSS pseudo content
 ## Panel wiring notes
 
 - Dials: transition duration (currently 1s), the easing, the text trail delay (0.1s).
-- Triggered by the InView gate today; could also be triggered by `html.entered` if a bracket ever lives above the fold.
+- Triggered by the InView gate today; could also be triggered by `html.preloading-done` if a bracket ever lives above the fold.

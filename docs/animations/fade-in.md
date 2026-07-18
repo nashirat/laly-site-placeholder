@@ -13,7 +13,7 @@ The image strip is an Embla carousel with an auto-scroll plugin — it's continu
 
 ## The non-obvious bits
 
-- Gated on `html.entered` like the hero copy (`.entry-fade`), so the strip waits for the preloader too. Slides stagger left→right via inline `animation-delay` (`BASE_DELAY + i * STAGGER`), where `BASE_DELAY` is counted from `entered` (starts after the hero copy settles).
+- Gated on `html.preloading-done` like hero copy (`.entry-fade`). Slides stagger left→right via inline `animation-delay` (`BASE_DELAY + i * STAGGER`), shortly after button starts.
 - Base `opacity: 0` (not 0.5) — the strip is client-only anyway (Embla needs JS), so there's no JS-dead degradation to protect; hidden-until-ready is fine.
 
 ## CSS
@@ -26,7 +26,8 @@ The image strip is an Embla carousel with an auto-scroll plugin — it's continu
 .entry-fade {
   opacity: 0;
 }
-html.entered .entry-fade {
+html.preloading-done .entry-fade,
+html.preloader-done .entry-fade {
   animation-name: fade-in;
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -34,14 +35,15 @@ html.entered .entry-fade {
 }
 @media (prefers-reduced-motion: reduce) {
   .entry-fade { opacity: 1; }
-  html.entered .entry-fade { animation: none; }
+  html.preloading-done .entry-fade,
+  html.preloader-done .entry-fade { animation: none; }
 }
 ```
 
 ## Usage (`ImageMarquee.tsx`)
 
 ```tsx
-const BASE_DELAY = 0.6 // after the hero copy settles, counted from `entered`
+const BASE_DELAY = 1.2 // shortly after button starts, counted from `preloading-done`
 const STAGGER = 0.05   // per-slide, left->right
 
 <div className="entry-fade …" style={{ animationDelay: `${BASE_DELAY + i * STAGGER}s` }}>

@@ -34,9 +34,8 @@ html.lenis body {
   pointer-events: none; /* an iframe would swallow the wheel events mid-scroll */
 }
 
-/* Preloader curtain (see Preloader.tsx) — covers from first paint, then slides up off-screen.
-   `both` fill is load-bearing: the backwards fill holds the covering `from` state during the delay,
-   so there's no uncovered flash before the animation starts. Delay set inline (motion.ts). */
+/* Preloader curtain (see Preloader.tsx) — covers from first paint. `preloading-done` starts its
+   slide-up; `preloader-done` unmounts it. */
 @keyframes preloader-up {
   from {
     transform: translateY(0);
@@ -46,7 +45,14 @@ html.lenis body {
   }
 }
 .preloader {
+  animation: none;
+}
+html.preloading-done .preloader {
   animation: preloader-up 1.2s cubic-bezier(0.83, 0, 0.17, 1) both; /* easeInOutQuint */
+}
+/* State changes before React unmounts the node. Keep it above viewport for that render boundary. */
+html.preloader-done .preloader {
+  transform: translateY(-100%);
 }
 @media (prefers-reduced-motion: reduce) {
   /* no curtain at all — animation:none would leave it parked over the page forever */
@@ -55,17 +61,14 @@ html.lenis body {
   }
 }
 
-/* Hero entry — gated on <html class="entered">, which the Preloader stamps at the curtain's
-   animationend (see Preloader.tsx). Not a delay: hero starts exactly when the preloader is done.
-   Per-element sequencing is a small inline animation-delay (0 / .15 / .3), counted from `entered`.
+/* Hero entry — gated on <html class="preloading-done">, at same time curtain starts closing.
+   Heading waits 0.8s; it begins before curtain fully clears at 1.2s.
 
-   fade-up = hero copy (heading/desc/button). Base sits AT the keyframe's from-state (opacity .5,
-   nudged down 12px) so attaching the animation causes no jump, and JS-dead degrades to half-visible
-   rather than blank. Starts half-visible on purpose: legible immediately, just settles (premium, not
-   "waiting for an animation" — team review). Quick 0.6s. */
+   fade-up = hero copy (heading/desc/button). Base sits at keyframe from-state, so attaching
+   animation causes no jump. */
 @keyframes fade-up {
   from {
-    opacity: 0.5;
+    opacity: 0;
     transform: translateY(12px);
   }
   to {
@@ -74,10 +77,11 @@ html.lenis body {
   }
 }
 .entry-copy {
-  opacity: 0.5;
+  opacity: 0;
   transform: translateY(12px);
 }
-html.entered .entry-copy {
+html.preloading-done .entry-copy,
+html.preloader-done .entry-copy {
   animation-name: fade-up;
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint */
@@ -89,7 +93,8 @@ html.entered .entry-copy {
 .entry-fade {
   opacity: 0;
 }
-html.entered .entry-fade {
+html.preloading-done .entry-fade,
+html.preloader-done .entry-fade {
   animation-name: fade-in;
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -103,8 +108,10 @@ html.entered .entry-fade {
   .entry-fade {
     opacity: 1;
   }
-  html.entered .entry-copy,
-  html.entered .entry-fade {
+  html.preloading-done .entry-copy,
+  html.preloader-done .entry-copy,
+  html.preloading-done .entry-fade,
+  html.preloader-done .entry-fade {
     animation: none;
   }
 }

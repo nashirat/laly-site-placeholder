@@ -47,12 +47,11 @@ All sections are RSC taking a typed `content` prop. Mock data: `src/lib/mock/hom
 
 Team review flagged the old motion as tacky/not-skimmable. Current model, after the rework:
 
-**1. Hero entry is event-driven, not delay-driven.**
-- The `Preloader` (`src/components/Preloader.tsx`) is a full-screen curtain that covers from first paint, holds, then slides up. When its slide-up `animationend` fires, it stamps `class="entered"` on `<html>`.
-- Hero copy (`.entry-copy`) and the image strip (`.entry-fade`) animate **only** under `html.entered` (see `src/app/(frontend)/styles.css`). So the hero starts exactly when the preloader finishes — no hand-tuned delay guessing the curtain's duration.
-- Base state = the animation's from-state, so attaching the animation causes no flash; JS-dead degrades to half-visible copy, not blank.
-- Reduced-motion: Preloader adds `entered` immediately (curtain is `display:none`, so `animationend` never fires); a `setTimeout` is the safety net if the event is ever missed.
-- Per-element sequencing is a small inline `animationDelay` (0 / .15 / .3s) counted from `entered`.
+**1. Hero entry is state-driven.**
+- The `Preloader` (`src/components/Preloader.tsx`) moves through `preloading` → `preloading-done` → `preloader-done`. It holds 0.6s; `preloading-done` starts 1.2s slide-up; `preloader-done` unmounts curtain.
+- Hero copy (`.entry-copy`) and image strip (`.entry-fade`) animate under `html.preloading-done` and remain active through `html.preloader-done` (see `src/app/(frontend)/styles.css`).
+- Heading starts 0.8s after `preloading-done`, opacity `0 → 1`; description/button follow `.15s` apart.
+- Reduced-motion skips curtain and entry animation. A `setTimeout` is safety net if close animation event is missed.
 
 **2. Below-fold sections: bracket only, fires once.**
 - The only motion is the bracketed eyebrow label (`[ WHO WE ARE ]`, `src/components/ui/BracketLabel.tsx`) wiping in — a pure-CSS `@property --x-translate` + clip-path effect (recreated from karocrafts.com without GSAP).
@@ -74,7 +73,7 @@ Team review flagged the old motion as tacky/not-skimmable. Current model, after 
 1. Killed the letter-by-letter / staggered reveals everywhere (deleted `TextReveal.tsx`, `LineReveal.tsx`, and the `char-rise`/`line-rise` keyframes).
 2. Below-fold sections → bracket-only, static content, fire-once (removed the rearm-on-scroll-back).
 3. Retuned the entry fade to subtle (`opacity .5→1`, 0.6s).
-4. **Reworked the hero entry to be state/event-driven** off the preloader's `animationend` (`html.entered` gate) instead of a magic delay number.
+4. **Reworked hero entry** to start at `preloading-done`: 0.8s heading delay while curtain completes 1.2s close.
 
 ---
 
@@ -121,7 +120,7 @@ src/
     styles.css              # @theme tokens, Lenis CSS, ALL keyframes + the entry/bracket gates
     components/Fonts/        # self-hosted next/font (Neue Haas, New Spirit, Geist Mono)
   components/
-    Preloader.tsx           # curtain + stamps html.entered (hero start signal)
+    Preloader.tsx           # three-state curtain + hero start signal
     SmoothScroll.tsx        # Lenis driver + scroll reset
     ImageMarquee.tsx        # hero auto-scroll strip (Embla)
     Header.tsx, NavMenu.tsx

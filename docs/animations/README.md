@@ -19,7 +19,7 @@ Every entry/reveal technique this project has used — current and archived — 
 
 | File | Model | Status |
 |---|---|---|
-| [orchestration.md](orchestration.md) | paint-clock vs delay-cascade vs event-gate (`html.entered`) vs InView-gate | mixed — see file |
+| [orchestration.md](orchestration.md) | paint-clock vs delay-cascade vs state-gate (`html.preloading-done`) vs InView-gate | mixed — see file |
 
 A reveal technique (the *what*) is independent of the clock that triggers it (the *when*). The control panel should treat these as two separate dropdowns.
 

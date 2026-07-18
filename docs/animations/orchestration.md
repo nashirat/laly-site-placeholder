@@ -40,24 +40,20 @@ export const SECTION_DELAY = {
 
 ---
 
-## 3. Event-gate (`html.entered`) — CURRENT for the hero
+## 3. State-gate (`html.preloading-done`) — CURRENT for the hero
 
-State-driven, not delay-driven. The `Preloader` stamps `class="entered"` on `<html>` at the curtain's `animationend`; gated CSS animations run only under `html.entered`. The hero starts *exactly* when the preloader is done — retune the curtain and the hero follows for free, no magic number.
+Preloader state changes from `preloading` to `preloading-done` after its 0.6s hold. That starts curtain close and releases hero animations together. Heading waits 0.8s, so it starts 0.4s before 1.2s curtain close ends. At `animationend`, state becomes `preloader-done` and curtain unmounts.
 
 ```tsx
 // Preloader.tsx (client)
-onAnimationEnd={(e) => {
-  if (e.animationName.includes('preloader-up')) {
-    document.documentElement.classList.add('entered')
-  }
-}}
+setTimeout(() => setPreloaderState('preloading-done'), PRELOADER_HOLD * 1000)
 ```
 ```css
-html.entered .entry-copy { animation-name: fade-up; … }
+html.preloading-done .entry-copy { animation-name: fade-up; … }
 ```
 
-- Reduced-motion: the curtain is `display:none` (no `animationend`), so the Preloader adds `entered` immediately on mount. A `setTimeout` fallback covers a missed event.
-- **Base state must equal the keyframe's from-state** so attaching the animation causes no flash, and JS-dead degrades gracefully. See [fade-up.md](fade-up.md).
+- Reduced-motion moves directly to `preloader-done`; curtain and entry animation are skipped.
+- Timeout fallback moves state to `preloader-done` if close `animationend` is missed.
 
 ---
 
@@ -86,7 +82,7 @@ const io = new IntersectionObserver(([e]) => {
 |---|---|---|---|
 | paint-clock | first paint + delay | no | once |
 | delay-cascade | first paint + layered delays | no | once |
-| event-gate | preloader `animationend` → `html.entered` | yes | once |
+| state-gate | preloader state → `html.preloading-done` | yes | once |
 | inview-gate | IntersectionObserver → `.is-visible` | yes | once (disconnects) |
 
 Any reveal technique can pair with any of these. The tacky-vs-premium verdict lives mostly in the **reveal + stagger**, not the orchestration — but the orchestration decides whether the timing feels intentional or guessed.
