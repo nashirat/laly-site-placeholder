@@ -60,7 +60,7 @@ function readPosition(): PanelPosition | null {
       PanelPosition
     > | null
     if (typeof saved?.x !== 'number' || typeof saved?.y !== 'number') return null
-    return saved
+    return { x: saved.x, y: saved.y }
   } catch {
     return null
   }
