@@ -4,6 +4,8 @@ import img2 from '../../../public/carousel/2.png'
 import img3 from '../../../public/carousel/3.png'
 import img4 from '../../../public/carousel/4.png'
 import img5 from '../../../public/carousel/5.png'
+import senft from '../../../public/senft.png'
+import vajra from '../../../public/vajra.png'
 import type {
   AboutContent,
   ContactContent,
@@ -50,6 +52,30 @@ export const home: {
     heading: 'Do you know where your\nmarketing dollars are going?',
     description:
       "50% of Businesses Fail After Just 5 Years. The Culprit? Wasted Marketing Dollars. But It Doesn't Have to Be That Way. This Could Be Us:",
+    cards: [
+      {
+        image: toMedia(senft, 'Senft Legal billboard'),
+        title: 'Senft Legal',
+        body: 'Senft Legal is a personal injury law firm founded in South Florida in 1991. After 3 years of working with Laly, Senft Legal has an established revenue stream in four states with an active plan for nationwide growth.',
+        stat: { value: '133%', label: 'Lead\nIncrease' },
+        link: { label: 'EXPLORE' },
+        bg: '#caca86',
+        border: '#57570F',
+        fg: '#313008',
+        muted: '#57570F',
+      },
+      {
+        image: toMedia(vajra, 'Vajra Jahra retreat waterfall'),
+        title: 'Vajra Jahra',
+        body: 'Vajra Jahra is a Costa Rica retreat center built in 2023. Vajra Jahra partnered with Laly in 2025, going from 0 bookings to 9. In 2026, Vajra Jahra has already increased revenue by 150% and is on track to be fully booked out for two full calendar years.',
+        stat: { value: '150%', label: 'Revenue\nGrowth' },
+        link: { label: 'EXPLORE' },
+        bg: '#f3e8f2',
+        border: '#716370',
+        fg: '#3a2f39',
+        muted: '#716370',
+      },
+    ],
   },
   strategy: {
     label: 'Strategy',

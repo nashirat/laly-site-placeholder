@@ -1,4 +1,8 @@
+import { MediaImage } from '@/components/Media/Image'
+import { ArrowCircleButton } from '@/components/ui/ArrowCircleButton'
 import { BracketLabel } from '@/components/ui/BracketLabel'
+import { Button } from '@/components/ui/Button'
+import { CountUp } from '@/components/ui/CountUp'
 import { InView } from '@/components/ui/InView'
 import type { WhoWeAreContent } from '@/lib/types'
 
@@ -6,15 +10,8 @@ import type { WhoWeAreContent } from '@/lib/types'
 // reused verbatim rather than re-specified.
 // Bracket always animates (via <InView>, once, on scroll-in). Dev panel can fade the rest up.
 
-// Each card carries its own palette — the border is tinted to the fill, not shared section-wide.
-// ponytail: colors only. These are placeholders; the real case-study cards bring image/copy/stat
-// and their own field shape, and this array becomes a Payload array field.
-const CARDS = [
-  { bg: '#C9CF88', border: '#262626' },
-  { bg: '#EFDFEE', border: '#716370' },
-]
 export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
-  const { label, heading, description } = content
+  const { label, heading, description, cards } = content
 
   return (
     <section aria-label="Who we are" className="w-full bg-[#fcf7f3] py-16 md:py-24 3xl:py-32">
@@ -33,16 +30,76 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
           {description}
         </p>
 
-        {/* ponytail: placeholder cards — height only, no content. They exist to push the section
-            down so the scroll triggers below have something to scroll past. Replaced by the real
-            case-study cards (image + copy + stat + Explore), which bring their own data shape. */}
-        <div className="section-media-reveal mt-10 flex flex-col gap-8 md:mt-12 md:gap-12 3xl:mt-16 3xl:gap-16">
-          {CARDS.map((card) => (
-            <div
-              key={card.bg}
-              className="h-[420px] border md:h-[500px] 3xl:h-[600px]"
-              style={{ backgroundColor: card.bg, borderColor: card.border }}
-            />
+        <div className="section-media-reveal mt-10 flex flex-col gap-8 md:mt-12 3xl:mt-16">
+          {cards.map((card) => (
+            <article
+              key={card.title}
+              // Mobile: single column, stacked (title+arrow, image, body, stat). Desktop: image fills
+              // the left column across all three rows; title/body/stat stack in the right column with
+              // the body row growing so the stat pins to the bottom.
+              className="relative grid grid-cols-1 gap-6 overflow-hidden border px-3 py-6 text-left md:grid-cols-2 md:grid-rows-[auto_1fr_auto] md:p-6 3xl:gap-x-10 3xl:p-8"
+              style={{ color: card.fg, backgroundColor: card.bg, borderColor: card.border }}
+            >
+              {/* title row — arrow button only shows on mobile (EXPLORE takes over on desktop) */}
+              <div className="flex items-center justify-between gap-4 md:col-start-2 md:row-start-1">
+                {/* heading/h1/m — Neue Haas 450 / 48px / 110% */}
+                <h3 className="font-display text-[32px] font-normal leading-[1.1] tracking-tight md:text-5xl 3xl:text-6xl">
+                  {card.title}
+                </h3>
+                {/* on mobile the arrow's stretched ::before makes the whole card clickable */}
+                <ArrowCircleButton
+                  href={card.link.href}
+                  label={card.link.label}
+                  className="md:hidden before:absolute before:inset-0 before:content-['']"
+                />
+              </div>
+
+              {/* campaign image — landscape crop on mobile, fills the column height on desktop */}
+              <div className="aspect-[16/10] overflow-hidden md:col-start-1 md:row-start-1 md:row-span-3 md:aspect-auto md:h-full">
+                <MediaImage
+                  media={card.image}
+                  sizes="(max-width: 768px) 100vw, (min-width: 1920px) 580px, 40vw"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              {/* body-2/xl — New Spirit 400 / 24px / 125% */}
+              <p
+                className="font-sans text-lg font-normal leading-[1.25] md:col-start-2 md:row-start-2 md:text-2xl 3xl:text-[28px]"
+                style={{ color: card.muted }}
+              >
+                {card.body}
+              </p>
+
+              {/* stat row — stacked (value over label) on mobile, EXPLORE pill added on desktop */}
+              <div className="flex items-end justify-between md:col-start-2 md:row-start-3 md:self-end">
+                <p className="flex flex-col items-start gap-1 md:flex-row md:items-center md:gap-1.5">
+                  {/* % same as heading */}
+                  <CountUp
+                    value={card.stat.value}
+                    className="font-mono text-3xl font-normal leading-none md:text-4xl 3xl:text-5xl"
+                    style={{ color: card.fg }}
+                  />
+                  {/* body-2/xs — New Spirit 400 / 14px / 125% */}
+                  <span
+                    className="font-sans text-sm leading-[1.4] whitespace-normal md:whitespace-pre-line 3xl:text-base"
+                    style={{ color: card.muted }}
+                  >
+                    {card.stat.label}
+                  </span>
+                </p>
+                <span className="hidden md:block">
+                  <Button
+                    variant="outline"
+                    href={card.link.href}
+                    scrambleColor={card.fg}
+                    className="hover:bg-black/5"
+                  >
+                    {card.link.label}
+                  </Button>
+                </span>
+              </div>
+            </article>
           ))}
         </div>
       </InView>

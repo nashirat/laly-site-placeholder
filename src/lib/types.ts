@@ -26,12 +26,28 @@ export type HeroContent = {
   slides: MediaDoc[]
 }
 
+// A case-study card: image + copy + a headline stat + an "Explore" link, on its own tinted ground.
+// Each card carries its full palette — ground, keyline, and the two text tones — so a green card and
+// a lilac card read as siblings without the section hardcoding either.
+export type CaseStudy = {
+  image: MediaDoc
+  title: string
+  body: string
+  stat: { value: string; label: string } // e.g. "133%" / "Lead Increase"
+  link: LinkField
+  bg: string
+  border: string
+  fg: string // heading + stat value
+  muted: string // body + stat label
+}
+
 // Who We Are block. `label` is the bracketed eyebrow — the brackets are CSS pseudos, so the CMS
 // value is the bare text ("WHO WE ARE"), never the punctuation.
 export type WhoWeAreContent = {
   label: string
   heading: string
   description: string
+  cards: CaseStudy[]
 }
 
 // Strategy block — dark ground, same label/heading/desc stack as WhoWeAre. Identical shape today;
