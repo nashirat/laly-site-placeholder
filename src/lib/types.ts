@@ -50,12 +50,24 @@ export type WhoWeAreContent = {
   cards: CaseStudy[]
 }
 
-// Strategy block — dark ground, same label/heading/desc stack as WhoWeAre. Identical shape today;
-// kept as its own type because the cards diverge (three service pillars vs two case studies).
+// A service pillar card on the dark ground: title, a row of tagged capabilities, a hook line with an
+// arrow link, and the explainer at the bottom. `fg` tints the title; each badge carries its own star
+// colour, so the accent trio is data, not CSS.
+export type ServicePillar = {
+  title: string
+  badges: { label: string; color: string }[]
+  hook: string
+  body: string
+  link: LinkField
+  fg: string
+}
+
+// Strategy block — dark ground, same label/heading/desc stack as WhoWeAre, three pillars below.
 export type StrategyContent = {
   label: string
   heading: string
   description: string
+  cards: ServicePillar[]
 }
 
 // About Us block — cream ground, same label/heading/desc stack. The card below it becomes the team

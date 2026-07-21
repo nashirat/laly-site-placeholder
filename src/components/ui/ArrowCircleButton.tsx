@@ -8,23 +8,26 @@ import arrow from '../../../public/arrow-up-right.png'
 export function ArrowCircleButton({
   href,
   label,
+  size = 32,
   className = '',
 }: {
   href?: string
   label: string
+  size?: number // circle diameter in px; the arrow stays 20px
   className?: string
 }) {
   const cls =
-    `inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-current ` +
+    `inline-flex shrink-0 items-center justify-center rounded-full border border-current ` +
     `transition-colors hover:bg-black/5 ${className}`.trim()
+  const style = { width: size, height: size }
   const icon = <Image src={arrow} alt="" width={20} height={20} className="h-5 w-5" />
 
   return href ? (
-    <Link href={href} aria-label={label} className={cls}>
+    <Link href={href} aria-label={label} className={cls} style={style}>
       {icon}
     </Link>
   ) : (
-    <button type="button" aria-label={label} className={cls}>
+    <button type="button" aria-label={label} className={cls} style={style}>
       {icon}
     </button>
   )

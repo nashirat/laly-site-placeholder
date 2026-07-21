@@ -82,6 +82,45 @@ export const home: {
     heading: 'How we help you grow.',
     // no \n — the design's 2-line break is just where it lands at that width; max-w does that job
     description: 'You don’t need to spend more—you need to spend smarter.',
+    cards: [
+      {
+        title: 'The Power of Paid\nAdvertisement',
+        badges: [
+          { label: 'Social Media Strategy', color: '#A2A11C' },
+          { label: 'Meta-Optimized Ads', color: '#F3E8F2' },
+          { label: 'Scalable Ads', color: '#F5C882' },
+        ],
+        hook: "If you're looking for a new stream of high-quality leads, this is for you.",
+        body: 'Pay for website traffic that translates to a reliable stream of new clients for your business, every month.',
+        link: { label: 'Explore paid advertisement' },
+        fg: '#E5CBE2',
+      },
+      {
+        title: 'The Power of\nBranding',
+        badges: [
+          { label: 'Brand Strategy', color: '#A2A11C' },
+          { label: 'Brand Book & Guidelines', color: '#F3E8F2' },
+          { label: 'Web Design', color: '#F5C882' },
+        ],
+        hook: 'If your business depends on referrals, this is for you.',
+        body: 'Selling a service gets you one-time clients; selling a brand gets you loyal customers. Build and establish your brand on search engines, social media, and beyond, with a clear, recognizable offering that everyone remembers.',
+        link: { label: 'Explore branding' },
+        fg: '#DFA854',
+      },
+      // ponytail: card 3 copy is a stand-in — the Figma frame is cropped. Swap when you have it.
+      {
+        title: 'The Power of\nTechnology',
+        badges: [
+          { label: 'Custom Software', color: '#A2A11C' },
+          { label: 'Automation', color: '#F3E8F2' },
+          { label: 'AI Integration', color: '#F5C882' },
+        ],
+        hook: 'If your team is buried in busywork, this is for you.',
+        body: 'We customize everything to your business, so the tools work the way you already do—not the other way around.',
+        link: { label: 'Explore technology' },
+        fg: '#B5B449',
+      },
+    ],
   },
   about: {
     label: 'About us',
