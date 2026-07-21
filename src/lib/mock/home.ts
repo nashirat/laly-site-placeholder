@@ -126,6 +126,14 @@ export const home: {
     label: 'About us',
     heading: 'Your In-House\nMarketing Team.',
     description: 'Meet the friendly faces here to nurture your brand’s growth.',
+    // No `photo` yet — each member renders the placeholder frame. Drop headshots in as they arrive.
+    // `role` is the info-bar line; the \n is the authored 2-line break (rendered via whitespace-pre-line).
+    members: [
+      { name: 'Cindy Ripoll', role: 'The trusty team leader\nand your first point of contact.' },
+      { name: 'Team Member', role: 'The steady hand\nkeeping every campaign on track.' },
+      { name: 'Team Member', role: 'The creative spark\nbehind the brand you remember.' },
+    ],
+    story: { label: 'OUR STORY' },
   },
   contact: {
     label: 'Contact',

@@ -1,3 +1,4 @@
+import { TeamCarousel } from '@/components/TeamCarousel'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { InView } from '@/components/ui/InView'
 import type { AboutContent } from '@/lib/types'
@@ -6,7 +7,7 @@ import type { AboutContent } from '@/lib/types'
 // panel can fade the rest up.
 // The desc sits tight under the heading here (Figma has them nearly touching), unlike WhoWeAre.
 export default function About({ content }: { content: AboutContent }) {
-  const { label, heading, description } = content
+  const { label, heading, description, members, story } = content
 
   return (
     <section aria-label="About us" className="w-full bg-[#fffcf9] py-16 md:py-24 3xl:py-32">
@@ -25,9 +26,7 @@ export default function About({ content }: { content: AboutContent }) {
           {description}
         </p>
 
-        {/* ponytail: placeholder — becomes the team carousel (member photo, name, role, prev/next
-            arrows, dark footer bar with the Our Story button). Here to prove the cascade only. */}
-        <div className="section-media-reveal mt-8 h-[420px] bg-[#F0EEEC] md:mt-10 md:h-[660px] 3xl:mt-12 3xl:h-[780px]" />
+        <TeamCarousel members={members} story={story} />
       </InView>
     </section>
   )

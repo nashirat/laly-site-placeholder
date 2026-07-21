@@ -21,6 +21,11 @@ const VARIANTS = {
     shell: 'border-[0.5px] border-[#262626] text-[#262626]',
     flash: '#ff6d6a',
   },
+  // outlineInverse: same keyline pill but for dark grounds — white border + text, same logo flash
+  outlineInverse: {
+    shell: 'border-[0.5px] border-white text-white hover:bg-white/10',
+    flash: '#ff6d6a',
+  },
   // solid: filled, white text; decrypt chars stay white (no color change)
   solid: {
     shell: 'border-[0.5px] border-transparent bg-[#262626] text-white',

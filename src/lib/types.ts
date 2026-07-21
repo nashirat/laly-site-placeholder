@@ -70,12 +70,23 @@ export type StrategyContent = {
   cards: ServicePillar[]
 }
 
-// About Us block — cream ground, same label/heading/desc stack. The card below it becomes the team
-// carousel (one member at a time, prev/next arrows, name + role + "Our Story" link).
+// A team member in the About carousel. `photo` is optional until real headshots exist — the carousel
+// renders a placeholder frame when it's absent, so the section ships before the assets do. Maps 1:1 to
+// a Payload array row (or a Team-collection relationship) later.
+export type TeamMember = {
+  photo?: MediaDoc
+  name: string
+  role: string
+}
+
+// About Us block — cream ground, same label/heading/desc stack. Below it: the team carousel (one
+// member at a time, prev/next arrows) with a dark footer bar carrying the "Our Story" link.
 export type AboutContent = {
   label: string
   heading: string
   description: string
+  members: TeamMember[]
+  story: LinkField
 }
 
 // Contact block — brand-pink ground, oversized display heading, two CTAs.
