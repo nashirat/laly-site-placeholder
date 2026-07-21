@@ -52,11 +52,13 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               </h3>
 
               {/* capability pills — star tinted per badge, so the accent trio comes from data */}
-              <ul className="mt-2 flex flex-wrap gap-2">
+              {/* one row, never two — a wrapped badge would grow the shared subgrid row and shove
+                  every card's hook line down. Fixed 23px pills, no wrap; mobile scrolls instead. */}
+              <ul className="mt-2 flex gap-2 overflow-x-auto md:flex-nowrap md:overflow-visible [&::-webkit-scrollbar]:hidden">
                 {card.badges.map((badge) => (
                   <li
                     key={badge.label}
-                    className="flex items-center gap-1 rounded-full bg-[#2D2A28] px-2.5 py-1 font-sans text-sm leading-[15px] text-[#FCF7F3] 3xl:px-3 3xl:py-1.5 3xl:text-base shadow-[0_1px_2px_rgba(16,24,40,0.08)]"
+                    className="flex h-[23px] shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#2D2A28] px-2 font-sans text-[13px] leading-none text-[#FCF7F3] shadow-[0_1px_2px_rgba(16,24,40,0.08)] md:px-2.5 md:text-sm 3xl:h-[27px] 3xl:px-3 3xl:text-base"
                   >
                     {/* star.svg as a mask so one asset serves all three tints */}
                     <span
