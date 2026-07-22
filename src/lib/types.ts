@@ -104,6 +104,12 @@ export type ContactContent = {
   socials: SocialLink[]
 }
 
+// Dark band under Contact — a single paragraph. The `\n` is an authored break (the closing line
+// sits on its own row), rendered via whitespace-pre-line.
+export type NoteContent = {
+  body: string
+}
+
 // Header global.
 export type HeaderContent = {
   nav: Required<LinkField>[]

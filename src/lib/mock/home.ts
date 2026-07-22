@@ -11,6 +11,7 @@ import type {
   ContactContent,
   HeroContent,
   MediaDoc,
+  NoteContent,
   StrategyContent,
   WhoWeAreContent,
 } from '@/lib/types'
@@ -32,6 +33,7 @@ export const home: {
   strategy: StrategyContent
   about: AboutContent
   contact: ContactContent
+  note: NoteContent
 } = {
   hero: {
     heading: 'Marketing you can follow.\nGrowth you can feel.',
@@ -146,5 +148,9 @@ export const home: {
       { platform: 'youtube' },
       { platform: 'facebook' },
     ],
+  },
+  note: {
+    // the break before the closing line is the design; the rest wraps to the container
+    body: 'We’re looking for business owners who are passionate about nurturing their brand growth. As passionate as we are about our work, we can only provide services to a limited number of clients—that’s how we ensure every brand gets the attentive focus it deserves.\nGet in touch to be considered.',
   },
 }

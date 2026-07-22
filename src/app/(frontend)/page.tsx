@@ -1,6 +1,7 @@
 import About from '@/components/sections/About'
 import Contact from '@/components/sections/Contact'
 import Hero from '@/components/sections/Hero'
+import Note from '@/components/sections/Note'
 import Strategy from '@/components/sections/Strategy'
 import WhoWeAre from '@/components/sections/WhoWeAre'
 import { home } from '@/lib/mock/home'
@@ -15,6 +16,7 @@ export default function HomePage() {
       <Strategy content={home.strategy} />
       <About content={home.about} />
       <Contact content={home.contact} />
+      <Note content={home.note} />
     </main>
   )
 }
