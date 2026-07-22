@@ -349,3 +349,25 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     opacity: 1;
   }
 }
+
+/* Typewriter caret (see Typewriter.tsx) — steps(1) so it snaps on/off instead of fading, which is
+   what reads as a terminal cursor. Reduced motion keeps it lit rather than hiding it: it's the
+   leading edge of the heading, not decoration. */
+@keyframes caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.tw-caret {
+  animation: caret-blink 1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tw-caret {
+    animation: none;
+  }
+}

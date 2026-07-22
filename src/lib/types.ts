@@ -90,10 +90,18 @@ export type AboutContent = {
 }
 
 // Contact block — brand-pink ground, oversized display heading, two CTAs.
+// A social account. `platform` picks the icon (see the Icon registry) — it isn't free text, so a
+// Payload select field with these four options maps straight onto it.
+export type SocialLink = {
+  platform: 'instagram' | 'tiktok' | 'youtube' | 'facebook'
+  href?: string
+}
+
 export type ContactContent = {
   label: string
   heading: string
   buttons: LinkField[]
+  socials: SocialLink[]
 }
 
 // Header global.

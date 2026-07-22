@@ -139,5 +139,12 @@ export const home: {
     label: 'Contact',
     heading: 'GROW\nWITH US.', // the break is the design; this one is display type, not body copy
     buttons: [{ label: "LET'S BEGIN" }, { label: 'BOOK A CALL' }],
+    // ponytail: no hrefs yet — the real account URLs land with the Globals doc
+    socials: [
+      { platform: 'instagram' },
+      { platform: 'tiktok' },
+      { platform: 'youtube' },
+      { platform: 'facebook' },
+    ],
   },
 }
