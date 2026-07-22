@@ -10,7 +10,7 @@ export default function Note({ content }: { content: NoteContent }) {
     <section aria-label="A note on availability" className="w-full bg-[#292624]">
       {/* max-w already IS Figma's 1248 text block (1440 frame minus the 96px side padding) — adding
           px-24 on top of it double-counted the inset. Side padding is just the gutter now. */}
-      <InView className="mx-auto max-w-[1248px] px-5 py-10 md:py-12">
+      <InView className="mx-auto max-w-[1248px] px-6 py-8 md:py-12 3xl:max-w-[1400px] 3xl:py-14">
         <p className="section-text-reveal whitespace-pre-line text-center font-sans text-lg font-normal leading-[1.25] text-[#FF6D6A] md:text-2xl 3xl:text-[28px]">
           {content.body}
         </p>
