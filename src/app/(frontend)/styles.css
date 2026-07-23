@@ -4,8 +4,10 @@
   /* New Spirit (serif) = body/font-sans; Neue Haas Grotesk = headings/font-display */
   --font-sans: var(--font-new-spirit), Georgia, serif;
   --font-display: var(--font-neue-haas), system-ui, sans-serif;
-  /* Geist Mono = button/scramble labels (mono keeps the decrypt width-stable) */
+  /* Geist Mono = scramble labels (mono keeps the decrypt width-stable) */
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Fira Code = button labels + stat percentages */
+  --font-fira: var(--font-fira-code), ui-monospace, monospace;
 
   /* Big-screen breakpoints on top of the defaults (2xl stays 1536px). */
   --breakpoint-3xl: 120rem; /* 1920px — FHD */

@@ -41,10 +41,10 @@ export default function Contact({ content }: { content: ContactContent }) {
         <div className="section-media-reveal mt-10 flex justify-center gap-3 md:mt-12 3xl:mt-14 3xl:gap-4">
           {/* no scramble — these are the page's closing CTAs; the decrypt reads as noise on the
               action you actually want clicked */}
-          <Button variant="solid" scramble={false} href={buttons[0].href}>
+          <Button variant="solid" scramble={false} href={buttons[0].href} className="hover:bg-[#3a3a3a]">
             {buttons[0].label}
           </Button>
-          <Button variant="outline" scramble={false} href={buttons[1].href}>
+          <Button variant="outline" scramble={false} href={buttons[1].href} className="hover:bg-black/5">
             {buttons[1].label}
           </Button>
         </div>

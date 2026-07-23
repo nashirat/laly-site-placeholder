@@ -114,3 +114,11 @@ export type NoteContent = {
 export type HeaderContent = {
   nav: Required<LinkField>[]
 }
+
+// Footer global — logo + nav column + contact column + copyright line.
+export type FooterContent = {
+  nav: Required<LinkField>[]
+  email: string
+  phone: string
+  copyright: string
+}

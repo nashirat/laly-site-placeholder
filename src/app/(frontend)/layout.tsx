@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Script from 'next/script'
 import { fontVariables } from '@/app/(frontend)/components/Fonts'
 import { AnimationControlPanel } from '@/components/AnimationControlPanel'
+import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { Preloader } from '@/components/Preloader'
 import { SmoothScroll } from '@/components/SmoothScroll'
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Preloader />
         <Header />
         {children}
+        <Footer />
         <AnimationControlPanel />
       </body>
     </html>

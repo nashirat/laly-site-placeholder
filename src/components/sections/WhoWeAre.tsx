@@ -77,7 +77,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                   {/* % same as heading */}
                   <CountUp
                     value={card.stat.value}
-                    className="font-mono text-3xl font-normal leading-none md:text-4xl 3xl:text-5xl"
+                    className="font-fira text-3xl font-normal leading-none md:text-4xl 3xl:text-5xl"
                     style={{ color: card.fg }}
                   />
                   {/* body-2/xs — New Spirit 400 / 14px / 125% */}
