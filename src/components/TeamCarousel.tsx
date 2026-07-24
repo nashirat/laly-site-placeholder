@@ -211,10 +211,10 @@ function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean 
     <MediaImage
       media={member.photo}
       eager={eager}
-      // 1024 not the box's true 1016: 1024*2 lands exactly on the 2048 deviceSize, where 1056*2
-      // (=2112) overshot to a 3840px encode. The 1200 branch needs 2400 at DPR2 and relies on the
-      // 2560 deviceSize added in next.config.mjs — without it that case also jumps to 3840.
-      sizes="(max-width: 1151px) 100vw, (min-width: 1920px) 1200px, 1024px"
+      // Source WebP served as-is, matching the hero marquee: no AVIF re-encode, no resize. The box
+      // is 1016px (1160 at 3xl) and object-cover scales portrait sources by width, so the widest
+      // need is 1160*2 = 2320 device px — see the re-export targets before trusting these weights.
+      unoptimized
       className="h-full w-full object-cover object-top"
     />
   ) : (
