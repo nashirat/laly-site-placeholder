@@ -1,11 +1,23 @@
 import type { StaticImageData } from 'next/image'
-import img1 from '../../../public/carousel/1.png'
-import img2 from '../../../public/carousel/2.png'
-import img3 from '../../../public/carousel/3.png'
-import img4 from '../../../public/carousel/4.png'
-import img5 from '../../../public/carousel/5.png'
-import senft from '../../../public/senft.png'
+import adam from '../../../public/aboutus/Adam.webp'
+import cindy from '../../../public/aboutus/Cindy.webp'
+import diya from '../../../public/aboutus/Diya.webp'
+import fran from '../../../public/aboutus/Fran.webp'
+import harry from '../../../public/aboutus/Harry.webp'
+import leo from '../../../public/aboutus/Leo.webp'
+import nicole from '../../../public/aboutus/Nicole.webp'
+import ramon from '../../../public/aboutus/Ramon.webp'
+import billboard from '../../../public/carousel/Billboard.webp'
+import ctaDesktop from '../../../public/growwithus/Cta-Desktop.webp'
+import ctaMobile from '../../../public/growwithus/Cta-Mobile.webp'
+import bus from '../../../public/carousel/Bus.webp'
+import businessCards from '../../../public/carousel/Business-Cards2.webp'
+import flyer from '../../../public/carousel/Flyer.webp'
+import shirt from '../../../public/carousel/Shirt.webp'
+import vjCta from '../../../public/carousel/VJ_CTA.webp'
+import vjEcommerce from '../../../public/carousel/VJ-Ecommerce.webp'
 import vajra from '../../../public/vajra.png'
+import senftPlaceholder from '../../../public/whoweare/Senft-palceholder.webp'
 import type {
   AboutContent,
   ContactContent,
@@ -42,11 +54,13 @@ export const home: {
       'Optimize your workflows, build your brand, and scale your business with a tech-forward in-house marketing team.',
     button: { label: "LET'S BEGIN" },
     slides: [
-      toMedia(img1, 'Senft Legal billboard campaign'),
-      toMedia(img2, 'Mobile commerce app screens'),
-      toMedia(img3, 'Brand stationery mockup'),
-      toMedia(img4, 'Editorial landing page design'),
-      toMedia(img5, 'Product photography art direction'),
+      toMedia(billboard, 'Billboard campaign'),
+      toMedia(vjEcommerce, 'Vajra ecommerce site design'),
+      toMedia(businessCards, 'Business card design'),
+      toMedia(bus, 'Bus wrap advertising'),
+      toMedia(shirt, 'Branded apparel'),
+      toMedia(flyer, 'Print flyer design'),
+      toMedia(vjCta, 'Vajra campaign creative'),
     ],
   },
   whoWeAre: {
@@ -56,7 +70,7 @@ export const home: {
       "50% of Businesses Fail After Just 5 Years. The Culprit? Wasted Marketing Dollars. But It Doesn't Have to Be That Way. This Could Be Us:",
     cards: [
       {
-        image: toMedia(senft, 'Senft Legal billboard'),
+        image: toMedia(senftPlaceholder, 'Senft Legal billboard'),
         title: 'Senft Legal',
         body: 'Senft Legal is a personal injury law firm founded in South Florida in 1991. After 3 years of working with Laly, Senft Legal has an established revenue stream in four states with an active plan for nationwide growth.',
         stat: { value: '133%', label: 'Lead\nIncrease' },
@@ -68,6 +82,7 @@ export const home: {
       },
       {
         image: toMedia(vajra, 'Vajra Jahra retreat waterfall'),
+        video: '/whoweare/vajra.mp4',
         title: 'Vajra Jahra',
         body: 'Vajra Jahra is a Costa Rica retreat center built in 2023. Vajra Jahra partnered with Laly in 2025, going from 0 bookings to 9. In 2026, Vajra Jahra has already increased revenue by 150% and is on track to be fully booked out for two full calendar years.',
         stat: { value: '150%', label: 'Revenue\nGrowth' },
@@ -128,12 +143,17 @@ export const home: {
     label: 'About us',
     heading: 'Your In-House\nMarketing Team.',
     description: 'Meet the friendly faces here to nurture your brand’s growth.',
-    // No `photo` yet — each member renders the placeholder frame. Drop headshots in as they arrive.
+    // Photos are final; `role` is placeholder copy until the real lines land.
     // `role` is the info-bar line; the \n is the authored 2-line break (rendered via whitespace-pre-line).
     members: [
-      { name: 'Cindy Ripoll', role: 'The trusty team leader\nand your first point of contact.' },
-      { name: 'Team Member', role: 'The steady hand\nkeeping every campaign on track.' },
-      { name: 'Team Member', role: 'The creative spark\nbehind the brand you remember.' },
+      { photo: toMedia(cindy, 'Cindy'), name: 'Cindy Ripoll', role: 'The trusty team leader\nand your first point of contact.' },
+      { photo: toMedia(adam, 'Adam'), name: 'Adam', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(diya, 'Diya'), name: 'Diya', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(fran, 'Fran'), name: 'Fran', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(harry, 'Harry'), name: 'Harry', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(leo, 'Leo'), name: 'Leo', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(nicole, 'Nicole'), name: 'Nicole', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(ramon, 'Ramon'), name: 'Ramon', role: 'Role line placeholder —\nsecond line of the blurb.' },
     ],
     story: { label: 'OUR STORY' },
   },
@@ -141,6 +161,8 @@ export const home: {
     label: 'Contact',
     heading: 'GROW\nWITH US.', // the break is the design; this one is display type, not body copy
     buttons: [{ label: "LET'S BEGIN" }, { label: 'BOOK A CALL' }],
+    photo: toMedia(ctaDesktop, 'The Laly team'),
+    photoMobile: toMedia(ctaMobile, 'The Laly team'),
     // ponytail: no hrefs yet — the real account URLs land with the Globals doc
     socials: [
       { platform: 'instagram' },

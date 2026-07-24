@@ -1,4 +1,5 @@
 import { Icon } from '@/components/Icon'
+import { MediaImage } from '@/components/Media/Image'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { Button } from '@/components/ui/Button'
 import { InView } from '@/components/ui/InView'
@@ -10,7 +11,7 @@ import type { ContactContent } from '@/lib/types'
 //
 // Bracket always animates like every other section. Dev panel can fade heading/photo/CTAs up.
 export default function Contact({ content }: { content: ContactContent }) {
-  const { label, heading, buttons, socials } = content
+  const { label, heading, buttons, socials, photo, photoMobile } = content
 
   return (
     <section
@@ -34,9 +35,21 @@ export default function Contact({ content }: { content: ContactContent }) {
           className="section-media-reveal relative z-10 font-display text-[72px] font-medium uppercase leading-[0.9] tracking-[-0.03em] text-[#151414] md:text-[140px] xl:text-[188px] 3xl:text-[200px]"
         />
 
-        {/* ponytail: placeholder — becomes the team photo (tilted, overlapping the heading at md+).
+        {/* team photo — tilted, overlapping the heading at md+. Two crops: landscape below md,
+            portrait at md+ (the frame's aspect flips, so one file can't serve both).
             md top offset clears the bracket label, which is now a flex sibling rather than above. */}
-        <div className="section-media-reveal order-1 z-0 mt-8 aspect-[3/2] w-full bg-[#EFEDEA] md:rotate-2 md:absolute md:right-0 md:top-12 md:order-none md:mt-0 md:aspect-auto md:h-[330px] md:w-[280px] 3xl:top-14 3xl:h-[400px] 3xl:w-[340px]" />
+        <div className="section-media-reveal order-1 z-0 mt-8 aspect-[3/2] w-full overflow-hidden md:rotate-2 md:absolute md:right-0 md:top-12 md:order-none md:mt-0 md:aspect-auto md:h-[330px] md:w-[280px] 3xl:top-14 3xl:h-[400px] 3xl:w-[340px]">
+          <MediaImage
+            media={photoMobile}
+            sizes="100vw"
+            className="h-full w-full object-cover md:hidden"
+          />
+          <MediaImage
+            media={photo}
+            sizes="340px"
+            className="hidden h-full w-full object-cover md:block"
+          />
+        </div>
 
         <div className="section-media-reveal mt-10 flex justify-center gap-3 md:mt-12 3xl:mt-14 3xl:gap-4">
           {/* no scramble — these are the page's closing CTAs; the decrypt reads as noise on the

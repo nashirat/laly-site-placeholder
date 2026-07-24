@@ -56,11 +56,26 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
 
               {/* campaign image — landscape crop on mobile, fills the column height on desktop */}
               <div className="aspect-[16/10] overflow-hidden md:col-start-1 md:row-start-1 md:row-span-3 md:aspect-auto md:h-full">
-                <MediaImage
-                  media={card.image}
-                  sizes="(max-width: 768px) 100vw, (min-width: 1920px) 580px, 40vw"
-                  className="h-full w-full object-cover"
-                />
+                {card.video ? (
+                  // muted+playsInline so mobile autoplays inline; the still doubles as the poster
+                  <video
+                    src={card.video}
+                    poster={card.image.url}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    aria-label={card.image.alt}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <MediaImage
+                    media={card.image}
+                    sizes="(max-width: 768px) 100vw, (min-width: 1920px) 580px, 40vw"
+                    className="h-full w-full object-cover"
+                  />
+                )}
               </div>
 
               {/* body-2/xl — New Spirit 400 / 24px / 125% */}

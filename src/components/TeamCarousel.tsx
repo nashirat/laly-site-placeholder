@@ -4,7 +4,8 @@ import { type ReactNode, type TouchEvent as ReactTouchEvent, useCallback, useRef
 import { MediaImage } from '@/components/Media/Image'
 import { Button } from '@/components/ui/Button'
 import type { LinkField, TeamMember } from '@/lib/types'
-import NavArrowIcon from '../../public/nav_arrow.svg'
+import NavArrowIcon from '../../public/arrow_pixel.svg'
+import ScrollArrowIcon from '../../public/nav_arrow.svg'
 
 // About team carousel — one member per slide, state-driven (no Embla) so the photo and the text move
 // independently: on arrow click the PHOTO slides horizontally (right on next, left on prev) while the
@@ -95,7 +96,7 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
       {/* mobile only — swipe affordance, sits above the card (no on-card arrows on small screens) */}
       <div className="mb-2 flex items-center justify-end gap-1.5 text-[#ff6d6a] md:hidden">
         <span className="font-mono text-xs uppercase tracking-wider">Scroll</span>
-        <NavArrowIcon className="h-4 w-4" />
+        <ScrollArrowIcon className="h-4 w-4" />
       </div>
 
       {/* photo block — mobile: fixed 430px tall, width fills; md+: 1120:750 ratio.
@@ -169,7 +170,7 @@ function Photo({ member }: { member: TeamMember }) {
     <MediaImage
       media={member.photo}
       sizes="(max-width: 768px) 100vw, (min-width: 1920px) 1200px, 1056px"
-      className="h-full w-full object-cover"
+      className="h-full w-full object-cover object-top"
     />
   ) : (
     // ponytail: image placeholder — swap for the real headshot upload
@@ -237,7 +238,7 @@ function NavArrow({ direction, onClick }: { direction: Dir; onClick: () => void 
       className="inline-flex cursor-pointer items-center justify-center"
     >
       <NavArrowIcon
-        className={`h-10 w-10 3xl:h-14 3xl:w-14 ${direction === 'prev' ? '-scale-x-100' : ''}`}
+        className={`h-auto w-10 3xl:w-14 ${direction === 'prev' ? '-scale-x-100' : ''}`}
       />
     </button>
   )

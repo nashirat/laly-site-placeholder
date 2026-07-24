@@ -30,7 +30,8 @@ export type HeroContent = {
 // Each card carries its full palette — ground, keyline, and the two text tones — so a green card and
 // a lilac card read as siblings without the section hardcoding either.
 export type CaseStudy = {
-  image: MediaDoc
+  image: MediaDoc // also the video poster when `video` is set
+  video?: string // optional looping clip URL; replaces the still on the card
   title: string
   body: string
   stat: { value: string; label: string } // e.g. "133%" / "Lead Increase"
@@ -102,6 +103,8 @@ export type ContactContent = {
   heading: string
   buttons: LinkField[]
   socials: SocialLink[]
+  photo: MediaDoc // portrait crop, md+
+  photoMobile: MediaDoc // landscape crop, below md
 }
 
 // Dark band under Contact — a single paragraph. The `\n` is an authored break (the closing line
