@@ -154,17 +154,18 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
           </div>
         )}
 
-        {/* only current+incoming are mounted, so every other member would fetch at slide time and
-            flash its blur placeholder. Mounting them hidden warms the cache during the preloader:
-            display:none doesn't stop an <img> fetch, and srcset picks off `sizes`, not layout, so
-            these resolve to the same URL the slide asks for later. */}
+        {/* only current+incoming are mounted, so a neighbour would fetch at slide time and flash its
+            blur placeholder. Mounting them hidden warms the cache: display:none doesn't stop an
+            <img> fetch, and srcset picks off `sizes`, not layout, so these resolve to the same URL
+            the slide asks for later. Just the two adjacent members — warming all 8 fired ~3MB right
+            after load for photos most visitors never advance to. */}
         {warm && (
           <div className="hidden" aria-hidden>
-            {members.map((member, i) =>
-              i === current || i === incoming ? null : (
-                <Photo key={member.name} member={member} eager />
-              ),
-            )}
+            {[(current + 1) % members.length, (current - 1 + members.length) % members.length]
+              .filter((i, n, self) => i !== current && i !== incoming && self.indexOf(i) === n)
+              .map((i) => (
+                <Photo key={members[i].name} member={members[i]} eager />
+              ))}
           </div>
         )}
 
@@ -211,10 +212,11 @@ function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean 
     <MediaImage
       media={member.photo}
       eager={eager}
-      // Source WebP served as-is, matching the hero marquee: no AVIF re-encode, no resize. The box
-      // is 1016px (1160 at 3xl) and object-cover scales portrait sources by width, so the widest
-      // need is 1160*2 = 2320 device px — see the re-export targets before trusting these weights.
-      unoptimized
+      // Box is 1016px (1160 at 3xl); object-cover scales these portrait sources by width. Declared
+      // 1024/1200 rather than the true box so DPR2 lands on a deviceSize exactly (1024*2 = 2048)
+      // instead of overshooting. Sources are 2320 wide, which is exactly 3xl's DPR2 need, so every
+      // breakpoint/DPR pair resolves to ratio >= 1.0 — verified in the audit script.
+      sizes="(max-width: 1151px) 100vw, (min-width: 1920px) 1200px, 1024px"
       className="h-full w-full object-cover object-top"
     />
   ) : (
