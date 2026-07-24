@@ -9,11 +9,16 @@ export function MediaImage({
   className = '',
   sizes,
   priority = false,
+  eager = false,
 }: {
   media: MediaDoc
   className?: string
   sizes?: string
   priority?: boolean // set on the LCP image only
+  // opt out of lazy-loading without claiming LCP priority: the fetch starts at parse time (i.e.
+  // behind the preloader curtain) instead of when the image scrolls into view, so galleries the
+  // user reaches mid-scroll are already decoded and never show their blur placeholder.
+  eager?: boolean
 }) {
   return (
     <NextImage
@@ -24,6 +29,7 @@ export function MediaImage({
       className={className}
       sizes={sizes}
       priority={priority}
+      loading={eager && !priority ? 'eager' : undefined}
       placeholder={media.blurDataURL ? 'blur' : 'empty'}
       blurDataURL={media.blurDataURL}
     />

@@ -1,6 +1,13 @@
 'use client'
 
-import { type ReactNode, type TouchEvent as ReactTouchEvent, useCallback, useRef, useState } from 'react'
+import {
+  type ReactNode,
+  type TouchEvent as ReactTouchEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { MediaImage } from '@/components/Media/Image'
 import { Button } from '@/components/ui/Button'
 import type { LinkField, TeamMember } from '@/lib/types'
@@ -40,6 +47,26 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
   const [phase, setPhase] = useState<Phase>('idle')
   const [direction, setDirection] = useState<Dir>('next')
   const locked = useRef(false)
+
+  // The preloader hold belongs to the hero marquee alone — these photos are far below the fold, so
+  // fetching them behind the curtain would only steal bandwidth from the images the user sees
+  // first. Once the curtain is up they warm in the background, well before anyone scrolls here.
+  const [warm, setWarm] = useState(false)
+  useEffect(() => {
+    const root = document.documentElement
+    // reduced motion skips the curtain entirely, so it's already done on mount
+    if (root.classList.contains('preloader-done')) {
+      setWarm(true)
+      return
+    }
+    const observer = new MutationObserver(() => {
+      if (!root.classList.contains('preloader-done')) return
+      setWarm(true)
+      observer.disconnect()
+    })
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
 
   const advance = useCallback(
     (dir: Dir) => {
@@ -113,7 +140,7 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
             transition: sliding ? `transform ${PHOTO_MS}ms ${PHOTO_EASE}` : 'none',
           }}
         >
-          <Photo member={members[current]} />
+          <Photo member={members[current]} eager={warm} />
         </div>
         {incoming !== null && (
           <div
@@ -123,7 +150,21 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
               transition: phase !== 'idle' ? `transform ${PHOTO_MS}ms ${PHOTO_EASE}` : 'none',
             }}
           >
-            <Photo member={members[incoming]} />
+            <Photo member={members[incoming]} eager={warm} />
+          </div>
+        )}
+
+        {/* only current+incoming are mounted, so every other member would fetch at slide time and
+            flash its blur placeholder. Mounting them hidden warms the cache during the preloader:
+            display:none doesn't stop an <img> fetch, and srcset picks off `sizes`, not layout, so
+            these resolve to the same URL the slide asks for later. */}
+        {warm && (
+          <div className="hidden" aria-hidden>
+            {members.map((member, i) =>
+              i === current || i === incoming ? null : (
+                <Photo key={member.name} member={member} eager />
+              ),
+            )}
           </div>
         )}
 
@@ -165,10 +206,11 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
   )
 }
 
-function Photo({ member }: { member: TeamMember }) {
+function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean }) {
   return member.photo ? (
     <MediaImage
       media={member.photo}
+      eager={eager}
       sizes="(max-width: 1151px) 100vw, (min-width: 1920px) 1200px, 1056px"
       className="h-full w-full object-cover object-top"
     />
