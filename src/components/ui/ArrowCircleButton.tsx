@@ -20,7 +20,7 @@ export function ArrowCircleButton({
     `inline-flex shrink-0 items-center justify-center rounded-full border border-current ` +
     `transition-colors hover:bg-black/5 ${className}`.trim()
   const style = { width: size, height: size }
-  const icon = <Image src={arrow} alt="" width={20} height={20} className="h-5 w-5" />
+  const icon = <Image src={arrow} alt="" width={20} height={20} quality={100} className="h-5 w-5" />
 
   return href ? (
     <Link href={href} aria-label={label} className={cls} style={style}>

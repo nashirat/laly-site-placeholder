@@ -10,11 +10,15 @@ export function MediaImage({
   sizes,
   priority = false,
   eager = false,
+  quality = 100,
 }: {
   media: MediaDoc
   className?: string
   sizes?: string
   priority?: boolean // set on the LCP image only
+  // next/image re-encodes to AVIF/WebP and defaults to q=75 — that default, not the source file,
+  // is what ships. 100 = max; drop it per-caller if a specific image's weight ever matters.
+  quality?: number
   // opt out of lazy-loading without claiming LCP priority: the fetch starts at parse time (i.e.
   // behind the preloader curtain) instead of when the image scrolls into view, so galleries the
   // user reaches mid-scroll are already decoded and never show their blur placeholder.
@@ -28,6 +32,7 @@ export function MediaImage({
       height={media.height}
       className={className}
       sizes={sizes}
+      quality={quality}
       priority={priority}
       loading={eager && !priority ? 'eager' : undefined}
       placeholder={media.blurDataURL ? 'blur' : 'empty'}

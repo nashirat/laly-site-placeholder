@@ -31,10 +31,12 @@ export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
             className="entry-fade relative shrink-0 pl-4 3xl:pl-8"
             style={{ '--slide-delay': `${i * STAGGER}s` } as CSSProperties}
           >
+            {/* slides are h-fixed / w-auto, so the widest (3:2 landscape) is ~1.5x the height —
+                sizes tracks that width, not the height, or wide slides get a too-small srcset pick */}
             <MediaImage
               media={media}
               eager
-              sizes="(max-width: 1151px) 240px, (min-width: 1920px) 500px, 350px"
+              sizes="(max-width: 1151px) 360px, (min-width: 1920px) 750px, 520px"
               className="h-[240px] w-auto md:h-[340px] 3xl:h-[476px]"
             />
           </div>

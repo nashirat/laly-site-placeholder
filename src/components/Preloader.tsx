@@ -67,6 +67,7 @@ export function Preloader() {
         src={logo}
         alt="Laly Agency"
         priority
+        quality={100}
         sizes="120px"
         className="h-7 w-30" /* matches the navbar logo exactly (Header.tsx) */
       />
