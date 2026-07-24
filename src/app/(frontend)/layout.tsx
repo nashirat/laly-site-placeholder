@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
-import Script from 'next/script'
 import { fontVariables } from '@/app/(frontend)/components/Fonts'
-import { AnimationControlPanel } from '@/components/AnimationControlPanel'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { Preloader } from '@/components/Preloader'
@@ -14,18 +12,20 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // the anim-* classes pick the shipped animation variant; they were runtime-switchable while the
+  // control panel existed, now they're just the chosen pair (see styles.css).
   return (
-    <html lang="en" suppressHydrationWarning className={`${fontVariables} preloading`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fontVariables} preloading anim-heading-fade anim-sections-media`}
+    >
       <body className="relative min-h-screen antialiased font-sans">
-        <Script id="animation-controls" strategy="beforeInteractive">
-          {`try{var s=JSON.parse(localStorage.getItem('laly-animation-controls')||'{}');if(s.version!==3)s={};document.documentElement.classList.add('anim-heading-'+(s.heading==='letters'||s.heading==='mix'?s.heading:'fade'),'anim-sections-'+(s.sections==='fadeup'||s.sections==='brackets'?s.sections:'media'))}catch(e){document.documentElement.classList.add('anim-heading-fade','anim-sections-media')}`}
-        </Script>
         <SmoothScroll />
         <Preloader />
         <Header />
         {children}
         <Footer />
-        <AnimationControlPanel />
       </body>
     </html>
   )
