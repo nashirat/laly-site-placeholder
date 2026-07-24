@@ -35,7 +35,9 @@ export default function Strategy({ content }: { content: StrategyContent }) {
             // animation-delay longhand beats the stylesheet's `animation` shorthand (inline wins).
             <article
               key={card.title}
-              className="section-media-reveal relative flex flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left 3xl:px-6 3xl:py-8 md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:gap-y-5 3xl:min-h-[460px]"
+              // min-w-0 defeats the grid item's `min-width: auto`, so the nowrap badges stop
+              // widening the track and scroll inside the card instead.
+              className="section-media-reveal relative flex min-w-0 flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left 3xl:px-6 3xl:py-8 md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:gap-y-5 3xl:min-h-[460px]"
               style={{ animationDelay: `${0.2 + i * 0.2}s` }}
             >
               {/* heading/h2/l — Neue Haas 450 / 44px / 110% */}
@@ -52,9 +54,9 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               </h3>
 
               {/* capability pills — star tinted per badge, so the accent trio comes from data */}
-              {/* one row, never two — a wrapped badge would grow the shared subgrid row and shove
-                  every card's hook line down. Fixed 23px pills, no wrap; mobile scrolls instead. */}
-              <ul className="mt-2 flex gap-2 overflow-x-auto md:flex-nowrap md:overflow-visible [&::-webkit-scrollbar]:hidden">
+              {/* md+: one row, never two — a wrapped badge would grow the shared subgrid row and
+                  shove every card's hook line down. Mobile has no subgrid, so it just wraps. */}
+              <ul className="mt-2 flex flex-wrap gap-2 md:flex-nowrap">
                 {card.badges.map((badge) => (
                   <li
                     key={badge.label}

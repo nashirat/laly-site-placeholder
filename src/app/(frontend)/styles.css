@@ -9,6 +9,11 @@
   /* Fira Code = button labels + stat percentages */
   --font-fira: var(--font-fira-code), ui-monospace, monospace;
 
+  /* md is this site's only layout switch (mobile stack → desktop rows). Default 768 puts iPad Mini
+     exactly on the desktop side; 1024 does the same to iPad Pro 12.9" portrait. 1152 clears every
+     portrait tablet and still catches the smallest real laptops (1280). */
+  --breakpoint-md: 72rem; /* 1152px */
+
   /* Big-screen breakpoints on top of the defaults (2xl stays 1536px). */
   --breakpoint-3xl: 120rem; /* 1920px — FHD */
   --breakpoint-4xl: 160rem; /* 2560px — QHD/ultrawide */
