@@ -11,6 +11,7 @@ export function MediaImage({
   priority = false,
   eager = false,
   quality = 100,
+  unoptimized = false,
 }: {
   media: MediaDoc
   className?: string
@@ -19,6 +20,10 @@ export function MediaImage({
   // next/image re-encodes to AVIF/WebP and defaults to q=75 — that default, not the source file,
   // is what ships. 100 = max; drop it per-caller if a specific image's weight ever matters.
   quality?: number
+  // serve the source file as-is: no resize, no AVIF re-encode, no srcset. For fixed-height /
+  // w-auto layouts where one `sizes` string can't fit slides of differing aspect ratios, so the
+  // widest slide ends up under-served. Costs the full file on every viewport — mobile included.
+  unoptimized?: boolean
   // opt out of lazy-loading without claiming LCP priority: the fetch starts at parse time (i.e.
   // behind the preloader curtain) instead of when the image scrolls into view, so galleries the
   // user reaches mid-scroll are already decoded and never show their blur placeholder.
@@ -33,6 +38,7 @@ export function MediaImage({
       className={className}
       sizes={sizes}
       quality={quality}
+      unoptimized={unoptimized}
       priority={priority}
       loading={eager && !priority ? 'eager' : undefined}
       placeholder={media.blurDataURL ? 'blur' : 'empty'}

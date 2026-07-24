@@ -31,12 +31,14 @@ export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
             className="entry-fade relative shrink-0 pl-4 3xl:pl-8"
             style={{ '--slide-delay': `${i * STAGGER}s` } as CSSProperties}
           >
-            {/* slides are h-fixed / w-auto, so the widest (3:2 landscape) is ~1.5x the height —
-                sizes tracks that width, not the height, or wide slides get a too-small srcset pick */}
+            {/* Slides are h-fixed / w-auto, so box width = height * aspect and every slide differs:
+                Bus (1.78) renders 846px at 3xl while Shirt (0.67) renders 317px. One `sizes` string
+                can't serve both — calibrating for the average left the wide slides visibly soft.
+                Sources are 63KB-1.5MB, so we ship them whole (WebP, native res) instead. */}
             <MediaImage
               media={media}
               eager
-              sizes="(max-width: 1151px) 360px, (min-width: 1920px) 750px, 520px"
+              unoptimized
               className="h-[240px] w-auto md:h-[340px] 3xl:h-[476px]"
             />
           </div>

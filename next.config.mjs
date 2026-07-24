@@ -10,8 +10,12 @@ const nextConfig = {
     optimizeCss: true,
   },
   images: {
-    // WebP/AVIF delivery via next/image — perf priority
+    // WebP/AVIF delivery via next/image — perf priority. AVIF first: ~30-50% smaller than WebP at
+    // equal quality, and non-supporting browsers fall back to WebP off the Accept header.
     formats: ['image/avif', 'image/webp'],
+    // default deviceSizes jump 2048 -> 3840, so any box wanting 2049-3839 device px gets a 3840
+    // encode. 2560 fills that gap (the 1120-wide team carousel at DPR2 needs 2320).
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 2560, 3840],
     // Vercel Blob media (wired in Payload phase)
     remotePatterns: [
       { protocol: 'https', hostname: '**.public.blob.vercel-storage.com' },
