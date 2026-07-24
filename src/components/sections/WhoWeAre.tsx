@@ -72,7 +72,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                 ) : (
                   <MediaImage
                     media={card.image}
-                    sizes="(max-width: 768px) 100vw, (min-width: 1920px) 580px, 40vw"
+                    sizes="(max-width: 1151px) 100vw, (min-width: 1920px) 580px, 40vw"
                     className="h-full w-full object-cover"
                   />
                 )}

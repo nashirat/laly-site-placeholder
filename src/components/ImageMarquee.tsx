@@ -33,7 +33,7 @@ export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
           >
             <MediaImage
               media={media}
-              sizes="(max-width: 768px) 240px, (min-width: 1920px) 500px, 350px"
+              sizes="(max-width: 1151px) 240px, (min-width: 1920px) 500px, 350px"
               className="h-[240px] w-auto md:h-[340px] 3xl:h-[476px]"
             />
           </div>

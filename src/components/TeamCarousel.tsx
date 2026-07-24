@@ -169,7 +169,7 @@ function Photo({ member }: { member: TeamMember }) {
   return member.photo ? (
     <MediaImage
       media={member.photo}
-      sizes="(max-width: 768px) 100vw, (min-width: 1920px) 1200px, 1056px"
+      sizes="(max-width: 1151px) 100vw, (min-width: 1920px) 1200px, 1056px"
       className="h-full w-full object-cover object-top"
     />
   ) : (
