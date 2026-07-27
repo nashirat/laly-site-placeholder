@@ -9,8 +9,13 @@ export default function Strategy({ content }: { content: StrategyContent }) {
   const { label, heading, description, cards } = content
 
   return (
-    <section aria-label="Strategy" className="w-full bg-[#292624] py-16 md:py-24 3xl:py-32">
-      <InView className="mx-auto max-w-[1360px] px-5 text-center 3xl:max-w-[1560px]">
+    <section
+      aria-label="Strategy"
+      // Figma desktop: 112 top+bottom, 48 sides, ground #292624
+      className="w-full bg-[#292624] py-16 md:py-28"
+    >
+      {/* no max-width — padding is the only rule */}
+      <InView className="px-5 text-center md:px-12">
         <BracketLabel className="mb-5 w-44 text-[#ff6d6a] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
@@ -29,7 +34,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
             badges / hook / body line up across all three cards no matter how the copy wraps. The
             last row is 1fr and the body sits at its end — the Figma "space-between" without letting
             each card resolve its own spacing. */}
-        <div className="mt-10 grid gap-6 md:mt-14 md:grid-cols-3 md:grid-rows-[auto_auto_auto_1fr] md:gap-y-4 3xl:mt-20 3xl:gap-x-8 3xl:gap-y-5">
+        <div className="mt-10 grid gap-6 md:mt-12 md:grid-cols-3 md:grid-rows-[auto_auto_auto_1fr] md:gap-y-4 3xl:gap-x-8 3xl:gap-y-5">
           {cards.map((card, i) => (
             // reveal is per-card, not per-grid, so they can stagger left→right. The inline
             // animation-delay longhand beats the stylesheet's `animation` shorthand (inline wins).

@@ -16,12 +16,12 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
   return (
     <section
       aria-label="Who we are"
-      // Figma desktop: 112 top+bottom, 160 sides, ground #FCF7F3
-      className="w-full bg-[#fcf7f3] py-16 md:py-28"
+      // Figma: 48 top+bottom / 20 sides mobile, 112 / 160 desktop. Ground #FCF7F3.
+      className="w-full bg-[#fcf7f3] py-12 md:py-28"
     >
       {/* no max-width — Figma's padding is the only rule: 20 sides mobile, 160 desktop */}
       <InView className="px-5 text-center md:px-40">
-        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-8 md:w-80">
+        <BracketLabel className="mb-6 w-44 text-[#867A72] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
         <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl xl:text-7xl">
@@ -37,8 +37,9 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
           {description.split('\n\n').map((para, i) => (
             <p
               key={para}
-              // wider tracking pushes "That" onto line 2, matching the Figma wrap
-              className={`section-text-reveal font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] tracking-[0.02em] text-[#4A4A4A] md:inline ${
+              // desktop-only tracking — it pushes "That" onto line 2 there, but on mobile it was
+              // spilling "Us:" onto a second line
+              className={`section-text-reveal font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#4A4A4A] md:inline md:tracking-[0.02em] ${
                 i > 0 ? "mt-6 md:mt-0 md:before:content-['_']" : ''
               }`}
             >
@@ -47,7 +48,8 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
           ))}
         </div>
 
-        <div className="section-media-reveal mt-10 flex flex-col gap-8 md:mt-12 3xl:mt-16">
+        {/* text block → cards: 32 mobile, 48 desktop */}
+        <div className="section-media-reveal mt-8 flex flex-col gap-8 md:mt-12">
           {cards.map((card) => (
             <article
               key={card.title}
