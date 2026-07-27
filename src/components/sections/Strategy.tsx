@@ -30,10 +30,11 @@ export default function Strategy({ content }: { content: StrategyContent }) {
           {description}
         </p>
 
-        {/* Rows are declared on the track parent and picked up by each card via subgrid, so title /
-            badges / hook / body line up across all three cards no matter how the copy wraps. The
-            last row is 1fr and the body sits at its end — the Figma "space-between" without letting
-            each card resolve its own spacing. */}
+        {/* Rows live on this parent and each card picks them up via subgrid, so title / badges /
+            hook / body start on the same line in all three — when one card's badges wrap to a
+            second line, every card's hook moves down with it. Last row is 1fr so the cards end
+            flush; the body sits at its top, not its end, or a long body would leave a hole in the
+            two short cards. */}
         <div className="mt-10 grid gap-6 md:mt-12 md:grid-cols-3 md:grid-rows-[auto_auto_auto_1fr] md:gap-y-4 3xl:gap-x-8 3xl:gap-y-5">
           {cards.map((card, i) => (
             // reveal is per-card, not per-grid, so they can stagger left→right. The inline
@@ -42,7 +43,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               key={card.title}
               // min-w-0 defeats the grid item's `min-width: auto`, so the nowrap badges stop
               // widening the track and scroll inside the card instead.
-              className="section-media-reveal relative flex min-w-0 flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left 3xl:px-6 3xl:py-8 md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:gap-y-5 3xl:min-h-[460px]"
+              className="section-media-reveal relative flex min-w-0 flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
               style={{ animationDelay: `${0.2 + i * 0.2}s` }}
             >
               {/* heading/h2/l — Neue Haas 450 / 44px / 110%.
@@ -68,10 +69,11 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                 />
               </div>
 
-              {/* capability pills — star tinted per badge, so the accent trio comes from data */}
-              {/* md+: one row, never two — a wrapped badge would grow the shared subgrid row and
-                  shove every card's hook line down. Mobile has no subgrid, so it just wraps. */}
-              <ul className="mt-2 flex flex-wrap gap-2 md:flex-nowrap">
+              {/* capability pills — star tinted per badge, so the accent trio comes from data.
+                  Free to wrap now that cards don't share a row track. */}
+              {/* items-start/content-start: the badge row is shared, so a card with one line of
+                  badges still spans two — without this the pills stretch to fill it */}
+              <ul className="mt-2 flex flex-wrap content-start items-start gap-2">
                 {card.badges.map((badge) => (
                   <li
                     key={badge.label}

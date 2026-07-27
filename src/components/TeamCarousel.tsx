@@ -118,7 +118,8 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
   const sliding = incoming !== null && phase !== 'idle'
 
   return (
-    <div className="section-media-reveal mt-8 text-left md:mt-10 3xl:mt-12">
+    // md+: the About section's own 32 gap spaces this, so no top margin of its own
+    <div className="section-media-reveal mt-8 text-left md:mt-0">
       {/* mobile only — swipe affordance, sits above the card (no on-card arrows on small screens) */}
       <div className="mb-2 flex items-center justify-end gap-1.5 text-[#FF8A88] md:hidden">
         {/* Fira Code 400 / 10 / 100% / no tracking / #FF8A88 */}

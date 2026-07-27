@@ -125,16 +125,15 @@ export const home: {
         link: { label: 'Explore branding' },
         fg: '#DFA854',
       },
-      // ponytail: card 3 copy is a stand-in — the Figma frame is cropped. Swap when you have it.
       {
         title: 'The Power of\nTechnology',
         badges: [
-          { label: 'Custom Software', color: '#A2A11C' },
-          { label: 'Automation', color: '#F3E8F2' },
-          { label: 'AI Integration', color: '#F5C882' },
+          { label: 'Custom Code', color: '#A2A11C' },
+          { label: 'API Integrations', color: '#F3E8F2' },
+          { label: 'Advanced Forms', color: '#F5C882' },
         ],
-        hook: 'If your team is buried in busywork, this is for you.',
-        body: 'We customize everything to your business, so the tools work the way you already do—not the other way around.',
+        hook: 'If your marketing efforts feel disconnected from your business, this is for you.',
+        body: 'We custom-build digital systems to help you track everything from where your budget is going to how your business is growing across all platforms.',
         link: { label: 'Explore technology' },
         fg: '#B5B449',
       },

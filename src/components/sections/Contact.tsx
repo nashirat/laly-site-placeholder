@@ -16,8 +16,8 @@ export default function Contact({ content }: { content: ContactContent }) {
   return (
     <section
       aria-label="Contact"
-      // Figma mobile: 48 top / 64 bottom / 20 sides
-      className="w-full overflow-hidden bg-[#ff6d6a] pt-12 pb-16 md:py-24 3xl:py-32"
+      // Figma: 48 top / 64 bottom / 20 sides mobile; 112 top+bottom / 160 sides desktop
+      className="w-full overflow-hidden bg-[#ff6d6a] pt-12 pb-16 md:py-28"
     >
       {/* flex column + `order` so ONE photo node serves both layouts: on mobile it flows between the
           CTAs and the socials (order-1), at md+ it leaves the flow entirely and hangs off the
@@ -25,8 +25,8 @@ export default function Contact({ content }: { content: ContactContent }) {
       {/* mobile is four blocks 32 apart: caption / heading+CTAs / photo / socials. The heading and
           its CTAs are one block, so they're wrapped — the wrapper goes `display:contents` at md+,
           leaving the desktop layout (absolute photo, per-child margins) exactly as it was. */}
-      <InView className="relative mx-auto flex max-w-[1056px] flex-col gap-8 px-5 text-center md:gap-0 3xl:max-w-[1200px]">
-        <BracketLabel className="w-44 text-[#262626] md:mb-8 md:w-80">
+      <InView className="relative flex flex-col gap-8 px-5 text-center md:gap-0 md:px-40">
+        <BracketLabel className="w-44 text-[#262626] md:mb-12 md:w-80">
           {label}
         </BracketLabel>
 
@@ -45,13 +45,14 @@ export default function Contact({ content }: { content: ContactContent }) {
         <div className="section-media-reveal flex justify-center gap-3 md:mt-12 3xl:mt-14 3xl:gap-4">
           {/* no scramble, no hover tint — client's call: these closing CTAs stay completely static.
               Costs the pointer its only affordance; the cursor and focus ring are all that's left. */}
-          {/* Figma has this pair at 6.51 / 8.69 padding on #151414 with Drop shadow at 4% —
-              instance-only, the shared Button keeps its own numbers. */}
+          {/* instance-only sizing, the shared Button keeps its own numbers:
+              mobile  = 8.69 / 6.51 padding, 16px label, Drop shadow 0 1.09 2.17 @4%
+              desktop = Large/Tertiary — 13.02 / 9.77 padding, 40px label, 0 3.26 9.77 @6% */}
           <Button
             variant="solid"
             scramble={false}
             href={buttons[0].href}
-            className="bg-[#151414]! px-[8.69px]! py-[6.51px]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]!"
+            className="bg-[#151414]! px-[8.69px]! py-[6.51px]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]! md:px-[13.02px]! md:py-[9.77px]! md:shadow-[0_3.26px_9.77px_0_rgba(16,24,40,0.06)]! md:[&>span]:text-[40px]! md:[&>span]:leading-[50px]!"
           >
             {buttons[0].label}
           </Button>
@@ -59,7 +60,7 @@ export default function Contact({ content }: { content: ContactContent }) {
             variant="outline"
             scramble={false}
             href={buttons[1].href}
-            className="border-[#151414]! px-[8.69px]! py-[6.51px]! text-[#151414]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]!"
+            className="border-[#151414]! px-[8.69px]! py-[6.51px]! text-[#151414]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]! md:px-[13.02px]! md:py-[9.77px]! md:shadow-[0_3.26px_9.77px_0_rgba(16,24,40,0.06)]! md:[&>span]:text-[40px]! md:[&>span]:leading-[50px]!"
           >
             {buttons[1].label}
           </Button>
@@ -69,7 +70,7 @@ export default function Contact({ content }: { content: ContactContent }) {
         {/* team photo — tilted, overlapping the heading at md+. Two crops: landscape below md,
             portrait at md+ (the frame's aspect flips, so one file can't serve both).
             md top offset clears the bracket label, which is now a flex sibling rather than above. */}
-        <div className="section-media-reveal order-1 z-0 h-[248px] w-full overflow-hidden md:rotate-2 md:absolute md:right-0 md:top-12 md:order-none md:mt-0 md:aspect-auto md:h-[330px] md:w-[280px] 3xl:top-14 3xl:h-[400px] 3xl:w-[340px]">
+        <div className="section-media-reveal order-1 z-0 h-[248px] w-full overflow-hidden md:rotate-2 md:absolute md:right-[180px] md:top-12 md:order-none md:mt-0 md:aspect-auto md:h-[330px] md:w-[280px] 3xl:top-14 3xl:h-[400px] 3xl:w-[340px]">
           <MediaImage
             media={photoMobile}
             sizes="100vw"
@@ -84,7 +85,7 @@ export default function Contact({ content }: { content: ContactContent }) {
 
         {/* socials — icons are 32x32 as drawn; last in both layouts (order-2 keeps them under the
             photo on mobile, where the photo is order-1) */}
-        <div className="section-media-reveal order-2 flex items-center justify-center gap-4 md:mt-10 3xl:mt-12">
+        <div className="section-media-reveal order-2 flex items-center justify-center gap-4 md:mt-12">
           {socials.map((s) => (
             <a
               key={s.platform}
@@ -92,7 +93,7 @@ export default function Contact({ content }: { content: ContactContent }) {
               aria-label={s.platform}
               target="_blank"
               rel="noreferrer"
-              className="text-[#292624] transition-opacity hover:opacity-70"
+              className="text-[#292624] transition-opacity hover:opacity-70 md:text-black"
             >
               {/* svgs ship with #151414 baked in — ring (rect stroke) and glyph (path fill) both
                   repainted from currentColor; CSS outranks a presentation attribute */}
