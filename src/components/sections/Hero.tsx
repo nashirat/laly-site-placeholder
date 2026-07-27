@@ -9,6 +9,7 @@ import type { HeroContent } from '@/lib/types'
 // (which is absolute, so it has no flow height) and keeps the centering optical. min-h, not h, so
 // short viewports scroll instead of clipping.
 // Heading = Figma display/l: Neue Haas (font-display) 500 / 72px / 100% leading / center / #262626.
+// Mobile = Figma heading/h1/s: 450 (→400, only 400/500/700 shipped) / 44px / 110% leading.
 // Desc = Figma body-2/xxl: New Spirit (font-sans) 400 / 28px / 125% leading / center / #4A4A4A.
 // Entry: `preloading-done` starts the curtain close and hero sequence together. Heading waits 0.8s,
 // so it begins shortly before the 1.2s curtain close completes.
@@ -21,12 +22,13 @@ export default function Hero({ content }: { content: HeroContent }) {
       aria-label="Home"
       className="flex min-h-[100dvh] w-full flex-col justify-center bg-[#fffcf9] pt-19"
     >
-      <div className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
+      {/* Figma mobile: text container hugs at 291px (≈50px each side on a 390 frame), children gap 20 */}
+      <div className="mx-auto max-w-[291px] px-0 text-center md:max-w-[1056px] md:px-5 3xl:max-w-[1200px]">
         {/* whole heading fades up as one — no per-letter ripple (reads tacky, team review). The
             authored \n stays a hard break via block spans; on mobile each line wraps beneath it. */}
         <h1
           aria-label={rows.join(' ')}
-          className="hero-heading entry-copy font-display text-[40px] font-medium leading-none tracking-tight text-[#262626] md:text-7xl 3xl:text-8xl"
+          className="hero-heading entry-copy font-display text-[44px] font-normal leading-[1.1] tracking-tight text-[#262626] md:text-7xl md:font-medium md:leading-none 3xl:text-8xl"
           style={{ animationDelay: '0.8s' }}
         >
           {rows.map((line, lineIndex) => {
@@ -59,13 +61,13 @@ export default function Hero({ content }: { content: HeroContent }) {
           })}
         </h1>
         <p
-          className="hero-desc entry-copy mx-auto mt-6 max-w-[616px] font-sans text-lg font-normal leading-[1.25] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
+          className="hero-desc entry-copy mx-auto mt-5 max-w-[616px] md:mt-6 font-sans text-lg font-normal leading-[1.25] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
           style={{ animationDelay: '0.95s' }}
         >
           {description}
         </p>
         <div
-          className="hero-cta entry-copy mt-10 flex justify-center md:mt-6"
+          className="hero-cta entry-copy mt-5 flex justify-center md:mt-6"
           style={{ animationDelay: '1.1s' }}
         >
           <Button variant="primary" href={button.href}>
@@ -75,7 +77,8 @@ export default function Hero({ content }: { content: HeroContent }) {
       </div>
 
       {/* full-bleed image strip below the button; already scrolling, slides fade in staggered */}
-      <div className="mt-24 w-full">
+      {/* Figma mobile: hero stack gap = spacing/56 */}
+      <div className="mt-14 w-full md:mt-24">
         <ImageMarquee slides={slides} />
       </div>
     </section>

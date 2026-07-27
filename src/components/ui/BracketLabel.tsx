@@ -18,7 +18,9 @@ export function BracketLabel({
   return (
     <div
       aria-label={children}
-      className={`bracket-label mx-auto flex justify-between font-mono text-[16px] font-normal uppercase leading-[1.4] tracking-tight md:text-[18px] 3xl:text-[20px] ${className}`}
+      // mobile 14px (caption spec), desktop 24px (Figma heading/h5/l). tracking is letter-spacing/xxxl
+      // — token value unknown, eyeballed off the 1120 frame; nudge here, not per caller.
+      className={`bracket-label mx-auto flex justify-between font-mono text-[14px] font-normal uppercase leading-[1.4] tracking-[0.2em] md:text-[24px] ${className}`}
     >
       <p aria-hidden>{children}</p>
     </div>

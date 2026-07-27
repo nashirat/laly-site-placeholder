@@ -22,7 +22,7 @@ export default function Contact({ content }: { content: ContactContent }) {
           CTAs and the socials (order-1), at md+ it leaves the flow entirely and hangs off the
           container's right edge, overlapping the heading. */}
       <InView className="relative mx-auto flex max-w-[1056px] flex-col px-5 text-center 3xl:max-w-[1200px]">
-        <BracketLabel className="mb-8 w-44 text-[#262626] md:mb-10 md:w-56 3xl:w-64">
+        <BracketLabel className="mb-8 w-44 text-[#262626] md:mb-10 md:w-80">
           {label}
         </BracketLabel>
 
@@ -52,12 +52,12 @@ export default function Contact({ content }: { content: ContactContent }) {
         </div>
 
         <div className="section-media-reveal mt-10 flex justify-center gap-3 md:mt-12 3xl:mt-14 3xl:gap-4">
-          {/* no scramble — these are the page's closing CTAs; the decrypt reads as noise on the
-              action you actually want clicked */}
-          <Button variant="solid" scramble={false} href={buttons[0].href} className="hover:bg-[#3a3a3a]">
+          {/* no scramble, no hover tint — client's call: these closing CTAs stay completely static.
+              Costs the pointer its only affordance; the cursor and focus ring are all that's left. */}
+          <Button variant="solid" scramble={false} href={buttons[0].href}>
             {buttons[0].label}
           </Button>
-          <Button variant="outline" scramble={false} href={buttons[1].href} className="hover:bg-black/5">
+          <Button variant="outline" scramble={false} href={buttons[1].href}>
             {buttons[1].label}
           </Button>
         </div>

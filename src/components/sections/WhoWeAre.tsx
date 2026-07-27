@@ -16,19 +16,24 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
   return (
     <section aria-label="Who we are" className="w-full bg-[#fcf7f3] py-16 md:py-24 3xl:py-32">
       <InView className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
-        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-6 md:w-56 3xl:mb-8 3xl:w-64">
+        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-6 md:w-80 3xl:mb-8">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[32px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl 3xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl 3xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
             </span>
           ))}
         </h2>
-        <p className="section-text-reveal mx-auto mt-6 max-w-[760px] font-sans text-base font-normal leading-[1.25] text-[#4A4A4A] md:text-xl 3xl:max-w-[900px] 3xl:text-2xl">
-          {description}
-        </p>
+        {description.split('\n\n').map((para) => (
+          <p
+            key={para}
+            className="section-text-reveal mx-auto mt-6 max-w-[760px] font-sans text-xl font-normal leading-[1.25] text-[#4A4A4A] 3xl:max-w-[900px] 3xl:text-2xl"
+          >
+            {para}
+          </p>
+        ))}
 
         <div className="section-media-reveal mt-10 flex flex-col gap-8 md:mt-12 3xl:mt-16">
           {cards.map((card) => (
@@ -55,7 +60,10 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
               </div>
 
               {/* campaign image — landscape crop on mobile, fills the column height on desktop */}
-              <div className="aspect-[16/10] overflow-hidden md:col-start-1 md:row-start-1 md:row-span-3 md:aspect-auto md:h-full">
+              <div
+                className="aspect-[16/10] overflow-hidden border md:col-start-1 md:row-start-1 md:row-span-3 md:aspect-auto md:h-full"
+                style={{ borderColor: card.border }}
+              >
                 {card.video ? (
                   // muted+playsInline so mobile autoplays inline; the still doubles as the poster
                   <video

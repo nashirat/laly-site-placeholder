@@ -12,17 +12,17 @@ export default function About({ content }: { content: AboutContent }) {
   return (
     <section aria-label="About us" className="w-full bg-[#fffcf9] py-16 md:py-24 3xl:py-32">
       <InView className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
-        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-6 md:w-56 3xl:mb-8 3xl:w-64">
+        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-6 md:w-80 3xl:mb-8">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[32px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl 3xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl 3xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
             </span>
           ))}
         </h2>
-        <p className="section-text-reveal mx-auto mt-3 max-w-[620px] font-sans text-base font-normal leading-[1.25] text-[#262626] md:text-xl 3xl:max-w-[720px] 3xl:text-2xl">
+        <p className="section-text-reveal mx-auto mt-3 max-w-[620px] font-sans text-xl font-normal leading-[1.25] text-[#262626] 3xl:max-w-[720px] 3xl:text-2xl">
           {description}
         </p>
 

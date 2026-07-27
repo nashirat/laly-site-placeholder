@@ -240,6 +240,35 @@ html.anim-heading-mix.preloader-done .entry-fade {
   }
 }
 
+/* Masked label swap (see Button.tsx altLabel) — MENU <-> CLOSE inside the pill. Both labels sit in
+   the same grid cell, so the wrapper is as wide/tall as the wider one and the pill never resizes
+   mid-swap; overflow clips the pair to that one line. The two slide together: out the top on
+   activate, back down on deactivate. Same expo.inOut as the bracket label, half the duration —
+   this one answers a click, so it has to feel immediate. */
+.mask-swap {
+  display: grid;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.mask-swap > * {
+  grid-area: 1 / 1;
+  transition: transform 0.5s cubic-bezier(0.87, 0, 0.13, 1);
+}
+.mask-swap > :last-child {
+  transform: translateY(100%);
+}
+.mask-swap.is-alt > :first-child {
+  transform: translateY(-100%);
+}
+.mask-swap.is-alt > :last-child {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mask-swap > * {
+    transition: none;
+  }
+}
+
 /* Bracketed eyebrow label (see BracketLabel.tsx) — "[ WHO WE ARE ]", karocrafts' mechanic.
    The brackets are ::before/::after pushed to the container's edges by flex justify-between, then
    pulled back toward the middle by --x-translate (1 = stacked over the text, 0 = resting at the

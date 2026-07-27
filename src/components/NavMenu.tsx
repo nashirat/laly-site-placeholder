@@ -29,8 +29,15 @@ export function NavMenu({ items }: { items: HeaderContent['nav'] }) {
 
   return (
     <div className="relative">
-      {/* no scramble here — the toggle just tints on hover (transition-colors is in the shell base) */}
-      <Button onClick={toggle} scramble={false} className="hover:bg-black/5">
+      {/* no scramble here — the toggle just tints on hover (transition-colors is in the shell base).
+          Label masks up to CLOSE on open; `closing` counts as closed so it drops back with the items. */}
+      <Button
+        onClick={toggle}
+        scramble={false}
+        className="hover:bg-black/5"
+        altLabel="CLOSE"
+        showAlt={state === 'open'}
+      >
         MENU
       </Button>
 
@@ -43,7 +50,9 @@ export function NavMenu({ items }: { items: HeaderContent['nav'] }) {
             <span key={item.label} className="inline-block overflow-hidden">
               <a
                 href={item.href}
-                className={`inline-block font-mono text-base font-medium text-[#262626] 3xl:text-lg ${
+                /* pilled like the toggle above — items float over dark sections and images once
+                   scrolled, so each carries its own hero-cream surface instead of a full panel */
+                className={`inline-block rounded-full bg-[#fffcf9] px-3 py-1.5 font-mono text-base font-medium text-[#262626] 3xl:text-lg ${
                   closing ? 'slide-out-right' : 'slide-in-right'
                 }`}
                 /* enter: top->bottom; exit: bottom->top */

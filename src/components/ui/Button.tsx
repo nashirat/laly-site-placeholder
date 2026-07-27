@@ -10,7 +10,9 @@ import { useScramble } from '@/components/ui/ScrambleText'
 // Payload later: a CMSButton adapter maps the `button` field (type/page/link/styling) onto this.
 
 const SHELL_BASE =
-  'inline-flex cursor-pointer items-center justify-center rounded-full px-2 py-1 ' +
+  // Figma Button/Medium: padding 6px vertical / 8px horizontal, gap 6px (the label's gap-1.5),
+  // corner-radius/full. 23px line-height + 12px padding = the spec's 35px hug height.
+  'inline-flex cursor-pointer items-center justify-center rounded-full px-2 py-1.5 ' +
   'shadow-[0_1px_2px_0_rgba(16,24,40,0.08)] transition-colors'
 const TYPE = 'font-fira text-base font-medium leading-[23px] whitespace-nowrap 3xl:text-lg 3xl:leading-[26px]'
 
@@ -49,6 +51,8 @@ type Props = {
   scrambleColor?: string // overrides the variant's flash color
   className?: string
   onClick?: () => void
+  altLabel?: string // second label, masked-swapped in when showAlt flips (MENU <-> CLOSE)
+  showAlt?: boolean
 }
 
 export function Button({
@@ -60,15 +64,25 @@ export function Button({
   scrambleColor,
   className = '',
   onClick,
+  altLabel,
+  showAlt = false,
 }: Props) {
   const flash = scrambleColor ?? VARIANTS[variant].flash
   const { ref, run } = useScramble<HTMLSpanElement>(children, flash)
   const onMouseEnter = scramble ? run : undefined
+  const current = altLabel !== undefined && showAlt ? altLabel : children
 
   const label = (
     <span className={`inline-flex items-center gap-1.5 ${TYPE}`}>
       {icon}
-      {scramble ? (
+      {altLabel !== undefined ? (
+        /* both labels live in one grid cell, so the pill is as wide as the wider word and
+           doesn't resize mid-swap. aria-hidden — the button's aria-label carries the live one. */
+        <span aria-hidden className={`mask-swap ${showAlt ? 'is-alt' : ''}`}>
+          <span>{children}</span>
+          <span>{altLabel}</span>
+        </span>
+      ) : scramble ? (
         <span ref={ref} className="whitespace-nowrap">
           {children}
         </span>
@@ -86,7 +100,7 @@ export function Button({
   ) : (
     <button
       type="button"
-      aria-label={children}
+      aria-label={current}
       className={cls}
       onClick={onClick}
       onMouseEnter={onMouseEnter}

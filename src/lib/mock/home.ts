@@ -67,7 +67,8 @@ export const home: {
     label: 'Who we are', // bare text — BracketLabel supplies the [ ] and uppercases it
     heading: 'Do you know where your\nmarketing dollars are going?',
     description:
-      "50% of Businesses Fail After Just 5 Years. The Culprit? Wasted Marketing Dollars. But It Doesn't Have to Be That Way. This Could Be Us:",
+      // blank line = paragraph break, same authored-newline convention as the headings
+      "50% of Businesses Fail After Just 5 Years. The Culprit? Wasted Marketing Dollars.\n\nBut It Doesn't Have to Be That Way. This Could Be Us:",
     cards: [
       {
         image: toMedia(senftPlaceholder, 'Senft Legal billboard'),

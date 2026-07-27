@@ -11,17 +11,17 @@ export default function Strategy({ content }: { content: StrategyContent }) {
   return (
     <section aria-label="Strategy" className="w-full bg-[#292624] py-16 md:py-24 3xl:py-32">
       <InView className="mx-auto max-w-[1360px] px-5 text-center 3xl:max-w-[1560px]">
-        <BracketLabel className="mb-5 w-44 text-[#ff6d6a] md:mb-6 md:w-56 3xl:mb-8 3xl:w-64">
+        <BracketLabel className="mb-5 w-44 text-[#ff6d6a] md:mb-6 md:w-80 3xl:mb-8">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[32px] font-normal leading-none tracking-tight text-[#fffcf9] md:text-6xl 3xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#fffcf9] md:text-6xl 3xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
             </span>
           ))}
         </h2>
-        <p className="section-text-reveal mx-auto mt-6 max-w-[460px] font-sans text-base font-normal leading-[1.25] text-[#B5ADA7] md:text-xl 3xl:max-w-[560px] 3xl:text-2xl">
+        <p className="section-text-reveal mx-auto mt-6 max-w-[460px] font-sans text-xl font-normal leading-[1.25] text-[#B5ADA7] 3xl:max-w-[560px] 3xl:text-2xl">
           {description}
         </p>
 
@@ -40,18 +40,28 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               className="section-media-reveal relative flex min-w-0 flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left 3xl:px-6 3xl:py-8 md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:gap-y-5 3xl:min-h-[460px]"
               style={{ animationDelay: `${0.2 + i * 0.2}s` }}
             >
-              {/* heading/h2/l — Neue Haas 450 / 44px / 110% */}
-              <h3
-                className="font-display text-[32px] font-normal leading-[1.1] tracking-tight md:text-[44px] 3xl:text-[52px]"
-                style={{ color: card.fg }}
-              >
-                {/* designer's call: the subject always lands on line 2 — authored break, not wrap */}
-                {card.title.split('\n').map((line) => (
-                  <span key={line} className="block">
-                    {line}
-                  </span>
-                ))}
-              </h3>
+              {/* heading/h2/l — Neue Haas 450 / 44px / 110%.
+                  Mobile puts the arrow up here beside the title; desktop keeps it beside the hook
+                  below. Two instances, one hidden per breakpoint — cheaper than reflowing the
+                  subgrid, and only the visible one contributes its stretched ::before hit area. */}
+              <div className="flex items-start justify-between gap-4">
+                <h3
+                  className="font-display text-[32px] font-normal leading-[1.1] tracking-tight md:text-[44px] 3xl:text-[52px]"
+                  style={{ color: card.fg }}
+                >
+                  {/* designer's call: the subject always lands on line 2 — authored break, not wrap */}
+                  {card.title.split('\n').map((line) => (
+                    <span key={line} className="block">
+                      {line}
+                    </span>
+                  ))}
+                </h3>
+                <ArrowCircleButton
+                  href={card.link.href}
+                  label={card.link.label}
+                  className="md:hidden cursor-pointer text-[#FCF7F3] hover:bg-white/10 [&_img]:invert before:absolute before:inset-0 before:content-['']"
+                />
+              </div>
 
               {/* capability pills — star tinted per badge, so the accent trio comes from data */}
               {/* md+: one row, never two — a wrapped badge would grow the shared subgrid row and
@@ -94,7 +104,9 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                   href={card.link.href}
                   label={card.link.label}
                   size={40}
-                  className="cursor-pointer text-[#FCF7F3] hover:bg-white/10 [&_img]:invert before:absolute before:inset-0 before:content-['']"
+                  /* max-md:hidden, not `hidden md:inline-flex` — the component's own base
+                     `inline-flex` outranks a bare `hidden`; only a variant beats it */
+                  className="max-md:hidden cursor-pointer text-[#FCF7F3] hover:bg-white/10 [&_img]:invert before:absolute before:inset-0 before:content-['']"
                 />
               </div>
 
