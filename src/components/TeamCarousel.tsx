@@ -121,7 +121,7 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
     <div className="section-media-reveal mt-8 text-left md:mt-10 3xl:mt-12">
       {/* mobile only — swipe affordance, sits above the card (no on-card arrows on small screens) */}
       <div className="mb-2 flex items-center justify-end gap-1.5 text-[#ff6d6a] md:hidden">
-        <span className="font-mono text-xs uppercase tracking-wider">Scroll</span>
+        <span className="font-mono text-sm uppercase tracking-[0.2em]">Scroll</span>
         {/* same pixel arrow as the desktop on-card nav, at Figma's 9.14 x 8 */}
         <NavArrowIcon className="w-[9.14px] h-2" />
       </div>
@@ -222,7 +222,7 @@ function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean 
   ) : (
     // ponytail: image placeholder — swap for the real headshot upload
     <div className="flex h-full w-full items-center justify-center bg-[#E8E3DE]">
-      <span className="font-mono text-xs uppercase tracking-wider text-[#867A72]">Photo</span>
+      <span className="font-mono text-sm uppercase tracking-[0.2em] text-[#867A72]">Photo</span>
     </div>
   )
 }

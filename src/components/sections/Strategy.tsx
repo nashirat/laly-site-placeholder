@@ -11,17 +11,17 @@ export default function Strategy({ content }: { content: StrategyContent }) {
   return (
     <section aria-label="Strategy" className="w-full bg-[#292624] py-16 md:py-24 3xl:py-32">
       <InView className="mx-auto max-w-[1360px] px-5 text-center 3xl:max-w-[1560px]">
-        <BracketLabel className="mb-5 w-44 text-[#ff6d6a] md:mb-6 md:w-80 3xl:mb-8">
+        <BracketLabel className="mb-5 w-44 text-[#ff6d6a] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#fffcf9] md:text-6xl 3xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#fffcf9] md:text-6xl xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
             </span>
           ))}
         </h2>
-        <p className="section-text-reveal mx-auto mt-6 max-w-[460px] font-sans text-xl font-normal leading-[1.25] text-[#B5ADA7] 3xl:max-w-[560px] 3xl:text-2xl">
+        <p className="section-text-reveal mx-auto mt-6 max-w-[460px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#B5ADA7] 3xl:max-w-[560px]">
           {description}
         </p>
 
@@ -59,7 +59,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                 <ArrowCircleButton
                   href={card.link.href}
                   label={card.link.label}
-                  className="md:hidden cursor-pointer text-[#FCF7F3] hover:bg-white/10 [&_img]:invert before:absolute before:inset-0 before:content-['']"
+                  className="md:hidden cursor-pointer text-[#D1C1B7] hover:bg-white/10 before:absolute before:inset-0 before:content-['']"
                 />
               </div>
 
@@ -70,7 +70,9 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                 {card.badges.map((badge) => (
                   <li
                     key={badge.label}
-                    className="flex h-[23px] shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#2D2A28] px-2 font-sans text-[13px] leading-none text-[#FCF7F3] shadow-[0_1px_2px_rgba(16,24,40,0.08)] md:px-2.5 md:text-sm 3xl:h-[27px] 3xl:px-3 3xl:text-base"
+                    /* Figma badge: 12px/125% text, padding 4/10, gap 4 — hugs to the spec's 23px,
+                       so no fixed height and no breakpoint steps */
+                    className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#2D2A28] px-2.5 py-1 font-sans text-xs leading-[1.25] text-[#FCF7F3] shadow-[0_1px_2px_rgba(16,24,40,0.04)]"
                   >
                     {/* star.svg as a mask so one asset serves all three tints */}
                     <span
@@ -88,25 +90,26 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                         WebkitMaskPosition: 'center',
                       }}
                     />
-                    {badge.label}
+                    {/* +1px: the font's line box is descent-heavy, so centred glyphs read high */}
+                    <span className="translate-y-px">{badge.label}</span>
                   </li>
                 ))}
               </ul>
 
               {/* body-2/xl — New Spirit 400 / 24px / 125% */}
               <div className="mt-4 mb-4 flex items-start justify-between gap-4">
-                <p className="font-sans text-lg font-normal leading-[1.25] text-[#FCF7F3] md:text-xl 3xl:text-2xl">
+                <p className="font-sans text-lg font-normal leading-[1.25] text-[#FCF7F3] md:text-xl xl:text-2xl">
                   {card.hook}
                 </p>
-                {/* png arrow is dark ink — inverted here for the dark ground. Its stretched ::before
-                    makes the whole card the hit area (only link in the card, so nothing to nest). */}
+                {/* the arrow takes its colour from this element. Its stretched ::before makes the
+                    whole card the hit area (only link in the card, so nothing to nest). */}
                 <ArrowCircleButton
                   href={card.link.href}
                   label={card.link.label}
                   size={40}
                   /* max-md:hidden, not `hidden md:inline-flex` — the component's own base
                      `inline-flex` outranks a bare `hidden`; only a variant beats it */
-                  className="max-md:hidden cursor-pointer text-[#FCF7F3] hover:bg-white/10 [&_img]:invert before:absolute before:inset-0 before:content-['']"
+                  className="max-md:hidden cursor-pointer text-[#D1C1B7] hover:bg-white/10 before:absolute before:inset-0 before:content-['']"
                 />
               </div>
 

@@ -1,10 +1,10 @@
-import Image from 'next/image'
 import Link from 'next/link'
-import arrow from '../../../public/arrow-up-right.png'
+import ArrowIcon from '../../../public/arrow_topright.svg'
 
 // Circular keyline button with an up-right arrow. Static — no scramble, no motion (unlike Button).
-// Border/tint inherit `currentColor`, so the caller sets colour via the surrounding text colour.
-// Used on the mobile case-study card where the EXPLORE pill collapses to this icon.
+// The svg is the whole thing, ring included: 40px as drawn, 32px on mobile.
+// Its colours are baked in, so ring and glyph are repainted with currentColor — CSS outranks a
+// presentation attribute — and the caller sets colour via the surrounding text colour.
 export function ArrowCircleButton({
   href,
   label,
@@ -13,21 +13,26 @@ export function ArrowCircleButton({
 }: {
   href?: string
   label: string
-  size?: number // circle diameter in px; the arrow stays 20px
+  size?: number // svg diameter in px
   className?: string
 }) {
   const cls =
-    `inline-flex shrink-0 items-center justify-center rounded-full border border-current ` +
+    `inline-flex shrink-0 items-center justify-center rounded-full ` +
+    `[&_rect]:stroke-current [&_path]:fill-current [&_path]:stroke-current ` +
     `transition-colors hover:bg-black/5 ${className}`.trim()
-  const style = { width: size, height: size }
-  const icon = <Image src={arrow} alt="" width={20} height={20} quality={100} className="h-5 w-5" />
+  const icon = <ArrowIcon style={{ width: size, height: size }} />
 
   return href ? (
-    <Link href={href} aria-label={label} className={cls} style={style}>
+    <Link href={href} aria-label={label} className={cls} style={{ width: size, height: size }}>
       {icon}
     </Link>
   ) : (
-    <button type="button" aria-label={label} className={cls} style={style}>
+    <button
+      type="button"
+      aria-label={label}
+      className={cls}
+      style={{ width: size, height: size }}
+    >
       {icon}
     </button>
   )

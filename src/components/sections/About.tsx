@@ -12,17 +12,18 @@ export default function About({ content }: { content: AboutContent }) {
   return (
     <section aria-label="About us" className="w-full bg-[#fffcf9] py-16 md:py-24 3xl:py-32">
       <InView className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
-        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-6 md:w-80 3xl:mb-8">
+        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl 3xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
             </span>
           ))}
         </h2>
-        <p className="section-text-reveal mx-auto mt-3 max-w-[620px] font-sans text-xl font-normal leading-[1.25] text-[#262626] 3xl:max-w-[720px] 3xl:text-2xl">
+        {/* 16px here, 24px in the other sections — designer's call, not a system value */}
+        <p className="section-text-reveal mx-auto mt-4 max-w-[620px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#262626] 3xl:max-w-[720px]">
           {description}
         </p>
 

@@ -22,7 +22,7 @@ export default function Contact({ content }: { content: ContactContent }) {
           CTAs and the socials (order-1), at md+ it leaves the flow entirely and hangs off the
           container's right edge, overlapping the heading. */}
       <InView className="relative mx-auto flex max-w-[1056px] flex-col px-5 text-center 3xl:max-w-[1200px]">
-        <BracketLabel className="mb-8 w-44 text-[#262626] md:mb-10 md:w-80">
+        <BracketLabel className="mb-8 w-44 text-[#262626] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
 

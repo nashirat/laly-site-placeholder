@@ -36,7 +36,7 @@ export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
         {rendered.map((media, i) => (
           <div
             key={i}
-            className="entry-fade relative shrink-0 pl-4 3xl:pl-8"
+            className="entry-fade relative shrink-0 pl-3 3xl:pl-6"
             style={{ '--slide-delay': `${i * STAGGER}s` } as CSSProperties}
           >
             {/* Slides are h-fixed / w-auto, so box width = height * aspect and every slide differs:

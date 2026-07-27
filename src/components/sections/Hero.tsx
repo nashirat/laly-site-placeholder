@@ -20,10 +20,12 @@ export default function Hero({ content }: { content: HeroContent }) {
   return (
     <section
       aria-label="Home"
-      className="flex min-h-[100dvh] w-full flex-col justify-center bg-[#fffcf9] pt-19"
+      // Figma section padding: 20/20/48 mobile, 112/48/112 desktop — the top value sits BELOW the
+      // navbar, so pt is 76 + that. Closes on a 1px keyline.
+      className="flex min-h-[100dvh] w-full flex-col justify-center border-b border-[#544D49] bg-[#fffcf9] pt-24 pb-12 md:pt-[188px] md:pb-28"
     >
       {/* Figma mobile: text container hugs at 291px (≈50px each side on a 390 frame), children gap 20 */}
-      <div className="mx-auto max-w-[291px] px-0 text-center md:max-w-[1056px] md:px-5 3xl:max-w-[1200px]">
+      <div className="mx-auto max-w-[291px] px-0 text-center md:max-w-[1056px] md:px-12 3xl:max-w-[1200px]">
         {/* whole heading fades up as one — no per-letter ripple (reads tacky, team review). The
             authored \n stays a hard break via block spans; on mobile each line wraps beneath it. */}
         <h1
@@ -70,15 +72,21 @@ export default function Hero({ content }: { content: HeroContent }) {
           className="hero-cta entry-copy mt-5 flex justify-center md:mt-6"
           style={{ animationDelay: '1.1s' }}
         >
-          <Button variant="primary" href={button.href}>
+          {/* 20px label from desktop up — the shared Button ships 16/18, so the label span is
+              overridden here rather than moving every other button on the page */}
+          <Button
+            variant="primary"
+            href={button.href}
+            className="md:[&>span]:text-xl md:[&>span]:leading-[25px]"
+          >
             {button.label}
           </Button>
         </div>
       </div>
 
       {/* full-bleed image strip below the button; already scrolling, slides fade in staggered */}
-      {/* Figma mobile: hero stack gap = spacing/56 */}
-      <div className="mt-14 w-full md:mt-24">
+      {/* Figma: 56 mobile, 48 desktop */}
+      <div className="mt-14 w-full md:mt-12 3xl:mt-16">
         <ImageMarquee slides={slides} />
       </div>
     </section>

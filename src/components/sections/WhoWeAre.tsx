@@ -16,10 +16,10 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
   return (
     <section aria-label="Who we are" className="w-full bg-[#fcf7f3] py-16 md:py-24 3xl:py-32">
       <InView className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
-        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-6 md:w-80 3xl:mb-8">
+        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl 3xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
@@ -29,7 +29,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
         {description.split('\n\n').map((para) => (
           <p
             key={para}
-            className="section-text-reveal mx-auto mt-6 max-w-[760px] font-sans text-xl font-normal leading-[1.25] text-[#4A4A4A] 3xl:max-w-[900px] 3xl:text-2xl"
+            className="section-text-reveal mx-auto mt-6 max-w-[760px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#4A4A4A] 3xl:max-w-[900px]"
           >
             {para}
           </p>
@@ -60,9 +60,12 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
               </div>
 
               {/* campaign image — landscape crop on mobile, fills the column height on desktop */}
+              {/* outline, not border: the video card composites onto its own layer and paints over
+                  a 1px border. outline draws above content, -offset-1 keeps it inside the box so
+                  the two cards still measure identically. */}
               <div
-                className="aspect-[16/10] overflow-hidden border md:col-start-1 md:row-start-1 md:row-span-3 md:aspect-auto md:h-full"
-                style={{ borderColor: card.border }}
+                className="aspect-[16/10] overflow-hidden outline outline-1 -outline-offset-1 md:col-start-1 md:row-start-1 md:row-span-3 md:aspect-auto md:h-full"
+                style={{ outlineColor: card.border }}
               >
                 {card.video ? (
                   // muted+playsInline so mobile autoplays inline; the still doubles as the poster
@@ -75,7 +78,9 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                     playsInline
                     preload="metadata"
                     aria-label={card.image.alt}
-                    className="h-full w-full object-cover"
+                    /* block — a <video> is inline by default, so it leaves a baseline gap that
+                       pushes it past the bottom edge of the bordered box */
+                    className="block h-full w-full object-cover"
                   />
                 ) : (
                   <MediaImage

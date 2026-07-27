@@ -35,8 +35,8 @@ const VARIANTS = {
   },
   // primary: brand-pink fill, dark text; hover darkens the fill; no color flash
   primary: {
-    shell: 'bg-[#ff6d6a] text-[#262626] hover:bg-[#ff7e7b]',
-    flash: '#262626',
+    shell: 'bg-[#ff6d6a] text-[#292624] hover:bg-[#ff7e7b]',
+    flash: '#292624',
   },
 } as const
 
