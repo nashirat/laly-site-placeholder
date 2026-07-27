@@ -34,7 +34,9 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
         {/* two paragraphs on mobile, one flowing block on desktop — the paragraphs go inline at md+
             and the second picks up a leading space from ::before, so no second copy of the text */}
         <div className="mt-6 md:mt-8">
-          {description.split('\n\n').map((para, i) => (
+          {/* trim + filter: a trailing newline in the CMS field would otherwise render an empty
+              paragraph, which reads as a blank line at the bottom of the block */}
+          {description.split('\n\n').map((p) => p.trim()).filter(Boolean).map((para, i) => (
             <p
               key={para}
               // desktop-only tracking — it pushes "That" onto line 2 there, but on mobile it was
@@ -48,21 +50,22 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
           ))}
         </div>
 
-        {/* text block → cards: 32 mobile, 48 desktop */}
-        <div className="section-media-reveal mt-8 flex flex-col gap-8 md:mt-12">
+        {/* text block → cards: 44 mobile (Figma's 32 + 12, the copy block runs short), 48 desktop */}
+        <div className="section-media-reveal mt-11 flex flex-col gap-8 md:mt-12">
           {cards.map((card) => (
             <article
               key={card.title}
               // Mobile: single column, stacked (title+arrow, image, body, stat). Desktop: image fills
               // the left column across all three rows; title/body/stat stack in the right column with
               // the body row growing so the stat pins to the bottom.
-              className="relative grid grid-cols-1 gap-6 overflow-hidden border px-3 py-6 text-left md:grid-cols-2 md:grid-rows-[auto_1fr_auto] md:p-6 3xl:p-8"
+              className="relative grid grid-cols-1 gap-4 overflow-hidden border px-3 py-6 text-left md:grid-cols-2 md:gap-6 md:grid-rows-[auto_1fr_auto] md:p-6 3xl:p-8"
               style={{ color: card.fg, backgroundColor: card.bg, borderColor: card.border }}
             >
               {/* title row — arrow button only shows on mobile (EXPLORE takes over on desktop) */}
-              <div className="flex items-center justify-between gap-4 md:col-start-2 md:row-start-1">
+              {/* mb-2 on top of the card's 16 gap = the 24 Figma leaves under the title row */}
+              <div className="mb-2 flex items-center justify-between gap-4 md:col-start-2 md:row-start-1 md:mb-0">
                 {/* heading/h1/m — Neue Haas 450 / 48px / 110% */}
-                <h3 className="font-display text-[32px] font-normal leading-[1.1] tracking-tight md:text-5xl 3xl:text-6xl">
+                <h3 className="font-display text-[36px] font-normal leading-[1.1] tracking-tight md:text-5xl 3xl:text-6xl">
                   {card.title}
                 </h3>
                 {/* on mobile the arrow's stretched ::before makes the whole card clickable */}
@@ -107,8 +110,10 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
 
               {/* body-2/xl — New Spirit 400 / 24px / 125% */}
               <p
-                className="font-sans text-lg font-normal leading-[1.25] md:col-start-2 md:row-start-2 md:text-2xl 3xl:text-[28px]"
-                style={{ color: card.muted }}
+                // letter-spacing/l — same -0.01em we use on the hero desc
+                className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] opacity-80 md:col-start-2 md:row-start-2 md:text-2xl 3xl:text-[28px]"
+                // body-2/l is the card's own ink (#313008 Senft, #443B43 Vajra) at 80%
+                style={{ color: card.fg }}
               >
                 {card.body}
               </p>
@@ -120,12 +125,12 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                   {/* % same as heading */}
                   <CountUp
                     value={card.stat.value}
-                    className="font-fira text-3xl font-normal leading-none md:text-[44px]"
+                    className="font-fira text-[32px] font-normal leading-none md:text-[44px]"
                     style={{ color: card.fg }}
                   />
                   {/* body-2/xs — New Spirit 400 / 14px / 125%, flat at every width */}
                   <span
-                    className="font-sans text-sm leading-[1.25] whitespace-normal md:whitespace-pre-line"
+                    className="font-sans text-xs leading-[1.25] whitespace-normal md:text-sm md:whitespace-pre-line"
                     style={{ color: card.muted }}
                   >
                     {card.stat.label}

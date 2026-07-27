@@ -118,8 +118,8 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                 />
               </div>
 
-              {/* body/s — Neue Haas 450 / 16px / 125% */}
-              <p className="font-display text-sm font-normal leading-[1.25] text-[#D1C1B7] md:self-end md:text-base 3xl:text-lg">
+              {/* body/s — Neue Haas 450→400 / 16px / 125%, #FCF7F3 at 65% */}
+              <p className="font-display text-base font-normal leading-[1.25] text-[#FCF7F3] opacity-65 md:self-end">
                 {card.body}
               </p>
             </article>

@@ -90,7 +90,7 @@ export const home: {
         link: { label: 'EXPLORE' },
         bg: '#f3e8f2',
         border: '#716370',
-        fg: '#3a2f39',
+        fg: '#443B43', // color/accent-2/5 — the card's ink (title, body, stat value)
         muted: '#716370',
       },
     ],
