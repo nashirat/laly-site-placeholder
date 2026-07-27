@@ -64,7 +64,8 @@ export default function Hero({ content }: { content: HeroContent }) {
           })}
         </h1>
         <p
-          className="hero-desc entry-copy mx-auto mt-5 max-w-[616px] md:mt-6 font-sans text-lg font-normal leading-[1.25] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
+          // letter-spacing/l — token value unknown, eyeballed a touch tighter than default
+          className="hero-desc entry-copy mx-auto mt-5 max-w-[616px] md:mt-6 font-sans text-lg font-normal leading-[1.25] tracking-[-0.01em] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
           style={{ animationDelay: '0.95s' }}
         >
           {description}

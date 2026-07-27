@@ -14,8 +14,13 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
   const { label, heading, description, cards } = content
 
   return (
-    <section aria-label="Who we are" className="w-full bg-[#fcf7f3] py-16 md:py-24 3xl:py-32">
-      <InView className="mx-auto max-w-[1056px] px-5 text-center 3xl:max-w-[1200px]">
+    <section
+      aria-label="Who we are"
+      // Figma desktop: 112 top+bottom, 160 sides, ground #FCF7F3
+      className="w-full bg-[#fcf7f3] py-16 md:py-28"
+    >
+      {/* no max-width — Figma's padding is the only rule: 20 sides mobile, 160 desktop */}
+      <InView className="px-5 text-center md:px-40">
         <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
@@ -26,14 +31,21 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
             </span>
           ))}
         </h2>
-        {description.split('\n\n').map((para) => (
-          <p
-            key={para}
-            className="section-text-reveal mx-auto mt-6 max-w-[760px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#4A4A4A] 3xl:max-w-[900px]"
-          >
-            {para}
-          </p>
-        ))}
+        {/* two paragraphs on mobile, one flowing block on desktop — the paragraphs go inline at md+
+            and the second picks up a leading space from ::before, so no second copy of the text */}
+        <div className="mt-6">
+          {description.split('\n\n').map((para, i) => (
+            <p
+              key={para}
+              // wider tracking pushes "That" onto line 2, matching the Figma wrap
+              className={`section-text-reveal font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] tracking-[0.02em] text-[#4A4A4A] md:inline ${
+                i > 0 ? "mt-6 md:mt-0 md:before:content-['_']" : ''
+              }`}
+            >
+              {para}
+            </p>
+          ))}
+        </div>
 
         <div className="section-media-reveal mt-10 flex flex-col gap-8 md:mt-12 3xl:mt-16">
           {cards.map((card) => (
