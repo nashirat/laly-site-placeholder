@@ -23,7 +23,8 @@ export default function About({ content }: { content: AboutContent }) {
           ))}
         </h2>
         {/* 16px here, 24px in the other sections — designer's call, not a system value */}
-        <p className="section-text-reveal mx-auto mt-4 max-w-[620px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#262626] 3xl:max-w-[720px]">
+        {/* body-2/l — New Spirit 400 / 20 / 125% / letter-spacing l / #4A4A4A, centred */}
+        <p className="section-text-reveal mx-auto mt-4 max-w-[620px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] tracking-[-0.01em] text-[#4A4A4A] 3xl:max-w-[720px]">
           {description}
         </p>
 

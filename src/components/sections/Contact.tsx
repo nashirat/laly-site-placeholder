@@ -16,15 +16,21 @@ export default function Contact({ content }: { content: ContactContent }) {
   return (
     <section
       aria-label="Contact"
-      className="w-full overflow-hidden bg-[#ff6d6a] py-16 md:py-24 3xl:py-32"
+      // Figma mobile: 48 top / 64 bottom / 20 sides
+      className="w-full overflow-hidden bg-[#ff6d6a] pt-12 pb-16 md:py-24 3xl:py-32"
     >
       {/* flex column + `order` so ONE photo node serves both layouts: on mobile it flows between the
           CTAs and the socials (order-1), at md+ it leaves the flow entirely and hangs off the
           container's right edge, overlapping the heading. */}
-      <InView className="relative mx-auto flex max-w-[1056px] flex-col px-5 text-center 3xl:max-w-[1200px]">
-        <BracketLabel className="mb-8 w-44 text-[#262626] md:mb-8 md:w-80">
+      {/* mobile is four blocks 32 apart: caption / heading+CTAs / photo / socials. The heading and
+          its CTAs are one block, so they're wrapped — the wrapper goes `display:contents` at md+,
+          leaving the desktop layout (absolute photo, per-child margins) exactly as it was. */}
+      <InView className="relative mx-auto flex max-w-[1056px] flex-col gap-8 px-5 text-center md:gap-0 3xl:max-w-[1200px]">
+        <BracketLabel className="w-44 text-[#262626] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
+
+        <div className="flex flex-col gap-6 md:contents">
 
         {/* display-2: Neue Haas 65 Medium (w500), 200px / 90% / -6px tracking, uppercase, #151414.
             -6px at 200px == -0.03em, so the tracking scales with every step of the size ladder.
@@ -32,13 +38,38 @@ export default function Contact({ content }: { content: ContactContent }) {
             Mobile runs big enough to wrap to three lines (GROW / WITH / US.) like the design. */}
         <Typewriter
           text={heading}
-          className="section-media-reveal relative z-10 font-display text-[72px] font-medium uppercase leading-[0.9] tracking-[-0.03em] text-[#151414] md:text-[140px] xl:text-[188px] 3xl:text-[200px]"
+          // mobile: 122px / 500 / 90% / -6px tracking (not -0.03em — that's the desktop ratio)
+          className="section-media-reveal relative z-10 font-display text-[122px] font-medium uppercase leading-[0.9] tracking-[-6px] text-[#151414] md:text-[140px] md:tracking-[-0.03em] xl:text-[188px] 3xl:text-[200px]"
         />
+
+        <div className="section-media-reveal flex justify-center gap-3 md:mt-12 3xl:mt-14 3xl:gap-4">
+          {/* no scramble, no hover tint — client's call: these closing CTAs stay completely static.
+              Costs the pointer its only affordance; the cursor and focus ring are all that's left. */}
+          {/* Figma has this pair at 6.51 / 8.69 padding on #151414 with Drop shadow at 4% —
+              instance-only, the shared Button keeps its own numbers. */}
+          <Button
+            variant="solid"
+            scramble={false}
+            href={buttons[0].href}
+            className="bg-[#151414]! px-[8.69px]! py-[6.51px]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]!"
+          >
+            {buttons[0].label}
+          </Button>
+          <Button
+            variant="outline"
+            scramble={false}
+            href={buttons[1].href}
+            className="border-[#151414]! px-[8.69px]! py-[6.51px]! text-[#151414]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]!"
+          >
+            {buttons[1].label}
+          </Button>
+        </div>
+        </div>
 
         {/* team photo — tilted, overlapping the heading at md+. Two crops: landscape below md,
             portrait at md+ (the frame's aspect flips, so one file can't serve both).
             md top offset clears the bracket label, which is now a flex sibling rather than above. */}
-        <div className="section-media-reveal order-1 z-0 mt-8 aspect-[3/2] w-full overflow-hidden md:rotate-2 md:absolute md:right-0 md:top-12 md:order-none md:mt-0 md:aspect-auto md:h-[330px] md:w-[280px] 3xl:top-14 3xl:h-[400px] 3xl:w-[340px]">
+        <div className="section-media-reveal order-1 z-0 h-[248px] w-full overflow-hidden md:rotate-2 md:absolute md:right-0 md:top-12 md:order-none md:mt-0 md:aspect-auto md:h-[330px] md:w-[280px] 3xl:top-14 3xl:h-[400px] 3xl:w-[340px]">
           <MediaImage
             media={photoMobile}
             sizes="100vw"
@@ -51,20 +82,9 @@ export default function Contact({ content }: { content: ContactContent }) {
           />
         </div>
 
-        <div className="section-media-reveal mt-10 flex justify-center gap-3 md:mt-12 3xl:mt-14 3xl:gap-4">
-          {/* no scramble, no hover tint — client's call: these closing CTAs stay completely static.
-              Costs the pointer its only affordance; the cursor and focus ring are all that's left. */}
-          <Button variant="solid" scramble={false} href={buttons[0].href}>
-            {buttons[0].label}
-          </Button>
-          <Button variant="outline" scramble={false} href={buttons[1].href}>
-            {buttons[1].label}
-          </Button>
-        </div>
-
         {/* socials — icons are 32x32 as drawn; last in both layouts (order-2 keeps them under the
             photo on mobile, where the photo is order-1) */}
-        <div className="section-media-reveal order-2 mt-10 flex items-center justify-center gap-4 3xl:mt-12">
+        <div className="section-media-reveal order-2 flex items-center justify-center gap-4 md:mt-10 3xl:mt-12">
           {socials.map((s) => (
             <a
               key={s.platform}
@@ -72,9 +92,14 @@ export default function Contact({ content }: { content: ContactContent }) {
               aria-label={s.platform}
               target="_blank"
               rel="noreferrer"
-              className="transition-opacity hover:opacity-70"
+              className="text-[#292624] transition-opacity hover:opacity-70"
             >
-              <Icon name={s.platform} className="h-8 w-8" />
+              {/* svgs ship with #151414 baked in — ring (rect stroke) and glyph (path fill) both
+                  repainted from currentColor; CSS outranks a presentation attribute */}
+              <Icon
+                name={s.platform}
+                className="h-8 w-8 [&_rect]:stroke-current [&_path]:fill-current"
+              />
             </a>
           ))}
         </div>

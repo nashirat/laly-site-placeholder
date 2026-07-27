@@ -120,8 +120,9 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
   return (
     <div className="section-media-reveal mt-8 text-left md:mt-10 3xl:mt-12">
       {/* mobile only — swipe affordance, sits above the card (no on-card arrows on small screens) */}
-      <div className="mb-2 flex items-center justify-end gap-1.5 text-[#ff6d6a] md:hidden">
-        <span className="font-mono text-sm uppercase tracking-[0.2em]">Scroll</span>
+      <div className="mb-2 flex items-center justify-end gap-1.5 text-[#FF8A88] md:hidden">
+        {/* Fira Code 400 / 10 / 100% / no tracking / #FF8A88 */}
+        <span className="font-mono text-[10px] uppercase leading-none">Scroll</span>
         {/* same pixel arrow as the desktop on-card nav, at Figma's 9.14 x 8 */}
         <NavArrowIcon className="w-[9.14px] h-2" />
       </div>
@@ -176,7 +177,8 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
             incoming={incoming !== null ? members[incoming].name : null}
             phase={phase}
             direction={direction}
-            className="font-sans text-[32px] font-normal leading-[1.4] text-[#262626] md:text-5xl 3xl:text-6xl"
+            // mobile = body-2/l: New Spirit 400 / 20 / 125% / letter-spacing l / #262626
+            className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#262626] md:text-5xl md:leading-[1.4] md:tracking-normal 3xl:text-6xl"
             {...T_NAME}
           />
           {/* on-card arrows — desktop only; mobile uses swipe + the SCROLL affordance above */}
@@ -195,11 +197,19 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
             incoming={incoming !== null ? members[incoming].role : null}
             phase={phase}
             direction={direction}
-            className="whitespace-pre-line font-sans text-lg font-normal leading-[1.25] text-[#FCF7F3] md:text-2xl 3xl:text-[28px]"
+            // mobile = body-2/s: New Spirit 400 / 16 / 125% / letter-spacing l / #FCF7F3
+            className="whitespace-pre-line font-sans text-base font-normal leading-[1.25] tracking-[-0.01em] text-[#FCF7F3] md:text-2xl 3xl:text-[28px]"
             {...T_ROLE}
           />
         </div>
-        <Button variant="outlineInverse" href={story.href}>
+        {/* Button/Small/Tertiary — its own Figma spec: 6px padding all round, 1px #FCF7F3 keyline
+            on #262626, and a Neue Haas label at 16/125% rather than the mono the others use.
+            Instance-only; button styles are deliberately not uniform across the page. */}
+        <Button
+          variant="outlineInverse"
+          href={story.href}
+          className="border-[1px]! border-[#FCF7F3]! bg-[#262626]! px-1.5! text-[#FCF7F3]! shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]! [&>span]:font-display! [&>span]:text-base! [&>span]:font-normal! [&>span]:leading-[1.25]!"
+        >
           {story.label}
         </Button>
       </div>
