@@ -33,7 +33,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
         </h2>
         {/* two paragraphs on mobile, one flowing block on desktop — the paragraphs go inline at md+
             and the second picks up a leading space from ::before, so no second copy of the text */}
-        <div className="mt-6">
+        <div className="mt-6 md:mt-8">
           {description.split('\n\n').map((para, i) => (
             <p
               key={para}
@@ -54,7 +54,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
               // Mobile: single column, stacked (title+arrow, image, body, stat). Desktop: image fills
               // the left column across all three rows; title/body/stat stack in the right column with
               // the body row growing so the stat pins to the bottom.
-              className="relative grid grid-cols-1 gap-6 overflow-hidden border px-3 py-6 text-left md:grid-cols-2 md:grid-rows-[auto_1fr_auto] md:p-6 3xl:gap-x-10 3xl:p-8"
+              className="relative grid grid-cols-1 gap-6 overflow-hidden border px-3 py-6 text-left md:grid-cols-2 md:grid-rows-[auto_1fr_auto] md:p-6 3xl:p-8"
               style={{ color: card.fg, backgroundColor: card.bg, borderColor: card.border }}
             >
               {/* title row — arrow button only shows on mobile (EXPLORE takes over on desktop) */}
@@ -76,7 +76,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                   a 1px border. outline draws above content, -offset-1 keeps it inside the box so
                   the two cards still measure identically. */}
               <div
-                className="aspect-[16/10] overflow-hidden outline outline-1 -outline-offset-1 md:col-start-1 md:row-start-1 md:row-span-3 md:aspect-auto md:h-full"
+                className="aspect-[16/10] overflow-hidden outline outline-1 -outline-offset-1 md:col-start-1 md:row-start-1 md:row-span-3 md:aspect-auto md:h-[330px]"
                 style={{ outlineColor: card.border }}
               >
                 {card.video ? (
@@ -92,7 +92,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                     aria-label={card.image.alt}
                     /* block — a <video> is inline by default, so it leaves a baseline gap that
                        pushes it past the bottom edge of the bordered box */
-                    className="block h-full w-full object-cover"
+                    className="block h-full w-full object-cover object-center"
                   />
                 ) : (
                   <MediaImage
@@ -112,28 +112,31 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
               </p>
 
               {/* stat row — stacked (value over label) on mobile, EXPLORE pill added on desktop */}
-              <div className="flex items-end justify-between md:col-start-2 md:row-start-3 md:self-end">
-                <p className="flex flex-col items-start gap-1 md:flex-row md:items-center md:gap-1.5">
+              {/* pb-2: Figma leaves 8 under the stat row, inside the card's own padding */}
+              <div className="flex items-end justify-between md:col-start-2 md:row-start-3 md:self-end md:pb-2">
+                <p className="flex flex-col items-start gap-1 md:flex-row md:items-center">
                   {/* % same as heading */}
                   <CountUp
                     value={card.stat.value}
-                    className="font-fira text-3xl font-normal leading-none md:text-4xl 3xl:text-5xl"
+                    className="font-fira text-3xl font-normal leading-none md:text-[44px]"
                     style={{ color: card.fg }}
                   />
-                  {/* body-2/xs — New Spirit 400 / 14px / 125% */}
+                  {/* body-2/xs — New Spirit 400 / 14px / 125%, flat at every width */}
                   <span
-                    className="font-sans text-sm leading-[1.4] whitespace-normal md:whitespace-pre-line 3xl:text-base"
+                    className="font-sans text-sm leading-[1.25] whitespace-normal md:whitespace-pre-line"
                     style={{ color: card.muted }}
                   >
                     {card.stat.label}
                   </span>
                 </p>
                 <span className="hidden md:block">
+                  {/* EXPLORE's own Figma spec — 1px #292624 keyline, Drop shadow/Small.
+                      Instance-only: button styles are deliberately not uniform across the page. */}
                   <Button
                     variant="outline"
                     href={card.link.href}
                     scrambleColor={card.fg}
-                    className="hover:bg-black/5"
+                    className="border-[1px]! border-[#292624]! text-[#292624]! shadow-[0_2px_6px_0_rgba(16,24,40,0.06)]! hover:bg-black/5"
                   >
                     {card.link.label}
                   </Button>

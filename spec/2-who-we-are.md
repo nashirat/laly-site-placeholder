@@ -33,7 +33,7 @@ section
 
 gaps
   caption → heading:       20 / 32 / 32
-  heading → desc:          24 / 24 / 24
+  heading → desc:          24 / 32 / 32
   desc → first card:       40 / 48 / 64
   card → card:             32 / 32 / 32
 
@@ -59,7 +59,7 @@ card
   leading:         125%
 
 "133%"
-  size:            30 / 36 / 48
+  size:            30 / 44 / 48
   weight:          400
   leading:         100%
 

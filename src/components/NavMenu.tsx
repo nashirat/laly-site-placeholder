@@ -6,7 +6,7 @@ import { ScrambleText } from '@/components/ui/ScrambleText'
 import type { HeaderContent } from '@/lib/types'
 
 // MENU toggle + dropdown. Items masked; slide in from the right on open, slide out to the right on
-// close, both staggered top->bottom. Geist Mono like the button; scramble-on-hover (mono).
+// close, both staggered top->bottom. Fira Code like the button; scramble-on-hover (mono).
 // Items come from the Header global (mocked for now) — order is whatever the CMS says.
 const STAGGER = 0.06 // seconds between items
 const DURATION = 1.2 // slide duration (matches the keyframes)

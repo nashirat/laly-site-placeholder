@@ -12,6 +12,7 @@ import { useScramble } from '@/components/ui/ScrambleText'
 const SHELL_BASE =
   // Figma Button/Medium: padding 6px vertical / 8px horizontal, gap 6px (the label's gap-1.5),
   // corner-radius/full. 23px line-height + 12px padding = the spec's 35px hug height.
+  // Per-button specs differ by design — override on the instance, don't unify here.
   'inline-flex cursor-pointer items-center justify-center rounded-full px-2 py-1.5 ' +
   'shadow-[0_1px_2px_0_rgba(16,24,40,0.08)] transition-colors'
 const TYPE = 'font-fira text-base font-medium leading-[23px] whitespace-nowrap 3xl:text-lg 3xl:leading-[26px]'

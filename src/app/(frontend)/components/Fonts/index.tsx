@@ -1,4 +1,4 @@
-import { Fira_Code, Geist_Mono } from 'next/font/google'
+import { Fira_Code } from 'next/font/google'
 import localFont from 'next/font/local'
 
 // Self-hosted woff2 (converted from the ttf/otf under /public).
@@ -37,15 +37,8 @@ export const newSpirit = localFont({
   variable: '--font-new-spirit',
 })
 
-/** Geist Mono — neo-grotesque monospace, scramble labels. Exposed as --font-mono in @theme.
- *  Variable Google font (self-hosted + subsetted by next/font at build). */
-export const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-geist-mono',
-})
-
-/** Fira Code — monospace, button labels + stat percentages. Exposed as --font-fira in @theme. */
+/** Fira Code — the page's only monospace: captions, nav items, button labels, stat percentages.
+ *  Backs both --font-mono and --font-fira in @theme. */
 export const firaCode = Fira_Code({
   subsets: ['latin'],
   display: 'swap',
@@ -53,4 +46,4 @@ export const firaCode = Fira_Code({
 })
 
 /** Concatenated CSS-variable classes to spread on <body>. */
-export const fontVariables = `${neueHaas.variable} ${newSpirit.variable} ${geistMono.variable} ${firaCode.variable}`
+export const fontVariables = `${neueHaas.variable} ${newSpirit.variable} ${firaCode.variable}`
