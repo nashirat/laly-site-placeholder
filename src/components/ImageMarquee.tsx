@@ -36,7 +36,9 @@ export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
         {rendered.map((media, i) => (
           <div
             key={i}
-            className="entry-fade relative shrink-0 pl-3 3xl:pl-6"
+            // full-bleed both edges — only the first slide carries the section's inset, so the
+            // strip reads as aligned at rest and runs off both sides once it scrolls
+            className={`entry-fade relative shrink-0 ${i === 0 ? 'pl-5 md:pl-12' : 'pl-3 3xl:pl-6'}`}
             style={{ '--slide-delay': `${i * STAGGER}s` } as CSSProperties}
           >
             {/* Slides are h-fixed / w-auto, so box width = height * aspect and every slide differs:
@@ -49,7 +51,7 @@ export function ImageMarquee({ slides }: { slides: MediaDoc[] }) {
             <MediaImage
               media={media}
               sizes={slideSizes(media)}
-              className="h-[240px] w-auto md:h-[340px] 3xl:h-[476px]"
+              className="h-[250px] w-auto md:h-[340px] 3xl:h-[476px]"
             />
           </div>
         ))}

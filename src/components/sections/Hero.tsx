@@ -4,10 +4,10 @@ import { Fragment } from 'react'
 import type { CSSProperties } from 'react'
 import type { HeroContent } from '@/lib/types'
 
-// Home hero — first section. Cream full-viewport. The whole stack (copy + strip) is centered in the
-// viewport below the navbar: min-h screen + flex column + justify-center, pt-19 reserves the navbar
-// (which is absolute, so it has no flow height) and keeps the centering optical. min-h, not h, so
-// short viewports scroll instead of clipping.
+// Home hero — first section, cream. Height HUGS its content, like the Figma frame: the 808/818 in
+// the design is a hug result, not a constraint, so a fixed height or 100dvh would only add dead
+// space (tall screens) or squeeze the padding (short ones). Padding then means literally what the
+// Figma panel says at every width.
 // Heading = Figma display/l: Neue Haas (font-display) 500 / 72px / 100% leading / center / #262626.
 // Mobile = Figma heading/h1/s: 450 (→400, only 400/500/700 shipped) / 44px / 110% leading.
 // Desc = Figma body-2/xxl: New Spirit (font-sans) 400 / 28px / 125% leading / center / #4A4A4A.
@@ -20,12 +20,13 @@ export default function Hero({ content }: { content: HeroContent }) {
   return (
     <section
       aria-label="Home"
-      // Figma section padding: 20/20/48 mobile, 112/48/112 desktop — the top value sits BELOW the
-      // navbar, so pt is 76 + that. Closes on a 1px keyline.
-      className="flex min-h-[100dvh] w-full flex-col justify-center border-b border-[#544D49] bg-[#fffcf9] pt-24 pb-12 md:pt-[188px] md:pb-28"
+      // Figma's frame holds the navbar, which is fixed here and out of flow — so the frame's gap
+      // between navbar and copy has to carry the navbar's own 76px: 76 + 80 mobile, 76 + 48 desktop.
+      // Sides 20/48, bottom 48/112. Closes on a 1px keyline.
+      className="flex w-full flex-col border-b border-[#544D49] bg-[#fffcf9] px-5 pt-[156px] pb-12 md:px-12 md:pt-[124px] md:pb-28"
     >
       {/* Figma mobile: text container hugs at 291px (≈50px each side on a 390 frame), children gap 20 */}
-      <div className="mx-auto max-w-[291px] px-0 text-center md:max-w-[1056px] md:px-12 3xl:max-w-[1200px]">
+      <div className="mx-auto max-w-[291px] text-center md:max-w-[1056px] 3xl:max-w-[1200px]">
         {/* whole heading fades up as one — no per-letter ripple (reads tacky, team review). The
             authored \n stays a hard break via block spans; on mobile each line wraps beneath it. */}
         <h1
@@ -85,8 +86,9 @@ export default function Hero({ content }: { content: HeroContent }) {
       </div>
 
       {/* full-bleed image strip below the button; already scrolling, slides fade in staggered */}
-      {/* Figma: 56 mobile, 48 desktop */}
-      <div className="mt-14 w-full md:mt-12 3xl:mt-16">
+      {/* gap above: 56 mobile, 48 desktop. Negative margins cancel the section's side padding — the
+          strip is full-bleed; ImageMarquee's first slide carries the inset on its own. */}
+      <div className="-mx-5 mt-14 md:-mx-12 md:mt-12 3xl:mt-16">
         <ImageMarquee slides={slides} />
       </div>
     </section>
