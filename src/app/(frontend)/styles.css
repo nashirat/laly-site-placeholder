@@ -19,6 +19,18 @@
   --breakpoint-4xl: 160rem; /* 2560px — QHD/ultrawide */
 }
 
+/* Every section is authored padding-only against Figma's 1440 frame, so past 1440 they just keep
+   stretching — at 1920 WhoWeAre's 160px sides leave a 1600px content row where the design has 1120.
+   This caps the shell and centres it; each section keeps its own padding, so the inner proportions
+   are untouched and only the runaway growth stops.
+   1600, not 1440: a hard 1440 reads as a 1440 window with dead rails on an FHD display. 1600 is
+   ~+11%, in line with the 3xl bumps already authored by hand (Hero/About text go 1056 -> 1200).
+   Hero opts out — its marquee is deliberately full-bleed and its text column already caps itself. */
+@utility section-shell {
+  margin-inline: auto;
+  max-width: 100rem; /* 1600px */
+}
+
 /* Brand colors go here once Figma lands: @theme { --color-brand: ...; } */
 
 /* Lenis (see SmoothScroll.tsx) — inlined rather than importing lenis/dist/lenis.css, because

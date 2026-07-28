@@ -19,8 +19,8 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
       // Figma: 48 top+bottom / 20 sides mobile, 112 / 160 desktop. Ground #FCF7F3.
       className="w-full bg-[#fcf7f3] py-12 md:py-28"
     >
-      {/* no max-width — Figma's padding is the only rule: 20 sides mobile, 160 desktop */}
-      <InView className="px-5 text-center md:px-40">
+      {/* Figma's padding is the rule inside the shell: 20 sides mobile, 160 desktop */}
+      <InView className="section-shell px-5 text-center md:px-40">
         <BracketLabel className="mb-6 w-44 text-[#867A72] md:mb-8 md:w-80">
           {label}
         </BracketLabel>

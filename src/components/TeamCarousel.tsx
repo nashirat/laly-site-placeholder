@@ -223,11 +223,11 @@ function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean 
     <MediaImage
       media={member.photo}
       eager={eager}
-      // Box is 1016px (1160 at 3xl); object-cover scales these portrait sources by width. Declared
-      // 1024/1200 rather than the true box so DPR2 lands on a deviceSize exactly (1024*2 = 2048)
-      // instead of overshooting. Sources are 2320 wide, which is exactly 3xl's DPR2 need, so every
-      // breakpoint/DPR pair resolves to ratio >= 1.0 — verified in the audit script.
-      sizes="(max-width: 1151px) 100vw, (min-width: 1920px) 1200px, 1024px"
+      // object-cover scales these portrait sources by width, so the box width is what matters.
+      // Between md and 3xl the section is padding-only (px-40), so the box tracks the viewport —
+      // a fixed px here understated it badly on a 1900px screen. Above 3xl .section-shell caps the
+      // shell at 1600, so the box is a constant 1600 - 320.
+      sizes="(max-width: 1151px) 100vw, (min-width: 1920px) 1280px, calc(100vw - 320px)"
       className="h-full w-full object-cover object-top"
     />
   ) : (

@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="w-full bg-[#fffcf9]">
       {/* mobile: 48 top / 20 sides / 20 bottom, three blocks 48 apart — logo, the NAV+CONTACT
           column, then the copyright */}
-      <div className="flex flex-col items-center gap-12 px-5 pt-12 pb-5 md:flex-row md:items-start md:justify-between md:gap-12 md:px-12 md:pt-12 md:pb-5">
+      <div className="section-shell flex flex-col items-center gap-12 px-5 pt-12 pb-5 md:flex-row md:items-start md:justify-between md:gap-12 md:px-12 md:pt-12 md:pb-5">
         <img
           src="/primarylogo.svg"
           alt="Laly Agency"
