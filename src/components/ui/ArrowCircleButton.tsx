@@ -19,7 +19,7 @@ export function ArrowCircleButton({
   const cls =
     `inline-flex shrink-0 items-center justify-center rounded-full ` +
     `[&_rect]:stroke-current [&_path]:fill-current [&_path]:stroke-current ` +
-    `transition-colors hover:bg-black/5 ${className}`.trim()
+    `transition-colors ${className}`.trim()
   const icon = <ArrowIcon style={{ width: size, height: size }} />
 
   return href ? (

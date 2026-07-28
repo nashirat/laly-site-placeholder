@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { ArrowCircleButton } from '@/components/ui/ArrowCircleButton'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { InView } from '@/components/ui/InView'
@@ -43,8 +44,10 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               key={card.title}
               // min-w-0 defeats the grid item's `min-width: auto`, so the nowrap badges stop
               // widening the track and scroll inside the card instead.
-              className="section-media-reveal relative flex min-w-0 flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
-              style={{ animationDelay: `${0.2 + i * 0.2}s` }}
+              // glow only, no keyline — mixed from --card-fg (the title colour), so each card
+              // lights up in its own accent.
+              className="section-media-reveal relative flex min-w-0 flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left transition-shadow duration-300 ease-out hover:shadow-[0_0_32px_4px_color-mix(in_srgb,var(--card-fg)_28%,transparent)] md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
+              style={{ '--card-fg': card.fg, animationDelay: `${0.2 + i * 0.2}s` } as CSSProperties}
             >
               {/* heading/h2/l — Neue Haas 450 / 44px / 110%.
                   Mobile puts the arrow up here beside the title; desktop keeps it beside the hook
@@ -65,7 +68,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                 <ArrowCircleButton
                   href={card.link.href}
                   label={card.link.label}
-                  className="md:hidden cursor-pointer text-[#D1C1B7] hover:bg-white/10 before:absolute before:inset-0 before:content-['']"
+                  className="md:hidden cursor-pointer text-[#D1C1B7] before:absolute before:inset-0 before:content-['']"
                 />
               </div>
 
@@ -116,7 +119,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                   size={40}
                   /* max-md:hidden, not `hidden md:inline-flex` — the component's own base
                      `inline-flex` outranks a bare `hidden`; only a variant beats it */
-                  className="max-md:hidden cursor-pointer text-[#D1C1B7] hover:bg-white/10 before:absolute before:inset-0 before:content-['']"
+                  className="max-md:hidden cursor-pointer text-[#D1C1B7] before:absolute before:inset-0 before:content-['']"
                 />
               </div>
 
