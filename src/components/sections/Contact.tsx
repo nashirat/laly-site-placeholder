@@ -80,7 +80,7 @@ export default function Contact({ content }: { content: ContactContent }) {
           />
           <MediaImage
             media={photo}
-            sizes="340px"
+            sizes="(min-width: 1920px) 340px, 280px"
             className="hidden h-full w-full object-cover md:block"
           />
         </div>
