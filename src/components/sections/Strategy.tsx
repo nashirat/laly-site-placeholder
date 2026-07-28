@@ -47,7 +47,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               // lights up in its own accent. `active` alongside `hover` because Tailwind compiles
               // hover: into @media (hover: hover), so touch would never light it: :active fires on
               // the card as an ancestor of the pressed arrow link.
-              className="section-media-reveal relative flex min-w-0 flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left transition-shadow duration-300 ease-out hover:shadow-[0_0_32px_4px_color-mix(in_srgb,var(--card-fg)_28%,transparent)] active:shadow-[0_0_32px_4px_color-mix(in_srgb,var(--card-fg)_28%,transparent)] md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
+              className="section-media-reveal relative flex min-w-0 flex-col gap-4 bg-[#151414]/32 px-4 py-6 text-left transition-shadow duration-300 ease-out hover:shadow-[0_0_20px_1px_color-mix(in_srgb,var(--card-fg)_25%,transparent)] active:shadow-[0_0_20px_1px_color-mix(in_srgb,var(--card-fg)_25%,transparent)] md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
               style={{ '--card-fg': card.fg, animationDelay: `${0.2 + i * 0.2}s` } as CSSProperties}
             >
               {/* heading/h2/l — Neue Haas 450 / 44px / 110%.
