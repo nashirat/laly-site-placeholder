@@ -27,7 +27,7 @@ export default function Contact({ content }: { content: ContactContent }) {
           leaving the desktop layout (absolute photo, per-child margins) exactly as it was. */}
       {/* the photo is absolute against this box, so the shell cap pulls it in with the copy
           instead of leaving it stranded at the viewport edge */}
-      <InView className="section-shell relative flex flex-col gap-8 px-5 text-center md:gap-0 md:px-40">
+      <InView className="section-shell relative flex flex-col gap-8 px-5 text-center sm:px-10 md:gap-0 md:px-40">
         <BracketLabel className="w-44 text-[#262626] md:mb-12 md:w-80">
           {label}
         </BracketLabel>

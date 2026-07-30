@@ -16,7 +16,7 @@ export default function About({ content }: { content: AboutContent }) {
       className="w-full bg-[#fffcf9] py-16 md:py-28"
     >
       {/* desktop is three blocks 32 apart: caption / heading+desc / carousel. */}
-      <InView className="section-shell flex flex-col px-5 text-center md:gap-8 md:px-40">
+      <InView className="section-shell flex flex-col px-5 text-center sm:px-10 md:gap-8 md:px-40">
         <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-0 md:w-80">
           {label}
         </BracketLabel>

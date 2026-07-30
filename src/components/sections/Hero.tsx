@@ -23,10 +23,13 @@ export default function Hero({ content }: { content: HeroContent }) {
       // Figma's frame holds the navbar, which is fixed here and out of flow — so the frame's gap
       // between navbar and copy has to carry the navbar's own 76px: 76 + 80 mobile, 76 + 48 desktop.
       // Sides 20/48, bottom 48/112. Closes on a 1px keyline.
-      className="flex w-full flex-col border-b border-[#544D49] bg-[#fffcf9] px-5 pt-[156px] pb-12 md:px-12 md:pt-[124px] md:pb-28"
+      className="flex w-full flex-col border-b border-[#544D49] bg-[#fffcf9] px-5 pt-[156px] pb-12 sm:px-10 md:px-12 md:pt-[124px] md:pb-28"
     >
-      {/* Figma mobile: text container hugs at 291px (≈50px each side on a 390 frame), children gap 20 */}
-      <div className="mx-auto max-w-[291px] text-center md:max-w-[1056px] 3xl:max-w-[1200px]">
+      {/* Figma mobile: text container hugs at 291px (≈50px each side on a 390 frame), children gap 20.
+          That hug is a phone number, but md is 1152 here, so it was still squeezing a 900px tablet
+          into 291px and wrapping every authored line in two. Released at sm so each sentence gets
+          its own line on tablet like it does on desktop. */}
+      <div className="mx-auto max-w-[291px] text-center sm:max-w-none md:max-w-[1056px] 3xl:max-w-[1200px]">
         {/* whole heading fades up as one — no per-letter ripple (reads tacky, team review). The
             authored \n stays a hard break via block spans; on mobile each line wraps beneath it. */}
         <h1
@@ -89,7 +92,7 @@ export default function Hero({ content }: { content: HeroContent }) {
       {/* full-bleed image strip below the button; already scrolling, slides fade in staggered */}
       {/* gap above: 56 mobile, 48 desktop. Negative margins cancel the section's side padding — the
           strip is full-bleed; ImageMarquee's first slide carries the inset on its own. */}
-      <div className="-mx-5 mt-14 md:-mx-12 md:mt-12 3xl:mt-16">
+      <div className="-mx-5 mt-14 sm:-mx-10 md:-mx-12 md:mt-12 3xl:mt-16">
         <ImageMarquee slides={slides} />
       </div>
     </section>

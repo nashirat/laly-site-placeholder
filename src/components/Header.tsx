@@ -11,7 +11,7 @@ import { header } from '@/lib/mock/globals'
 // component, so that swap is just awaiting the fetch here).
 export default function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex h-19 items-center justify-between bg-[#fffcf9] px-5">
+    <header className="fixed inset-x-0 top-0 z-50 flex h-19 items-center justify-between bg-[#fffcf9] px-5 sm:px-10">
       <img src="/primarylogo.svg" alt="Laly" width={120} height={28} className="h-7 w-30" />
       <NavMenu items={header.nav} />
     </header>
