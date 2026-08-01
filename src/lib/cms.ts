@@ -1,0 +1,74 @@
+import config from '@payload-config'
+import { getPayload } from 'payload'
+import type { HeroBlock, Media } from '@/payload-types'
+import type { HeroContent, MediaDoc } from '@/lib/types'
+import { home } from '@/lib/mock/home'
+
+// Payload's generated types are permissive where our render contract is not: upload relations are
+// `string | Media` depending on query depth, and every non-required scalar is `T | null | undefined`.
+// This file is the only place that reconciles the two, so the section components stay unaware.
+//
+// No getPayload wrapper/singleton on purpose: getPayload({ config }) is already memoized on a
+// global-backed cache in Payload 3, specifically so RSCs can call it freely without opening a new
+// mongoose connection. sia-cms's hooks/dbinstance.tsx re-caches a cached value and types it `any`,
+// which throws away payload.find's return typing everywhere downstream.
+
+// Mirrors toMedia() in mock/home.ts. Deliberately no blurDataURL: there's no blurhash hook yet, and
+// MediaImage falls back to placeholder="empty" when it's absent (src/components/Media/Image.tsx).
+function toMediaDoc(m: string | Media | null | undefined): MediaDoc | null {
+  // string => the relation wasn't populated (depth 0). Nothing renderable.
+  if (!m || typeof m === 'string') return null
+  // ImageMarquee derives per-slide `sizes` from width/height with no guard, so a dimensionless doc
+  // would emit sizes="NaNpx". Only sharp populates these; drop the slide rather than ship NaN.
+  if (!m.url || !m.width || !m.height) return null
+  // `?? ''` stays: required is only enforced through write validation, so a doc predating the field
+  // can carry alt: null. An empty alt is a valid decorative signal to next/image; alt={null} is a
+  // React warning and an a11y failure.
+  return { url: m.url, width: m.width, height: m.height, alt: m.alt ?? '' }
+}
+
+export function toHeroContent(block: HeroBlock): HeroContent | null {
+  const slides = (block.slides ?? []).map(toMediaDoc).filter((s): s is MediaDoc => s !== null)
+
+  if (!block.heading || !block.description || !block.button?.label || slides.length === 0) {
+    return null
+  }
+
+  return {
+    heading: block.heading,
+    description: block.description,
+    // null -> undefined: Button treats a falsy href as "render a <button>", and LinkField.href is
+    // `string | undefined`, not nullable.
+    button: { label: block.button.label, href: block.button.href ?? undefined },
+    slides,
+  }
+}
+
+// Returns the CMS hero, or the mock as a fallback so the site never hard-fails. Earns its keep three
+// ways: the page prerenders at BUILD time (an unreachable Atlas would otherwise fail the whole
+// build), Atlas free-tier clusters auto-pause when idle, and it keeps the swap revertible. The cost
+// is that a broken query is silent to a visitor — hence the [cms] logs on both branches.
+export async function getHomeHero(): Promise<HeroContent> {
+  try {
+    const payload = await getPayload({ config })
+    const { docs } = await payload.find({
+      collection: 'pages',
+      where: { slug: { equals: 'home' } },
+      // depth 1 resolves the slides' upload relations into Media docs (inside blocks too).
+      depth: 1,
+      limit: 1,
+      pagination: false,
+    })
+
+    // Discriminating on blockType rather than taking content[0] is what keeps this working unchanged
+    // once the other five blocks widen the union.
+    const block = docs[0]?.content?.find((b) => b.blockType === 'hero')
+    const hero = block ? toHeroContent(block) : null
+    if (hero) return hero
+
+    console.warn('[cms] no usable hero block on pages/home — falling back to mock')
+  } catch (err) {
+    console.error('[cms] pages/home query failed — falling back to mock:', err)
+  }
+  return home.hero
+}

@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+import { withPayload } from '@payloadcms/next/withPayload'
+
 const nextConfig = {
   reactStrictMode: true,
   // React Compiler (1.0) — auto-memoizes client components. Runs as a Babel pass, so it costs build
@@ -16,13 +18,17 @@ const nextConfig = {
     // default deviceSizes jump 2048 -> 3840, so any box wanting 2049-3839 device px gets a 3840
     // encode. 2560 fills that gap (the 1120-wide team carousel at DPR2 needs 2320).
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 2560, 3840],
-    // Vercel Blob media (wired in Payload phase)
+    // Vercel Blob media (wired in Payload phase). Local-disk uploads need no pattern: payload.config
+    // leaves serverURL unset, so Payload emits a relative /api/media/file/... url — same-origin.
     remotePatterns: [
       { protocol: 'https', hostname: '**.public.blob.vercel-storage.com' },
     ],
   },
   webpack(config) {
     // svgr: import x from './foo.svg' -> React component. `./foo.svg?url` still yields a URL.
+    // withPayload calls this fn FIRST, on the pristine config, then layers its own additions on the
+    // result — so the file-loader lookup below still sees stock Next rules. That ordering is load-
+    // bearing: the .find() and the .resourceQuery.not read are both brittle against a mutated config.
     const fileLoaderRule = config.module.rules.find(
       (rule) => rule.test?.test?.('.svg'),
     )
@@ -42,4 +48,8 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+// Wrapped, unlike sia-cms (which drops withPayload entirely). The wrapper supplies the
+// mongodb/mongoose ESM ignoreWarnings, the server-package externals (without which webpack tries to
+// bundle mongodb's optional native deps -> "Module not found: kerberos / aws4 / snappy"), and
+// outputFileTracingExcludes. No second options arg — devBundleServerPackages may not exist in 3.47.0.
+export default withPayload(nextConfig)

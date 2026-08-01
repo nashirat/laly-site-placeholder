@@ -12,12 +12,14 @@ yarn.lock
 /out
 next-env.d.ts
 
-# local media uploads
-/media
+# local media uploads (Payload staticDir; source of truth is Atlas + scripts/seed-home.ts)
+/public/media
 
-# env
+# env — *.env catches vendor-generated credential files (Atlas's "Download .env file" lands as
+# atlas-credentials.env, which matched none of the patterns below). .env.example still tracked.
 .env
 .env*.local
+*.env
 
 # vercel
 .vercel

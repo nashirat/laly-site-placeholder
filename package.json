@@ -12,13 +12,27 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "//scripts": "bun run generate:types, never bunx payload — the bin is #!/usr/bin/env node and registers its own TS loader for the config; bun run executes the .bin shim so the shebang is honored.",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "seed": "bun scripts/seed-home.ts",
+    "//seed:node": "Fallback runner on Node via Payload's own loader. Needed only if payload.config.ts ever imports @payloadcms/richtext-lexical again — its circular ESM deps break under bun.",
+    "seed:node": "payload run scripts/seed-home.ts"
   },
   "dependencies": {
+    "@payloadcms/db-mongodb": "3.47.0",
+    "@payloadcms/next": "3.47.0",
+    "@payloadcms/richtext-lexical": "3.47.0",
+    "@payloadcms/storage-vercel-blob": "3.47.0",
+    "@payloadcms/ui": "3.47.0",
     "embla-carousel-auto-scroll": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "graphql": "^16.8.1",
     "lenis": "^1.3.25",
     "next": "15.3.6",
+    "payload": "3.47.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "sharp": "^0.35.3"
