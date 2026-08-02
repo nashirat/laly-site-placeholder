@@ -18,17 +18,10 @@ import vjCta from '../../../public/carousel/VJ_CTA.webp'
 import vjEcommerce from '../../../public/carousel/VJ-Ecommerce.webp'
 import vajra from '../../../public/vajra.png'
 import senftPlaceholder from '../../../public/whoweare/Senft-palceholder.webp'
-import type {
-  AboutContent,
-  ContactContent,
-  HeroContent,
-  MediaDoc,
-  NoteContent,
-  StrategyContent,
-  WhoWeAreContent,
-} from '@/lib/types'
+import type { HomeContent, MediaDoc } from '@/lib/types'
 
-// Stand-in for the Pages "home" doc until Payload exists (Phase 4 deletes this file).
+// Fallback for the Pages "home" doc: getHome() drops back to this per-block when a block is missing
+// or malformed, so an empty/unreachable database renders the page instead of failing the build.
 // Static imports already carry dims + a generated blurDataURL, i.e. the same fields a Media doc
 // has — so we adapt them to MediaDoc here and the components never learn where images came from.
 const toMedia = (img: StaticImageData, alt: string): MediaDoc => ({
@@ -39,14 +32,7 @@ const toMedia = (img: StaticImageData, alt: string): MediaDoc => ({
   alt,
 })
 
-export const home: {
-  hero: HeroContent
-  whoWeAre: WhoWeAreContent
-  strategy: StrategyContent
-  about: AboutContent
-  contact: ContactContent
-  note: NoteContent
-} = {
+export const home: HomeContent = {
   hero: {
     heading: 'Marketing you can follow.\nGrowth you can feel.',
     // no \n — body copy wraps to the viewport (the heading keeps its authored 2-line break)

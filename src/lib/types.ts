@@ -3,7 +3,8 @@
 // Superseded by the generated payload-types.ts once collections exist.
 
 // A Payload Media doc, narrowed to what rendering actually needs.
-// `blurDataURL` comes from the blurhash plugin; absent -> the wrapper skips the blur placeholder.
+// `blurDataURL` is written on upload by the beforeChange hook in src/collections/Media.ts (and comes
+// free from StaticImageData in the mock); absent -> the wrapper skips the blur placeholder.
 export type MediaDoc = {
   url: string
   width: number
@@ -111,6 +112,16 @@ export type ContactContent = {
 // sits on its own row), rendered via whitespace-pre-line.
 export type NoteContent = {
   body: string
+}
+
+// The whole home page. Shared by the mock and by getHome() so the two can't drift.
+export type HomeContent = {
+  hero: HeroContent
+  whoWeAre: WhoWeAreContent
+  strategy: StrategyContent
+  about: AboutContent
+  contact: ContactContent
+  note: NoteContent
 }
 
 // Header global.

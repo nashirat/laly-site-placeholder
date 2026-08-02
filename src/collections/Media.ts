@@ -13,7 +13,11 @@ export const Media: CollectionConfig = {
   upload: {
     // dirname is <root>/src/collections -> <root>/public/media
     staticDir: path.resolve(dirname, '../../public/media'),
-    mimeTypes: ['image/*'],
+    // Video too — the Who We Are cards take an optional looping clip, and sia-cms's pattern is the
+    // right one: a clip is just another Media doc served from its own url, not a second collection
+    // and not a pasted URL string. Explicit codecs rather than 'video/*' so nobody uploads a 200 MB
+    // .mov that no browser can play.
+    mimeTypes: ['image/*', 'video/mp4', 'video/webm'],
     // No imageSizes / formatOptions on purpose: next/image is the resizer and re-encoder and works
     // off the original. Payload-generated derivatives would be dead bytes on disk that never enter
     // a srcset.
@@ -34,8 +38,9 @@ export const Media: CollectionConfig = {
           const blur = await sharp(buf).resize(16).webp({ quality: 20 }).toBuffer()
           return { ...data, blurDataURL: `data:image/webp;base64,${blur.toString('base64')}` }
         } catch {
-          // Never block an upload over a placeholder. sharp can't rasterize svg without librsvg,
-          // and mimeTypes lets image/svg+xml through.
+          // Never block an upload over a placeholder. Videos land here every time (sharp can't
+          // decode mp4), and so does svg — sharp needs librsvg to rasterize it, and mimeTypes lets
+          // image/svg+xml through.
           return data
         }
       },

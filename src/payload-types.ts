@@ -173,7 +173,10 @@ export interface Page {
    * The home page is 'home'.
    */
   slug: string;
-  content: HeroBlock[];
+  /**
+   * The home page renders these by type, not by the order below — its section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy.
+   */
+  content: (HeroBlock | WhoWeAreBlock | StrategyBlock | AboutBlock | ContactBlock | NoteBlock)[];
   updatedAt: string;
   createdAt: string;
 }
@@ -204,6 +207,223 @@ export interface HeroBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'hero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhoWeAreBlock".
+ */
+export interface WhoWeAreBlock {
+  /**
+   * Bare text, e.g. "Who we are". The [ brackets ] and the uppercasing are CSS — do not type them.
+   */
+  label: string;
+  /**
+   * Press Enter for the authored line break.
+   */
+  heading: string;
+  /**
+   * Leave a BLANK line between paragraphs — that is the paragraph break. A single newline does nothing, and a trailing one is trimmed.
+   */
+  description: string;
+  /**
+   * Case studies, stacked in this order.
+   */
+  cards: {
+    title: string;
+    /**
+     * Also the poster frame when a video is set.
+     */
+    image: string | Media;
+    /**
+     * Optional looping clip (mp4/webm) that replaces the still. Autoplays muted and downloads in full on mobile — keep it short and small.
+     */
+    video?: (string | null) | Media;
+    body: string;
+    stat: {
+      /**
+       * e.g. "133%". The number counts up on scroll-in.
+       */
+      value: string;
+      /**
+       * Press Enter for the two-line break (desktop only).
+       */
+      label: string;
+    };
+    link: {
+      label: string;
+      /**
+       * Leave empty to render an inert button (no destination yet).
+       */
+      href?: string | null;
+    };
+    /**
+     * Card ground, keyline and ink together. The hexes live in src/lib/palettes.ts.
+     */
+    palette: 'olive' | 'lilac';
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'whoWeAre';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StrategyBlock".
+ */
+export interface StrategyBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are CSS.
+   */
+  label: string;
+  /**
+   * Press Enter for an authored line break.
+   */
+  heading: string;
+  /**
+   * One paragraph — it wraps to the column on its own.
+   */
+  description: string;
+  cards: {
+    /**
+     * Press Enter for the break — the subject always lands on line 2.
+     */
+    title: string;
+    /**
+     * Capability pills. The star tint comes from the row position, not from here — all three cards share one accent trio.
+     */
+    badges: {
+      label: string;
+      id?: string | null;
+    }[];
+    /**
+     * One line, the "if you..." sentence. Line breaks render as spaces.
+     */
+    hook: string;
+    /**
+     * The explainer at the foot of the card. Line breaks render as spaces.
+     */
+    body: string;
+    link: {
+      label: string;
+      /**
+       * Leave empty to render an inert button (no destination yet).
+       */
+      href?: string | null;
+    };
+    /**
+     * Tints the title and the card’s hover glow.
+     */
+    accent: 'lilac' | 'amber' | 'olive';
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'strategy';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AboutBlock".
+ */
+export interface AboutBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are CSS.
+   */
+  label: string;
+  /**
+   * Press Enter for the authored line break.
+   */
+  heading: string;
+  /**
+   * One line under the heading. No breaks — it wraps.
+   */
+  description: string;
+  /**
+   * Carousel order, left to right.
+   */
+  members: {
+    /**
+     * Optional — the carousel renders an empty frame while a headshot is missing.
+     */
+    photo?: (string | null) | Media;
+    name: string;
+    /**
+     * The info-bar line. Press Enter for the authored two-line break.
+     */
+    role: string;
+    id?: string | null;
+  }[];
+  story: {
+    label: string;
+    /**
+     * Leave empty to render an inert button (no destination yet).
+     */
+    href?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'about';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactBlock".
+ */
+export interface ContactBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are CSS.
+   */
+  label: string;
+  /**
+   * Display type, typed out on scroll-in. Press Enter for each authored line — this one is set at 200px, so the breaks are the design.
+   */
+  heading: string;
+  /**
+   * Exactly two: the first renders filled, the second outlined.
+   */
+  buttons: {
+    label: string;
+    /**
+     * Leave empty to render an inert button.
+     */
+    href?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * Icon row. The platform picks the icon — there is no custom-icon path.
+   */
+  socials?:
+    | {
+        platform: 'instagram' | 'tiktok' | 'youtube' | 'facebook';
+        /**
+         * The account URL. Empty links to # until the real one exists.
+         */
+        href?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Portrait crop, shown at md and up.
+   */
+  photo: string | Media;
+  /**
+   * Landscape crop, shown below md. The frame’s aspect flips, so one file cannot serve both.
+   */
+  photoMobile: string | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'contact';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NoteBlock".
+ */
+export interface NoteBlock {
+  /**
+   * Rendered with whitespace-pre-line, so every Enter you press is a real line break. The design puts the closing sentence on its own row.
+   */
+  body: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'note';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -318,6 +538,11 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         hero?: T | HeroBlockSelect<T>;
+        whoWeAre?: T | WhoWeAreBlockSelect<T>;
+        strategy?: T | StrategyBlockSelect<T>;
+        about?: T | AboutBlockSelect<T>;
+        contact?: T | ContactBlockSelect<T>;
+        note?: T | NoteBlockSelect<T>;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -336,6 +561,131 @@ export interface HeroBlockSelect<T extends boolean = true> {
         href?: T;
       };
   slides?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhoWeAreBlock_select".
+ */
+export interface WhoWeAreBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  description?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        video?: T;
+        body?: T;
+        stat?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+            };
+        link?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        palette?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StrategyBlock_select".
+ */
+export interface StrategyBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  description?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        badges?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        hook?: T;
+        body?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        accent?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AboutBlock_select".
+ */
+export interface AboutBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  description?: T;
+  members?:
+    | T
+    | {
+        photo?: T;
+        name?: T;
+        role?: T;
+        id?: T;
+      };
+  story?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactBlock_select".
+ */
+export interface ContactBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  buttons?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  socials?:
+    | T
+    | {
+        platform?: T;
+        href?: T;
+        id?: T;
+      };
+  photo?: T;
+  photoMobile?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NoteBlock_select".
+ */
+export interface NoteBlockSelect<T extends boolean = true> {
+  body?: T;
   id?: T;
   blockName?: T;
 }

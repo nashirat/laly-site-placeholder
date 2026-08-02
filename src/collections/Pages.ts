@@ -1,5 +1,10 @@
 import type { CollectionConfig } from 'payload'
+import { AboutBlock } from '../blocks/about'
+import { ContactBlock } from '../blocks/contact'
 import { HeroBlock } from '../blocks/hero'
+import { NoteBlock } from '../blocks/note'
+import { StrategyBlock } from '../blocks/strategy'
+import { WhoWeAreBlock } from '../blocks/whoWeAre'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -32,9 +37,11 @@ export const Pages: CollectionConfig = {
       type: 'blocks',
       required: true,
       minRows: 1,
-      // Only the hero is modelled in this phase. The other five sections still read
-      // src/lib/mock/home.ts; each gets registered here as it's migrated.
-      blocks: [HeroBlock],
+      admin: {
+        description:
+          'The home page renders these by type, not by the order below — its section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy.',
+      },
+      blocks: [HeroBlock, WhoWeAreBlock, StrategyBlock, AboutBlock, ContactBlock, NoteBlock],
     },
   ],
 }
