@@ -24,6 +24,12 @@ next-env.d.ts
 # vercel
 .vercel
 
+# browser network captures. Two of these sat in public/ at ~9 MB each, which on Vercel means
+# publicly downloadable at /www.example.com.har. These two held no cookies or auth headers, but a
+# HAR is a verbatim request/response dump and the next one saved from a logged-in tab would.
+# Never in public/ — that directory is served as-is.
+*.har
+
 # misc
 *.tsbuildinfo
 .DS_Store
