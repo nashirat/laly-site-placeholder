@@ -135,26 +135,36 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <div
-          className="absolute inset-0"
-          style={{
-            transform: sliding ? `translateX(${photoExit})` : 'translateX(0)',
-            transition: sliding ? `transform ${PHOTO_MS}ms ${PHOTO_EASE}` : 'none',
-          }}
-        >
-          <Photo member={members[current]} eager={warm} />
-        </div>
-        {incoming !== null && (
+        {/* Keyed by member index, and rendered from an array so React reconciles by key rather than
+            by position. Load-bearing, not tidiness.
+            When the slide ends, `setCurrent(next)` + `setIncoming(null)` fire together. Unkeyed, the
+            children are matched positionally: the OUTGOING div survives and its <Photo> swaps member
+            underneath it, so one <img> keeps its DOM node and just gets a new src — while the
+            incoming div, already holding the correct fully-decoded image, is unmounted. A browser
+            paints the previous frame until the new src decodes, so the carousel visibly snapped back
+            to the person you just slid away from. The bigger the source file, the longer it sat
+            there.
+            Keyed, the node that was `incoming` matches `current` after the swap and is kept intact —
+            the decoded image is never rebuilt and nothing re-fetches. */}
+        {(incoming === null ? [current] : [current, incoming]).map((idx) => (
           <div
+            key={idx}
             className="absolute inset-0"
-            style={{
-              transform: phase !== 'idle' ? 'translateX(0)' : `translateX(${photoFrom})`,
-              transition: phase !== 'idle' ? `transform ${PHOTO_MS}ms ${PHOTO_EASE}` : 'none',
-            }}
+            style={
+              idx === incoming
+                ? {
+                    transform: phase !== 'idle' ? 'translateX(0)' : `translateX(${photoFrom})`,
+                    transition: phase !== 'idle' ? `transform ${PHOTO_MS}ms ${PHOTO_EASE}` : 'none',
+                  }
+                : {
+                    transform: sliding ? `translateX(${photoExit})` : 'translateX(0)',
+                    transition: sliding ? `transform ${PHOTO_MS}ms ${PHOTO_EASE}` : 'none',
+                  }
+            }
           >
-            <Photo member={members[incoming]} eager={warm} />
+            <Photo member={members[idx]} eager={warm} />
           </div>
-        )}
+        ))}
 
         {/* only current+incoming are mounted, so a neighbour would fetch at slide time and flash its
             blur placeholder. Mounting them hidden warms the cache: display:none doesn't stop an
