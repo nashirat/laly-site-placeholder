@@ -2,6 +2,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import type { CollectionConfig } from 'payload'
 import sharp from 'sharp'
+import { revalidateHome } from '../lib/revalidate'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -43,6 +44,20 @@ export const Media: CollectionConfig = {
           // image/svg+xml through.
           return data
         }
+      },
+    ],
+    // The rendered html embeds each media url and its blurDataURL, so swapping a file or fixing an
+    // alt has to purge the page too — not just editing the Pages doc. skipRevalidation as in Pages.ts.
+    afterChange: [
+      async ({ doc, context }) => {
+        if (!context?.skipRevalidation) await revalidateHome()
+        return doc
+      },
+    ],
+    afterDelete: [
+      async ({ doc, context }) => {
+        if (!context?.skipRevalidation) await revalidateHome()
+        return doc
       },
     ],
   },

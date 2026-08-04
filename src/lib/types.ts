@@ -75,8 +75,13 @@ export type StrategyContent = {
 // A team member in the About carousel. `photo` is optional until real headshots exist — the carousel
 // renders a placeholder frame when it's absent, so the section ships before the assets do. Maps 1:1 to
 // a Payload array row (or a Team-collection relationship) later.
+//
+// Two crops, same split as ContactContent: the carousel frame is 112:75 landscape at md+ but a
+// 430px-tall column below it, so one file can't serve both without gutting the composition.
+// `photoMobile` is optional and falls back to `photo`.
 export type TeamMember = {
   photo?: MediaDoc
+  photoMobile?: MediaDoc
   name: string
   role: string
 }

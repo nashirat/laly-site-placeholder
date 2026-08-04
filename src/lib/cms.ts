@@ -139,9 +139,15 @@ export function toAboutContent(block: AboutBlock): AboutContent | null {
   const members = (block.members ?? [])
     .map((m): TeamMember | null => {
       if (!m.name || !m.role) return null
-      // photo stays optional all the way through — TeamCarousel renders an empty frame without it,
-      // which is how the section shipped before the headshots existed.
-      return { photo: toMediaDoc(m.photo) ?? undefined, name: m.name, role: m.role }
+      // Both crops stay optional all the way through — TeamCarousel renders an empty frame without
+      // `photo`, which is how the section shipped before the headshots existed, and falls back to
+      // `photo` when only the mobile crop is missing.
+      return {
+        photo: toMediaDoc(m.photo) ?? undefined,
+        photoMobile: toMediaDoc(m.photoMobile) ?? undefined,
+        name: m.name,
+        role: m.role,
+      }
     })
     .filter(isPresent)
 

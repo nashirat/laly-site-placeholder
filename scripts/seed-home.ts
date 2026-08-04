@@ -8,17 +8,28 @@
  * fallback in src/lib/cms.ts, so keeping the two byte-identical is what makes the CMS swap verifiable
  * by diffing the rendered page.
  *
- * Idempotent — safe to re-run. Not cheap to re-run: it re-uploads ~8 MB of media (half of it the
- * Vajra clip) to Vercel Blob every time. See the delete-then-create note below for why.
+ * Idempotent — safe to re-run. Not cheap to re-run: it re-uploads ~28 MB of media to Vercel Blob
+ * every time (16 headshot crops at full resolution, plus the 4 MB clip). See the delete-then-create
+ * note below for why.
+ *
+ * This is the only path that writes content. Drop a new asset into public/, point the list below at
+ * it, re-run — the CMS follows. Edits made by hand in /admin do not survive a run.
  */
+import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { revalidateHome } from '../src/lib/revalidate'
 
 // fileURLToPath, not bun's import.meta.dir — keeps this runnable under both `bun run seed` and the
 // `payload run` fallback (which executes on Node).
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+// Media and Pages both purge the ISR cache in afterChange/afterDelete. A run here touches ~40 docs
+// and every one of them would POST a purge for the same single path, so they are suppressed and one
+// purge fires at the very end instead.
+const NO_REVALIDATE = { skipRevalidation: true }
 
 // Email is only a login identifier — no email adapter is configured, so Payload never sends mail
 // (hence the "No email adapter provided" warn on every run) and there is no password-reset flow.
@@ -60,9 +71,25 @@ if (users.docs.length === 0) {
 // storage would keep a /api/media/file/... url after the switch to Blob and 404 on Vercel. Deleting
 // first makes a re-run a true storage migration.
 //
+// Blob keys are flat — the storage adapter uses the basename alone, so public/ subdirectories do NOT
+// namespace anything. aboutus/Adam-Jobson.webp and aboutus/mobile/Adam-Jobson.webp would land on the
+// same key, and since this function deletes by filename first, seeding the mobile crop would delete
+// the desktop doc created moments earlier. `asName` renames on the way up to keep them distinct.
+const MIME: Record<string, string> = {
+  '.webp': 'image/webp',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+}
+
+// Every id this run created, so the prune at the bottom can tell ours from everything else.
+const seeded = new Set<string>()
+
 // `relPath` is relative to public/. Returns the new doc id.
-async function upload(relPath: string, alt: string): Promise<string> {
-  const filename = path.basename(relPath)
+async function upload(relPath: string, alt: string, asName?: string): Promise<string> {
+  const filename = asName ?? path.basename(relPath)
 
   const found = await payload.find({
     collection: 'media',
@@ -71,18 +98,32 @@ async function upload(relPath: string, alt: string): Promise<string> {
     pagination: false,
   })
   for (const stale of found.docs) {
-    await payload.delete({ collection: 'media', id: stale.id })
+    await payload.delete({ collection: 'media', id: stale.id, context: NO_REVALIDATE })
+  }
+
+  const absPath = path.join(ROOT, 'public', relPath)
+  // filePath takes the name from disk; a rename has to go through `file` with an explicit buffer.
+  let source: { filePath: string } | { file: { name: string; data: Buffer; mimetype: string; size: number } }
+  if (asName) {
+    const data = await readFile(absPath)
+    source = {
+      file: { name: filename, data, mimetype: MIME[path.extname(filename).toLowerCase()], size: data.byteLength },
+    }
+  } else {
+    source = { filePath: absPath }
   }
 
   const doc = await payload.create({
     collection: 'media',
     data: { alt },
-    filePath: path.join(ROOT, 'public', relPath),
+    context: NO_REVALIDATE,
+    ...source,
   })
   // Dimensions double as the sharp smoke test: nullxnull on an image means sharp isn't reaching
   // Payload, and the adapter will drop that doc rather than emit sizes="NaNpx". Videos are expected
   // to print nullxnull — sharp can't decode them and nothing downstream needs their dimensions.
   console.log(`[seed] uploaded ${filename} -> ${doc.width}x${doc.height}`)
+  seeded.add(String(doc.id))
   return String(doc.id)
 }
 
@@ -94,7 +135,7 @@ const existing = await payload.find({
   pagination: false,
 })
 for (const doc of existing.docs) {
-  await payload.delete({ collection: 'pages', id: doc.id })
+  await payload.delete({ collection: 'pages', id: doc.id, context: NO_REVALIDATE })
   console.log(`[seed] deleted existing pages/${doc.slug}`)
 }
 
@@ -116,26 +157,33 @@ for (const [file, alt] of [
 // --- who we are -------------------------------------------------------------------------------
 const senft = await upload('whoweare/Senft-palceholder.webp', 'Senft Legal billboard')
 const vajra = await upload('vajra.png', 'Vajra Jahra retreat waterfall')
-const vajraClip = await upload('whoweare/vajra.mp4', 'Vajra Jahra retreat waterfall')
+const vajraClip = await upload('whoweare/vjbrand.mp4', 'Guests at the Vajra Jahra retreat')
 
 // --- about ------------------------------------------------------------------------------------
 // Photos are final; `role` is placeholder copy until the real lines land. The \n is the authored
 // two-line break (rendered via whitespace-pre-line).
+// Each member is one basename served from two directories: aboutus/<file> is the landscape crop for
+// md+, aboutus/mobile/<file> the portrait one below it. See TeamMember in src/lib/types.ts.
 const PLACEHOLDER_ROLE = 'Role line placeholder —\nsecond line of the blurb.'
 const TEAM: [string, string, string][] = [
-  ['Cindy.webp', 'Cindy Ripoll', 'The trusty team leader\nand your first point of contact.'],
-  ['Adam.webp', 'Adam', PLACEHOLDER_ROLE],
-  ['Diya.webp', 'Diya', PLACEHOLDER_ROLE],
-  ['Fran.webp', 'Fran', PLACEHOLDER_ROLE],
-  ['Harry.webp', 'Harry', PLACEHOLDER_ROLE],
-  ['Leo.webp', 'Leo', PLACEHOLDER_ROLE],
-  ['Nicole.webp', 'Nicole', PLACEHOLDER_ROLE],
-  ['Ramon.webp', 'Ramon', PLACEHOLDER_ROLE],
+  ['Cindy-Ripoll.webp', 'Cindy Ripoll', 'The trusty team leader\nand your first point of contact.'],
+  ['Adam-Jobson.webp', 'Adam Jobson', PLACEHOLDER_ROLE],
+  ['Diya-Afreen.webp', 'Diya Afreen', PLACEHOLDER_ROLE],
+  ['Francesca-Sequani.webp', 'Francesca Sequani', PLACEHOLDER_ROLE],
+  ['Harry-Mussotte.webp', 'Harry Mussotte', PLACEHOLDER_ROLE],
+  ['Leo-Sequani.webp', 'Leo Sequani', PLACEHOLDER_ROLE],
+  ['Nicole-Cheer.webp', 'Nicole Cheer', PLACEHOLDER_ROLE],
+  ['Ramon-Ripoll.webp', 'Ramon Ripoll', PLACEHOLDER_ROLE],
 ]
-const members: { photo: string; name: string; role: string }[] = []
+const members: { photo: string; photoMobile: string; name: string; role: string }[] = []
 for (const [file, name, role] of TEAM) {
-  // alt is the bare first name in the mock, not the full name — kept as-is.
-  members.push({ photo: await upload(`aboutus/${file}`, file.replace('.webp', '')), name, role })
+  members.push({
+    photo: await upload(`aboutus/${file}`, name),
+    // -mobile suffix so the two crops don't collide on one flat blob key (see upload()).
+    photoMobile: await upload(`aboutus/mobile/${file}`, name, file.replace('.webp', '-mobile.webp')),
+    name,
+    role,
+  })
 }
 
 // --- contact ----------------------------------------------------------------------------------
@@ -266,5 +314,28 @@ await payload.create({
 })
 
 console.log('[seed] created pages/home with 6 blocks')
+
+// Prune. `upload()` only deletes docs that collide on filename, so renaming an asset (Cindy.webp ->
+// Cindy-Ripoll.webp, vajra.mp4 -> vjbrand.mp4) used to strand the old doc AND its blob object: the
+// page no longer referenced it, nothing pointed at it, and it billed storage forever. Anything not
+// created by this run is by definition unreferenced — the home doc above is the only consumer of
+// this collection, and it was just rebuilt from scratch.
+//
+// This makes the seed a true sync, and it is destructive: a file uploaded by hand through /admin is
+// deleted here. That is the same bargain the page doc already makes by being delete-then-create —
+// public/ plus this script are the source of truth, not the admin panel.
+const allMedia = await payload.find({ collection: 'media', limit: 0, pagination: false })
+for (const doc of allMedia.docs) {
+  if (seeded.has(String(doc.id))) continue
+  await payload.delete({ collection: 'media', id: doc.id, context: NO_REVALIDATE })
+  console.log(`[seed] pruned orphaned media ${doc.filename}`)
+}
+
+// One purge for the whole run. Points at .env's NEXT_PUBLIC_SITE_URL (localhost) by default — to
+// push a seed straight to production, override the target:
+//   REVALIDATE_BASE_URL=https://laly-new.vercel.app bun run seed
+await revalidateHome()
+console.log('[seed] requested ISR purge of /')
+
 // mongoose keeps the Atlas socket open; without this the process hangs.
 process.exit(0)

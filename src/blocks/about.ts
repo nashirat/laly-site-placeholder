@@ -37,7 +37,17 @@ export const AboutBlock: Block = {
           type: 'upload',
           relationTo: 'media',
           admin: {
-            description: 'Optional — the carousel renders an empty frame while a headshot is missing.',
+            description:
+              'Landscape crop, shown at md and up. Optional — the carousel renders an empty frame while a headshot is missing.',
+          },
+        },
+        {
+          name: 'photoMobile',
+          type: 'upload',
+          relationTo: 'media',
+          admin: {
+            description:
+              'Portrait crop, shown below md. The frame flips from 112:75 landscape to a 430px-tall column, so one file cannot serve both. Optional — falls back to the landscape crop, which centre-crops hard on a phone.',
           },
         },
         { name: 'name', type: 'text', required: true },

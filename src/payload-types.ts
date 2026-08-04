@@ -342,9 +342,13 @@ export interface AboutBlock {
    */
   members: {
     /**
-     * Optional — the carousel renders an empty frame while a headshot is missing.
+     * Landscape crop, shown at md and up. Optional — the carousel renders an empty frame while a headshot is missing.
      */
     photo?: (string | null) | Media;
+    /**
+     * Portrait crop, shown below md. The frame flips from 112:75 landscape to a 430px-tall column, so one file cannot serve both. Optional — falls back to the landscape crop, which centre-crops hard on a phone.
+     */
+    photoMobile?: (string | null) | Media;
     name: string;
     /**
      * The info-bar line. Press Enter for the authored two-line break.
@@ -641,6 +645,7 @@ export interface AboutBlockSelect<T extends boolean = true> {
     | T
     | {
         photo?: T;
+        photoMobile?: T;
         name?: T;
         role?: T;
         id?: T;

@@ -1,12 +1,21 @@
 import type { StaticImageData } from 'next/image'
-import adam from '../../../public/aboutus/Adam.webp'
-import cindy from '../../../public/aboutus/Cindy.webp'
-import diya from '../../../public/aboutus/Diya.webp'
-import fran from '../../../public/aboutus/Fran.webp'
-import harry from '../../../public/aboutus/Harry.webp'
-import leo from '../../../public/aboutus/Leo.webp'
-import nicole from '../../../public/aboutus/Nicole.webp'
-import ramon from '../../../public/aboutus/Ramon.webp'
+// Two crops per member — see TeamMember in src/lib/types.ts. The `mobile/` file is the portrait one.
+import adam from '../../../public/aboutus/Adam-Jobson.webp'
+import cindy from '../../../public/aboutus/Cindy-Ripoll.webp'
+import diya from '../../../public/aboutus/Diya-Afreen.webp'
+import fran from '../../../public/aboutus/Francesca-Sequani.webp'
+import harry from '../../../public/aboutus/Harry-Mussotte.webp'
+import leo from '../../../public/aboutus/Leo-Sequani.webp'
+import adamMobile from '../../../public/aboutus/mobile/Adam-Jobson.webp'
+import cindyMobile from '../../../public/aboutus/mobile/Cindy-Ripoll.webp'
+import diyaMobile from '../../../public/aboutus/mobile/Diya-Afreen.webp'
+import franMobile from '../../../public/aboutus/mobile/Francesca-Sequani.webp'
+import harryMobile from '../../../public/aboutus/mobile/Harry-Mussotte.webp'
+import leoMobile from '../../../public/aboutus/mobile/Leo-Sequani.webp'
+import nicoleMobile from '../../../public/aboutus/mobile/Nicole-Cheer.webp'
+import ramonMobile from '../../../public/aboutus/mobile/Ramon-Ripoll.webp'
+import nicole from '../../../public/aboutus/Nicole-Cheer.webp'
+import ramon from '../../../public/aboutus/Ramon-Ripoll.webp'
 import billboard from '../../../public/carousel/Billboard.webp'
 import ctaDesktop from '../../../public/growwithus/Cta-Desktop.webp'
 import ctaMobile from '../../../public/growwithus/Cta-Mobile.webp'
@@ -69,7 +78,7 @@ export const home: HomeContent = {
       },
       {
         image: toMedia(vajra, 'Vajra Jahra retreat waterfall'),
-        video: '/whoweare/vajra.mp4',
+        video: '/whoweare/vjbrand.mp4',
         title: 'Vajra Jahra',
         body: 'Vajra Jahra is a Costa Rica retreat center built in 2023. Vajra Jahra partnered with Laly in 2025, going from 0 bookings to 9. In 2026, Vajra Jahra has already increased revenue by 150% and is on track to be fully booked out for two full calendar years.',
         stat: { value: '150%', label: 'Revenue\nGrowth' },
@@ -132,14 +141,14 @@ export const home: HomeContent = {
     // Photos are final; `role` is placeholder copy until the real lines land.
     // `role` is the info-bar line; the \n is the authored 2-line break (rendered via whitespace-pre-line).
     members: [
-      { photo: toMedia(cindy, 'Cindy'), name: 'Cindy Ripoll', role: 'The trusty team leader\nand your first point of contact.' },
-      { photo: toMedia(adam, 'Adam'), name: 'Adam', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(diya, 'Diya'), name: 'Diya', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(fran, 'Fran'), name: 'Fran', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(harry, 'Harry'), name: 'Harry', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(leo, 'Leo'), name: 'Leo', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(nicole, 'Nicole'), name: 'Nicole', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(ramon, 'Ramon'), name: 'Ramon', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(cindy, 'Cindy Ripoll'), photoMobile: toMedia(cindyMobile, 'Cindy Ripoll'), name: 'Cindy Ripoll', role: 'The trusty team leader\nand your first point of contact.' },
+      { photo: toMedia(adam, 'Adam Jobson'), photoMobile: toMedia(adamMobile, 'Adam Jobson'), name: 'Adam Jobson', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(diya, 'Diya Afreen'), photoMobile: toMedia(diyaMobile, 'Diya Afreen'), name: 'Diya Afreen', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(fran, 'Francesca Sequani'), photoMobile: toMedia(franMobile, 'Francesca Sequani'), name: 'Francesca Sequani', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(harry, 'Harry Mussotte'), photoMobile: toMedia(harryMobile, 'Harry Mussotte'), name: 'Harry Mussotte', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(leo, 'Leo Sequani'), photoMobile: toMedia(leoMobile, 'Leo Sequani'), name: 'Leo Sequani', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(nicole, 'Nicole Cheer'), photoMobile: toMedia(nicoleMobile, 'Nicole Cheer'), name: 'Nicole Cheer', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(ramon, 'Ramon Ripoll'), photoMobile: toMedia(ramonMobile, 'Ramon Ripoll'), name: 'Ramon Ripoll', role: 'Role line placeholder —\nsecond line of the blurb.' },
     ],
     story: { label: 'OUR STORY' },
   },

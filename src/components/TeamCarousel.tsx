@@ -220,16 +220,33 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
 
 function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean }) {
   return member.photo ? (
-    <MediaImage
-      media={member.photo}
-      eager={eager}
-      // object-cover scales these portrait sources by width, so the box width is what matters.
-      // Between md and 3xl the section is padding-only (px-40), so the box tracks the viewport —
-      // a fixed px here understated it badly on a 1900px screen. Above 3xl .section-shell caps the
-      // shell at 1600, so the box is a constant 1600 - 320.
-      sizes="(max-width: 1151px) 100vw, (min-width: 1920px) 1280px, calc(100vw - 320px)"
-      className="h-full w-full object-cover object-top"
-    />
+    // Two crops, toggled by CSS like the Contact section's pair: the frame is 112:75 landscape at
+    // md+ but a 430px-tall column below it, so one file can't serve both.
+    //
+    // Both <img>s are in the DOM and display:none does NOT cancel a fetch — which is the whole
+    // point of the warm-neighbour block above, and a problem here, because this component is
+    // mounted four times over (current + incoming + two neighbours). So the hidden crop is given a
+    // 1px `sizes`: the browser still fetches, but resolves srcset to the smallest candidate
+    // (~16px, a few hundred bytes) instead of a second full-size image. Without it, every viewport
+    // would pull four headshots it can never display.
+    <>
+      <MediaImage
+        media={member.photoMobile ?? member.photo}
+        eager={eager}
+        sizes="(min-width: 1152px) 1px, 100vw"
+        className="h-full w-full object-cover object-top md:hidden"
+      />
+      <MediaImage
+        media={member.photo}
+        eager={eager}
+        // object-cover scales these by width, so the box width is what matters. Between md and 3xl
+        // the section is padding-only (px-40), so the box tracks the viewport — a fixed px here
+        // understated it badly on a 1900px screen. Above 3xl .section-shell caps the shell at 1600,
+        // so the box is a constant 1600 - 320.
+        sizes="(max-width: 1151px) 1px, (min-width: 1920px) 1280px, calc(100vw - 320px)"
+        className="hidden h-full w-full object-cover object-top md:block"
+      />
+    </>
   ) : (
     // ponytail: image placeholder — swap for the real headshot upload
     <div className="flex h-full w-full items-center justify-center bg-[#E8E3DE]">
