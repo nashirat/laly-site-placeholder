@@ -296,9 +296,13 @@ export interface StrategyBlock {
       id?: string | null;
     }[];
     /**
-     * One line, the "if you..." sentence. Line breaks render as spaces.
+     * The "if you..." sentence. Press Enter for a hard break — these are set by hand, not wrapped.
      */
     hook: string;
+    /**
+     * Only fill this in when the mobile breaks differ from desktop. Empty = hook is used at every width.
+     */
+    hookMobile?: string | null;
     /**
      * The explainer at the foot of the card. Line breaks render as spaces.
      */
@@ -620,6 +624,7 @@ export interface StrategyBlockSelect<T extends boolean = true> {
               id?: T;
             };
         hook?: T;
+        hookMobile?: T;
         body?: T;
         link?:
           | T
