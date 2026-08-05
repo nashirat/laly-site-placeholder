@@ -70,7 +70,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                   subgrid, and only the visible one contributes its stretched ::before hit area. */}
               <div className="flex items-start justify-between gap-4">
                 <h3
-                  className="font-display text-[32px] font-normal leading-[1.1] tracking-[-1px] md:text-[44px] 3xl:text-[52px]"
+                  className="font-display text-4xl font-normal leading-[1.1] tracking-[-1px] md:text-[44px] 3xl:text-[52px]"
                   style={{ color: card.fg }}
                 >
                   {/* designer's call: the subject always lands on line 2 — authored break, not wrap */}
