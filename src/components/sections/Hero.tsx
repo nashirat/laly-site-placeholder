@@ -10,7 +10,7 @@ import type { HeroContent } from '@/lib/types'
 // Figma panel says at every width.
 // Heading = Figma display/l: Neue Haas (font-display) 500 / 72px / 100% leading / center / #262626.
 // Mobile = Figma heading/h1/s: 450 (→400, only 400/500/700 shipped) / 44px / 110% leading.
-// Desc = Figma body-2/xxl: New Spirit (font-sans) 400 / 28px / 125% leading / center / #4A4A4A.
+// Desc = New Spirit (font-sans) 400 / 20px mobile, 28px desktop / 125% leading / center / #4A4A4A.
 // Entry: `preloading-done` starts the curtain close and hero sequence together. Heading waits 0.8s,
 // so it begins shortly before the 1.2s curtain close completes.
 export default function Hero({ content }: { content: HeroContent }) {
@@ -68,7 +68,7 @@ export default function Hero({ content }: { content: HeroContent }) {
         </h1>
         <p
           // letter-spacing/l — token value unknown, eyeballed a touch tighter than default
-          className="hero-desc entry-copy mx-auto mt-5 max-w-[616px] md:mt-6 font-sans text-lg font-normal leading-[1.25] tracking-[-0.01em] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
+          className="hero-desc entry-copy mx-auto mt-5 max-w-[616px] md:mt-6 font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#4A4A4A] md:text-[28px] 3xl:max-w-[800px] 3xl:text-[30px]"
           style={{ animationDelay: '0.95s' }}
         >
           {description}

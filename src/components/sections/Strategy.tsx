@@ -1,8 +1,19 @@
+import { Fragment } from 'react'
 import type { CSSProperties } from 'react'
 import { ArrowCircleButton } from '@/components/ui/ArrowCircleButton'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { InView } from '@/components/ui/InView'
 import type { StrategyContent } from '@/lib/types'
+
+const hookClass = 'font-sans text-2xl font-normal leading-[1.25] text-[#FCF7F3]'
+
+const hardBreaks = (text: string) =>
+  text.split('\n').map((line, i) => (
+    <Fragment key={line}>
+      {i > 0 && <br />}
+      {line}
+    </Fragment>
+  ))
 
 // "Strategy" — the dark counterpart to WhoWeAre. Same copy stack; only the ground and the card grid
 // differ (3 across instead of 2 stacked).
@@ -35,7 +46,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
             second line, every card's hook moves down with it. Last row is 1fr so the cards end
             flush; the body sits at its top, not its end, or a long body would leave a hole in the
             two short cards. */}
-        <div className="mt-10 grid gap-6 md:mt-12 md:grid-cols-3 md:grid-rows-[auto_auto_auto_1fr] md:gap-y-4 3xl:gap-x-8 3xl:gap-y-5">
+        <div className="mt-10 grid gap-8 md:mt-12 md:grid-cols-3 md:grid-rows-[auto_auto_auto_1fr] md:gap-4 3xl:gap-y-5">
           {cards.map((card, i) => (
             // reveal is per-card, not per-grid, so they can stagger left→right. The inline
             // animation-delay longhand beats the stylesheet's `animation` shorthand (inline wins).
@@ -59,7 +70,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                   subgrid, and only the visible one contributes its stretched ::before hit area. */}
               <div className="flex items-start justify-between gap-4">
                 <h3
-                  className="font-display text-[32px] font-normal leading-[1.1] tracking-tight md:text-[44px] 3xl:text-[52px]"
+                  className="font-display text-[32px] font-normal leading-[1.1] tracking-[-1px] md:text-[44px] 3xl:text-[52px]"
                   style={{ color: card.fg }}
                 >
                   {/* designer's call: the subject always lands on line 2 — authored break, not wrap */}
@@ -114,9 +125,16 @@ export default function Strategy({ content }: { content: StrategyContent }) {
 
               {/* body-2/xl — New Spirit 400 / 24px / 125% */}
               <div className="mt-4 mb-4 flex items-start justify-between gap-4">
-                <p className="font-sans text-lg font-normal leading-[1.25] text-[#FCF7F3] md:text-xl xl:text-2xl">
-                  {card.hook}
+                {/* every break here is authored, never a wrap — the designer sets them by hand.
+                    Card 3 is the only one whose mobile breaks differ, so hookMobile is optional and
+                    the second node only exists when it's set. display:none keeps the hidden copy out
+                    of the a11y tree, so screen readers still get exactly one. */}
+                <p className={`${hookClass}${card.hookMobile ? ' max-md:hidden' : ''}`}>
+                  {hardBreaks(card.hook)}
                 </p>
+                {card.hookMobile && (
+                  <p className={`${hookClass} md:hidden`}>{hardBreaks(card.hookMobile)}</p>
+                )}
                 {/* the arrow takes its colour from this element. Its stretched ::before makes the
                     whole card the hit area (only link in the card, so nothing to nest). */}
                 <ArrowCircleButton

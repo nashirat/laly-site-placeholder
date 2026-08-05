@@ -56,7 +56,18 @@ export const StrategyBlock: Block = {
           name: 'hook',
           type: 'textarea',
           required: true,
-          admin: { description: 'One line, the "if you..." sentence. Line breaks render as spaces.' },
+          admin: {
+            description:
+              'The "if you..." sentence. Press Enter for a hard break — these are set by hand, not wrapped.',
+          },
+        },
+        {
+          name: 'hookMobile',
+          type: 'textarea',
+          admin: {
+            description:
+              'Only fill this in when the mobile breaks differ from desktop. Empty = hook is used at every width.',
+          },
         },
         {
           name: 'body',

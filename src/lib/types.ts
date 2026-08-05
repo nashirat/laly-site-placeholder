@@ -58,7 +58,10 @@ export type WhoWeAreContent = {
 export type ServicePillar = {
   title: string
   badges: { label: string; color: string }[]
+  // \n in hook/title is a hard break the designer set by hand, not a wrap. hookMobile is only set
+  // when the mobile breaks differ from desktop's; absent -> hook serves both.
   hook: string
+  hookMobile?: string
   body: string
   link: LinkField
   fg: string

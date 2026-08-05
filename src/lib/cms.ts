@@ -123,6 +123,8 @@ export function toStrategyContent(block: StrategyBlock): StrategyContent | null 
         title: c.title,
         badges,
         hook: c.hook,
+        // blank textarea comes back '' — undefined, or Strategy renders an empty second <p>
+        hookMobile: c.hookMobile || undefined,
         body: c.body,
         link: { label: c.link.label, href: c.link.href ?? undefined },
         fg: STRATEGY_ACCENTS[c.accent],
