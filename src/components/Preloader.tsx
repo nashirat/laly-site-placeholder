@@ -11,8 +11,10 @@ import { PRELOADER_CLOSE_DURATION, PRELOADER_HOLD } from '@/lib/motion'
 //
 // State sequence: preloading -> preloading-done (starts the slide-up and hero entry) ->
 // preloader-done (curtain unmounts). This is why the component is client.
-// Later: the same component doubles as the route-transition curtain (slide down to cover, up to
-// reveal) — that direction needs client state, so it stays a separate concern.
+//
+// The curtain itself is <Curtain> below, shared with RouteTransition — same pink, same logo, same
+// 1.2s easeInOutQuint — but the two run on separate clocks and separate state, on purpose: this one
+// fires once at first paint, that one fires per navigation.
 export function Preloader() {
   const [state, setState] = useState<'preloading' | 'preloading-done' | 'preloader-done'>('preloading')
 
@@ -50,8 +52,8 @@ export function Preloader() {
   if (state === 'preloader-done') return null
 
   return (
-    <div
-      aria-hidden
+    <Curtain
+      className="preloader"
       // animationend bubbles from children too; the logo doesn't animate, but guard by name anyway.
       onAnimationEnd={(e) => {
         if (e.animationName.includes('preloader-up')) {
@@ -60,9 +62,26 @@ export function Preloader() {
           setState('preloader-done')
         }
       }}
-      className="preloader fixed inset-0 z-[100] flex items-center justify-center bg-[#ff6d6a]"
+    />
+  )
+}
+
+// The curtain, markup only — who slides it and when is the caller's business. Kept here rather than
+// in its own file because Preloader is the reason it exists; RouteTransition is the second caller.
+export function Curtain({
+  className = '',
+  onAnimationEnd,
+}: {
+  className?: string
+  onAnimationEnd?: (e: React.AnimationEvent<HTMLDivElement>) => void
+}) {
+  return (
+    <div
+      aria-hidden
+      onAnimationEnd={onAnimationEnd}
+      className={`fixed inset-0 z-[100] flex items-center justify-center bg-[#ff6d6a] ${className}`}
     >
-      {/* the first thing painted -> this is the LCP element, so it must not lazy-load */}
+      {/* on first load this is the first thing painted -> the LCP element, so it must not lazy-load */}
       <Image
         src={logo}
         alt="Laly Agency"

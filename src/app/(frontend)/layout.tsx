@@ -3,6 +3,7 @@ import { fontVariables } from '@/app/(frontend)/components/Fonts'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { Preloader } from '@/components/Preloader'
+import { RouteTransition } from '@/components/RouteTransition'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import './styles.css'
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="relative min-h-screen antialiased font-sans">
         <SmoothScroll />
         <Preloader />
+        <RouteTransition />
         <Header />
         {children}
         <Footer />

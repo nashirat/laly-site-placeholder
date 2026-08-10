@@ -251,7 +251,7 @@ await payload.create({
             ],
             hook: "If you're looking for a new stream of\nhigh-quality leads, this is for you.",
             body: 'Pay for website traffic that translates to a reliable stream of new clients for your business, every month.',
-            link: { label: 'Explore paid advertisement' },
+            link: { label: 'Explore paid advertisement', href: '/paid-advertising' },
             accent: 'lilac',
           },
           {

@@ -106,7 +106,7 @@ export const home: HomeContent = {
         // \n = designer's desktop line breaks, hard at md+ and ignored below (see Strategy.tsx)
         hook: "If you're looking for a new stream of\nhigh-quality leads, this is for you.",
         body: 'Pay for website traffic that translates to a reliable stream of new clients for your business, every month.',
-        link: { label: 'Explore paid advertisement' },
+        link: { label: 'Explore paid advertisement', href: '/paid-advertising' },
         fg: '#E5CBE2',
       },
       {

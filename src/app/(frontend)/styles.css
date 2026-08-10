@@ -33,6 +33,31 @@
 
 /* Brand colors go here once Figma lands: @theme { --color-brand: ...; } */
 
+/* Dark-hero pages (/paid-advertising). Header is rendered once in the layout and knows nothing about the
+   route, so the page's hero opts in with `.hero-dark` and the bar reads it off the body. :has, not a
+   prop, because Header is a server component and not a client scroll listener, because the hero is
+   the whole page's ground here — there is nothing to swap back to mid-scroll.
+   Add sections below the hero on such a page and the bar stays transparent over them; that is the
+   point at which this earns a scroll-aware variant, not before. */
+body:has(.hero-dark) header {
+  background-color: transparent;
+}
+body:has(.hero-dark) header .logo-dark {
+  display: none;
+}
+body:has(.hero-dark) header .logo-light {
+  display: block;
+}
+/* the MENU toggle, i.e. Button's `outline` variant flipped to `outlineInverse` without threading a
+   prop through NavMenu for one page */
+body:has(.hero-dark) header button {
+  border-color: #e7dcd4;
+  color: #e7dcd4;
+}
+body:has(.hero-dark) header button:hover {
+  background-color: rgb(255 255 255 / 0.1);
+}
+
 /* Lenis (see SmoothScroll.tsx) — inlined rather than importing lenis/dist/lenis.css, because
    Tailwind v4 needs extra resolution config to @import out of node_modules and this is five rules.
    Lenis stamps these classes on <html> itself. Check upstream if we ever bump major versions. */
@@ -73,9 +98,33 @@ html.preloading-done .preloader {
 html.preloader-done .preloader {
   transform: translateY(-100%);
 }
+
+/* Route transitions (see RouteTransition.tsx) — the same curtain on a per-navigation clock. It
+   enters from below, holds while the destination loads, then exits upward on the preloader's own
+   keyframes, so a navigation and a cold load are the same gesture at the same speed. Driven by a
+   class rather than an html state because two curtains must never share one switch. */
+@keyframes curtain-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.route-curtain.is-cover {
+  animation: curtain-in 1.2s cubic-bezier(0.83, 0, 0.17, 1) both;
+}
+.route-curtain.is-hold {
+  transform: translateY(0);
+}
+.route-curtain.is-reveal {
+  animation: preloader-up 1.2s cubic-bezier(0.83, 0, 0.17, 1) both;
+}
 @media (prefers-reduced-motion: reduce) {
-  /* no curtain at all — animation:none would leave it parked over the page forever */
-  .preloader {
+  /* no curtain at all — animation:none would leave it parked over the page forever. The route
+     curtain never mounts under this setting (RouteTransition bails on click), belt and braces. */
+  .preloader,
+  .route-curtain {
     display: none;
   }
 }

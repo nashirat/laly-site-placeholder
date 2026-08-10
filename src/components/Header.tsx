@@ -9,10 +9,28 @@ import { header } from '@/lib/mock/globals'
 // Logo = plain <img> from /public (svg needs no next/image optimization, no svgr).
 // Reads the Header global — mocked now, a cached Payload fetch in Phase 3 (this stays a server
 // component, so that swap is just awaiting the fetch here).
+//
+// Both logos ship on every page and styles.css hides one: a page that leads on a dark hero tags it
+// `.hero-dark`, and `body:has(.hero-dark)` flips the bar. That keeps this a server component with no
+// route awareness — the alternative was a client scroll listener for a swap that never changes
+// mid-page. The light svg is the same file with the wordmark recoloured; the mark stays brand pink.
 export default function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-19 items-center justify-between bg-[#fffcf9] px-5 sm:px-10">
-      <img src="/primarylogo.svg" alt="Laly" width={120} height={28} className="h-7 w-30" />
+      <img
+        src="/primarylogo.svg"
+        alt="Laly"
+        width={120}
+        height={28}
+        className="logo-dark h-7 w-30"
+      />
+      <img
+        src="/primarylogo-light.svg"
+        alt="Laly"
+        width={120}
+        height={28}
+        className="logo-light hidden h-7 w-30"
+      />
       <NavMenu items={header.nav} />
     </header>
   )
