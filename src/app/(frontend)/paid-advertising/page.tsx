@@ -9,6 +9,7 @@ import refundShot from '../../../../public/paid-advertising/refund.webp'
 import websiteShot from '../../../../public/paid-advertising/website.webp'
 import { MediaImage } from '@/components/Media/Image'
 import { Button } from '@/components/ui/Button'
+import { InView } from '@/components/ui/InView'
 import { ScratchCover } from '@/components/ui/ScratchCover'
 
 export const metadata: Metadata = {
@@ -52,6 +53,46 @@ const shot = (img: StaticImageData, alt: string) => ({
   alt,
   blurDataURL: img.blurDataURL,
 })
+
+// Figma's card ground is a conic gradient at 50% layer opacity over solid #292624. The alphas below
+// are the design's own, halved — a source-over layer at 0.5 opacity is exactly its alphas halved, so
+// this is one background-image instead of a second stacked element.
+const STAT_BG =
+  'conic-gradient(from 90deg, rgba(255,111,97,0.05) 0%, rgba(28,25,23,0.125) 35%, rgba(85,47,42,0.125) 65%, rgba(141,68,60,0.075) 85%, rgba(255,111,97,0.05) 100%)'
+
+// The \n is the designer's break, not a wrap — both lines are set by hand.
+const STATS = [
+  { value: '31', label: 'Qualified leads generated in a\nsingle month for one client' },
+  { value: '$0', label: "What you owe\nif we don't deliver in 6 months" },
+  { value: '100%', label: 'Of our revenue\ntied to your results' },
+]
+
+const PRICING = [
+  {
+    label: 'One-time Setup',
+    price: '$20,000',
+    items: [
+      'Business audit',
+      'Custom Scaling Roadmap',
+      'Full Website Build',
+      'Campaign Architecture',
+      'Tracking Infrastructure',
+      'Call Handling Setup',
+      'Reporting Dashboard',
+    ],
+  },
+  {
+    label: 'Per Qualified Lead',
+    price: '$1,500',
+    badge: 'PAY AS THEY COME IN',
+    items: [
+      'Only qualified leads that pass our filter and match the criteria we agreed on.',
+      'You review every lead in your dashboard.',
+      'Dispute any you disagree with.',
+      'Pay as they come in.',
+    ],
+  },
+]
 
 // Figma draws an arrow button in each panel's top-right at opacity 0 — a link that does not exist
 // yet. Not rendered: an invisible control is worse than an absent one.
@@ -293,6 +334,107 @@ export default function PaidAdvertisingPage() {
                 />
               }
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Figma 2488:822 — "The numbers speak." Three stat cards on the dark ground.
+          Cards enter left-to-right on the same clock as the Strategy pillars: InView's media gate
+          plus a 0.2s-per-card inline delay. */}
+      <section aria-label="Results" className="w-full bg-[#292624] px-5 py-16 md:px-20 md:py-28">
+        <InView className="mx-auto flex w-full max-w-[1280px] flex-col gap-16">
+          <div className="flex flex-col gap-6 text-center">
+            <p className="section-text-reveal font-mono text-base font-normal uppercase leading-[1.4] tracking-[0.06em] text-[#FF6D6A] md:text-2xl md:tracking-[1px]">
+              [ Results ]
+            </p>
+            <h2 className="section-text-reveal font-display text-[36px] font-normal leading-[1.1] tracking-[-1px] text-[#FCF7F3] md:text-[64px]">
+              The numbers speak.
+            </h2>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {STATS.map((stat, i) => (
+              <div
+                key={stat.value}
+                // the inline animation-delay longhand beats the stylesheet's `animation` shorthand,
+                // which is what staggers these left→right — same numbers as Strategy's pillars
+                className="section-media-reveal flex flex-col gap-4 rounded px-4 py-6 text-center"
+                style={{ backgroundImage: STAT_BG, animationDelay: `${0.2 + i * 0.2}s` }}
+              >
+                <p className="font-sans text-[64px] leading-[1.25] tracking-[-0.5px] text-[#FF6D6A] md:text-[96px]">
+                  {stat.value}
+                </p>
+                <p className="whitespace-pre-line font-sans text-xl leading-[1.25] text-[#FCF7F3] opacity-85 md:text-[28px]">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </InView>
+      </section>
+
+      {/* Figma 2329:4221 — Pricing. Two cards; the second carries the brand keyline, a glow, and the
+          "pay as they come in" tab straddling its top edge. */}
+      <section
+        aria-label="Pricing"
+        className="w-full border-t-[0.5px] border-[#867A72] bg-[#FCF7F3] px-5 py-16 md:px-40 md:py-28"
+      >
+        <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-16">
+          <div className="flex flex-col gap-6 text-center">
+            <p className="font-mono text-base font-normal uppercase leading-[1.4] tracking-[0.06em] text-[#867A72] md:text-2xl md:tracking-[1px]">
+              [ Pricing ]
+            </p>
+            {/* the break after "Transparent." is authored, not a wrap */}
+            <h2 className="whitespace-pre-line font-display text-[36px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
+              {'Simple. Transparent.\nPerformance-based.'}
+            </h2>
+          </div>
+
+          {/* items-stretch (grid's default) is what lets the shorter card match the taller one, and
+              justify-between then parks both CTAs on the same line */}
+          <div className="grid gap-8 md:grid-cols-2">
+            {PRICING.map((tier) => (
+              <div
+                key={tier.label}
+                className={`relative flex flex-col justify-between gap-10 border bg-[#FFFCF9] p-6 md:p-10 ${
+                  tier.badge
+                    ? 'border-[#FF6D6A] shadow-[0_0_6px_0_rgba(66,55,48,0.2),1px_1px_6px_0_rgba(66,55,48,0.2)]'
+                    : 'border-[#E7DCD4]'
+                }`}
+              >
+                {tier.badge && (
+                  // straddles the keyline near the right edge — Figma pins it at left:372 on a
+                  // fixed-width card, which is that inset measured from the wrong side
+                  <span className="absolute -top-3 right-6 rounded-full bg-[#FF6D6A] px-1.5 py-1 font-fira text-xs leading-[1.25] tracking-[-1px] text-[#292624] shadow-[0_1px_2px_0_rgba(16,24,40,0.04)] md:right-10 md:text-base">
+                    {tier.badge}
+                  </span>
+                )}
+
+                <div className="flex flex-col gap-8">
+                  <div className="flex flex-col gap-4">
+                    {/* body/l — Neue Haas 20 / 125% / 0.25px */}
+                    <p className="font-display text-base font-normal leading-[1.25] tracking-[0.25px] text-[#867A72] md:text-xl">
+                      {tier.label}
+                    </p>
+                    <p className="font-sans text-5xl leading-[1.25] tracking-[-0.5px] text-[#262626] md:text-[72px]">
+                      {tier.price}
+                    </p>
+                  </div>
+                  <ul className="ml-6 list-disc font-sans text-lg leading-[1.5] text-[#4A4A4A] md:ml-9 md:text-2xl">
+                    {tier.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="flex">
+                  {/* Figma sets this label at 20px; the shared Button ships 16/18 */}
+                  <Button className="md:[&>span]:text-xl md:[&>span]:leading-[25px]">
+                    BOOK A CALL
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
