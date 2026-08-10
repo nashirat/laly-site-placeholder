@@ -45,14 +45,14 @@ export default function Contact({ content }: { content: ContactContent }) {
         />
 
         <div className="section-media-reveal flex justify-center gap-3 md:mt-12 3xl:mt-14 3xl:gap-4">
-          {/* no scramble, no hover tint — client's call: these closing CTAs stay completely static.
-              Costs the pointer its only affordance; the cursor and focus ring are all that's left. */}
+          {/* scramble-on-hover is back on both CTAs (Button's default). The outline one overrides
+              the variant flash — its default #ff6d6a is this section's own background, so decrypt
+              chars would vanish mid-run; white reads against the pink. */}
           {/* instance-only sizing, the shared Button keeps its own numbers:
               mobile  = 8.69 / 6.51 padding, 16px label, Drop shadow 0 1.09 2.17 @4%
               desktop = Large/Tertiary — 13.02 / 9.77 padding, 32px label, 0 3.26 9.77 @6% */}
           <Button
             variant="solid"
-            scramble={false}
             href={buttons[0].href}
             className="bg-[#151414]! px-[8.69px]! py-[6.51px]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]! md:px-[13.02px]! md:py-[9.77px]! md:shadow-[0_3.26px_9.77px_0_rgba(16,24,40,0.06)]! md:[&>span]:text-[32px]! md:[&>span]:leading-[40px]!"
           >
@@ -60,7 +60,7 @@ export default function Contact({ content }: { content: ContactContent }) {
           </Button>
           <Button
             variant="outline"
-            scramble={false}
+            scrambleColor="#ffffff"
             href={buttons[1].href}
             className="border-[#151414]! px-[8.69px]! py-[6.51px]! text-[#151414]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]! md:px-[13.02px]! md:py-[9.77px]! md:shadow-[0_3.26px_9.77px_0_rgba(16,24,40,0.06)]! md:[&>span]:text-[32px]! md:[&>span]:leading-[40px]!"
           >
