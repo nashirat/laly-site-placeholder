@@ -95,13 +95,16 @@ export default function Contact({ content }: { content: ContactContent }) {
               aria-label={s.platform}
               target="_blank"
               rel="noreferrer"
-              className="text-[#292624] transition-opacity hover:opacity-70 md:text-black"
+              className="group"
             >
-              {/* svgs ship with #151414 baked in — ring (rect stroke) and glyph (path fill) both
-                  repainted from currentColor; CSS outranks a presentation attribute */}
+              {/* svgs ship with #151414 baked in — ring (rect stroke) and glyph (path fill) are
+                  both repainted here; CSS outranks a presentation attribute.
+                  hover fills the ring instead of fading it: rect gets fill + stroke #292624 and
+                  the glyph flips to #E7DCD4, so the icon inverts rather than dimming. The rect has
+                  no fill attribute and the svg root is fill="none", so it starts transparent. */}
               <Icon
                 name={s.platform}
-                className="h-8 w-8 [&_rect]:stroke-current [&_path]:fill-current"
+                className="h-8 w-8 [&_rect]:stroke-[#292624] [&_path]:fill-[#292624] [&_path]:transition-colors [&_rect]:transition-colors group-hover:[&_rect]:fill-[#292624] group-hover:[&_path]:fill-[#E7DCD4]"
               />
             </a>
           ))}

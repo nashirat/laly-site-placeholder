@@ -118,8 +118,10 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
   const sliding = incoming !== null && phase !== 'idle'
 
   return (
-    // md+: the About section's own 32 gap spaces this, so no top margin of its own
-    <div className="section-media-reveal mt-8 text-left md:mt-0">
+    // md+: the About section's own 32 gap spaces this, so no top margin of its own.
+    // px-36 is Figma's Team Section inset (144) — it sits INSIDE the section's own 160, so the card
+    // is narrower than the copy above it. Desktop only; mobile keeps the section's 20.
+    <div className="section-media-reveal mt-8 text-left md:mt-0 md:px-36">
       {/* mobile only — swipe affordance, sits above the card (no on-card arrows on small screens) */}
       <div className="mb-2 flex items-center justify-end gap-1.5 text-[#FF8A88] md:hidden">
         {/* Fira Code 400 / 10 / 100% / no tracking / #FF8A88 */}
@@ -128,10 +130,12 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
         <NavArrowIcon className="w-[9.14px] h-2" />
       </div>
 
-      {/* photo block — mobile: fixed 430px tall, width fills; md+: 1120:750 ratio.
+      {/* photo block — fixed height at both sizes: 430 mobile, 450 md+. The old md ratio (112:75)
+          grew the card with the viewport; the design pins it, so a wide screen gets a letterbox
+          rather than a 900px-tall headshot.
           current photo slides out, incoming slides in from the opposite edge */}
       <div
-        className="relative h-[430px] w-full overflow-hidden md:h-auto md:aspect-[112/75]"
+        className="relative h-[430px] w-full overflow-hidden md:h-[450px]"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -250,10 +254,10 @@ function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean 
         media={member.photo}
         eager={eager}
         // object-cover scales these by width, so the box width is what matters. Between md and 3xl
-        // the section is padding-only (px-40), so the box tracks the viewport — a fixed px here
-        // understated it badly on a 1900px screen. Above 3xl .section-shell caps the shell at 1600,
-        // so the box is a constant 1600 - 320.
-        sizes="(max-width: 1151px) 1px, (min-width: 1920px) 1280px, calc(100vw - 320px)"
+        // the section is padding-only, so the box tracks the viewport — a fixed px here understated
+        // it badly on a 1900px screen. 608 = the section's 160 sides plus this card's own 144.
+        // Above 3xl .section-shell caps the shell at 1600, so the box is a constant 1600 - 608.
+        sizes="(max-width: 1151px) 1px, (min-width: 1920px) 992px, calc(100vw - 608px)"
         className="hidden h-full w-full object-cover object-top md:block"
       />
     </>
