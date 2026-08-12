@@ -100,11 +100,15 @@ export default function Contact({ content }: { content: ContactContent }) {
               {/* svgs ship with #151414 baked in — ring (rect stroke) and glyph (path fill) are
                   both repainted here; CSS outranks a presentation attribute.
                   hover fills the ring instead of fading it: rect gets fill + stroke #292624 and
-                  the glyph flips to #E7DCD4, so the icon inverts rather than dimming. The rect has
-                  no fill attribute and the svg root is fill="none", so it starts transparent. */}
+                  the glyph flips to #E7DCD4, so the icon inverts rather than dimming.
+                  fill-transparent on the rect is load-bearing: the svg root is fill="none" and
+                  `none` is not a color, so it SNAPS to the dark fill instead of fading. transparent
+                  is rgba(0,0,0,0), which interpolates.
+                  300/ease-out rather than the 150ms default — at 150 the glyph crossing #292624 to
+                  #E7DCD4 reads as a flicker through the mid-greys instead of a fade. */}
               <Icon
                 name={s.platform}
-                className="h-8 w-8 [&_rect]:stroke-[#292624] [&_path]:fill-[#292624] [&_path]:transition-colors [&_rect]:transition-colors group-hover:[&_rect]:fill-[#292624] group-hover:[&_path]:fill-[#E7DCD4]"
+                className="h-8 w-8 [&_*]:transition-colors [&_*]:duration-300 [&_*]:ease-out [&_rect]:fill-transparent [&_rect]:stroke-[#292624] [&_path]:fill-[#292624] group-hover:[&_rect]:fill-[#292624] group-hover:[&_path]:fill-[#E7DCD4]"
               />
             </a>
           ))}

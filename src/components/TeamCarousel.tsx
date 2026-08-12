@@ -193,7 +193,8 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
             phase={phase}
             direction={direction}
             // mobile = body-2/l: New Spirit 400 / 20 / 125% / letter-spacing l / #262626
-            className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#262626] md:text-5xl md:leading-[1.4] md:tracking-normal 3xl:text-6xl"
+            // 40 at md+, flat — the 3xl step up to 60 was sized for the old 750-tall card
+            className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#262626] md:text-[40px] md:leading-[1.4] md:tracking-normal"
             {...T_NAME}
           />
           {/* on-card arrows — desktop only; mobile uses swipe + the SCROLL affordance above */}
@@ -327,7 +328,8 @@ function NavArrow({ direction, onClick }: { direction: Dir; onClick: () => void 
       className="inline-flex cursor-pointer items-center justify-center"
     >
       <NavArrowIcon
-        className={`h-auto w-10 3xl:w-14 ${direction === 'prev' ? '-scale-x-100' : ''}`}
+        // 40 everywhere; the 3xl step to 56 was sized for the old 750-tall card
+        className={`h-auto w-10 ${direction === 'prev' ? '-scale-x-100' : ''}`}
       />
     </button>
   )
