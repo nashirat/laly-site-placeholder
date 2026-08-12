@@ -8,9 +8,13 @@ import heroBg from '../../../../public/paid-advertising/hero.webp'
 import refundShot from '../../../../public/paid-advertising/refund.webp'
 import websiteShot from '../../../../public/paid-advertising/website.webp'
 import { MediaImage } from '@/components/Media/Image'
+import Contact from '@/components/sections/Contact'
+import Note from '@/components/sections/Note'
+import { getHome } from '@/lib/cms'
 import { Button } from '@/components/ui/Button'
 import { InView } from '@/components/ui/InView'
 import { ScratchCover } from '@/components/ui/ScratchCover'
+import ChevronDown from '../../../../public/chevron-down.svg'
 
 export const metadata: Metadata = {
   title: 'Paid Advertising | Laly Agency',
@@ -94,6 +98,19 @@ const PRICING = [
   },
 ]
 
+// ponytail: the Figma FAQ is five lorem rows with one lorem answer — the copy has not been written.
+// Shipped verbatim rather than invented, so nobody mistakes filler for approved copy. Swap q/a here.
+const FAQS = [
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
+].map((question) => ({
+  question,
+  answer: 'This is subtext which appears after expanding the accordion.',
+}))
+
 // Figma draws an arrow button in each panel's top-right at opacity 0 — a link that does not exist
 // yet. Not rendered: an invisible control is worse than an absent one.
 function Panel({
@@ -130,7 +147,17 @@ function Panel({
   )
 }
 
-export default function PaidAdvertisingPage() {
+// Same ISR window as the home page — the closing Contact block is the only CMS-backed thing here,
+// and it is the same document, so the two pages should not go stale at different times.
+export const revalidate = 3600
+
+export default async function PaidAdvertisingPage() {
+  // ponytail: the closing CTA is read off the home doc rather than copied. One edit in the admin
+  // moves both pages. getHome falls back to the mock per block, so an unreachable Atlas still
+  // builds — but it does pull the whole page doc for one block. Split it when a second page needs
+  // its own contact copy.
+  const { contact } = await getHome()
+
   return (
     <main>
       {/* .hero-dark is the header's only cue: styles.css flips the shared cream navbar to
@@ -438,6 +465,76 @@ export default function PaidAdvertisingPage() {
           </div>
         </div>
       </section>
+
+      {/* Figma 2458:5950 — FAQ. Same cream + grid texture ground as "What you get".
+          ponytail: native <details>/<summary>, so this stays a server component — the disclosure
+          state, keyboard handling and aria-expanded are the browser's, not ours. The cost is no
+          height transition (only Chromium animates ::details-content today) and no
+          one-open-at-a-time; neither is in the design. */}
+      <section
+        aria-label="FAQ"
+        className="relative w-full overflow-hidden border-y border-[#544D49] bg-[#FCF7F3] px-5 py-16 md:px-40 md:py-28"
+      >
+        <MediaImage
+          media={shot(gridTexture, '')}
+          quality={60}
+          sizes="100vw"
+          className="pointer-events-none absolute inset-0 size-full object-cover opacity-15"
+        />
+
+        <div className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-12">
+          <div className="flex flex-col gap-6 text-center">
+            <p className="font-mono text-base font-normal uppercase leading-[1.4] tracking-[0.06em] text-[#867A72] md:text-2xl md:tracking-[1px]">
+              [ FAQ ]
+            </p>
+            <h2 className="font-display text-[36px] font-normal leading-[1.1] tracking-[-1px] text-[#292624] md:text-[56px]">
+              Frequently Asked Questions
+            </h2>
+          </div>
+
+          <div className="flex w-full flex-col gap-4 border border-[#E7DCD4] bg-[#FFFCF9] p-4 md:p-6">
+            {FAQS.map((faq, i) => (
+              <details
+                // identical placeholder questions, so the index is the only stable key
+                key={i}
+                // last row drops the rule — Figma ends the stack on the container's own border
+                className={`group px-2 py-6 md:px-4 ${
+                  i < FAQS.length - 1 ? 'border-b border-[#E7DCD4]' : ''
+                }`}
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+                  {/* body-2/xl — New Spirit 24 / 125% */}
+                  <span className="font-sans text-lg leading-[1.25] text-[#292624] md:text-2xl">
+                    {faq.question}
+                  </span>
+                  {/* the chevron flips rather than swapping to Figma's separate cheveron-up node —
+                      same glyph mirrored, and it can then transition */}
+                  <ChevronDown
+                    aria-hidden
+                    className="h-[6.5px] w-[11.5px] shrink-0 transition-transform duration-300 ease-out group-open:rotate-180"
+                  />
+                </summary>
+                {/* body-2/m — New Spirit 18 / 125% / #867A72 */}
+                <p className="mt-5 font-sans text-base leading-[1.25] text-[#867A72] md:text-lg">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Contact content={contact} />
+
+      {/* Figma 2148:620 — the same dark qualifier band the home page closes on, with this page's own
+          copy. Not from the CMS: the home doc's note block says something else, and this one is
+          page-specific. 458 is Figma's text width, and it is what breaks the line after "have". */}
+      <Note
+        content={{
+          body: "We're looking for firms ready to scale. If you have the ad budget and want leads that actually convert, let's talk.",
+        }}
+        className="mx-auto max-w-[458px]"
+      />
     </main>
   )
 }
