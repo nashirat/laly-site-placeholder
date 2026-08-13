@@ -37,24 +37,28 @@
    route, so the page's hero opts in with `.hero-dark` and the bar reads it off the body. :has, not a
    prop, because Header is a server component and not a client scroll listener, because the hero is
    the whole page's ground here — there is nothing to swap back to mid-scroll.
-   Add sections below the hero on such a page and the bar stays transparent over them; that is the
-   point at which this earns a scroll-aware variant, not before. */
+   Only while the hero is still the ground under the bar: HeaderGround stamps `data-past-hero` on
+   <body> once it has scrolled by, and everything below reverts to the shipped cream bar — otherwise
+   the light logo ends up on a cream section with the page showing through. */
 body:has(.hero-dark) header {
+  transition: background-color 250ms ease;
+}
+body:has(.hero-dark):not([data-past-hero]) header {
   background-color: transparent;
 }
-body:has(.hero-dark) header .logo-dark {
+body:has(.hero-dark):not([data-past-hero]) header .logo-dark {
   display: none;
 }
-body:has(.hero-dark) header .logo-light {
+body:has(.hero-dark):not([data-past-hero]) header .logo-light {
   display: block;
 }
 /* the MENU toggle, i.e. Button's `outline` variant flipped to `outlineInverse` without threading a
    prop through NavMenu for one page */
-body:has(.hero-dark) header button {
+body:has(.hero-dark):not([data-past-hero]) header button {
   border-color: #e7dcd4;
   color: #e7dcd4;
 }
-body:has(.hero-dark) header button:hover {
+body:has(.hero-dark):not([data-past-hero]) header button:hover {
   background-color: rgb(255 255 255 / 0.1);
 }
 

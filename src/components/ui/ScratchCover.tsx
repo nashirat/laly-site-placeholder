@@ -123,7 +123,8 @@ export function ScratchCover({ label }: { label: string }) {
       {/* the prompt rides on top of the cover and leaves on the first stroke — it has done its job by
           then, and it would otherwise sit over whatever gets uncovered */}
       <span
-        className={`pointer-events-none absolute inset-0 flex items-center justify-center font-sans text-2xl leading-[1.4] tracking-[-0.5px] text-[#BAA99E] transition-opacity duration-500 ease-out ${
+        // heading/h4: 18px mobile (2581:2758), 24 from md up
+        className={`pointer-events-none absolute inset-0 flex items-center justify-center font-sans text-lg leading-[1.4] tracking-[-0.5px] text-[#BAA99E] transition-opacity duration-500 ease-out md:text-2xl ${
           started ? 'opacity-0' : 'opacity-100'
         }`}
       >

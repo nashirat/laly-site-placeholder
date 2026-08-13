@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { fontVariables } from '@/app/(frontend)/components/Fonts'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
+import { HeaderGround } from '@/components/HeaderGround'
 import { Preloader } from '@/components/Preloader'
 import { RouteTransition } from '@/components/RouteTransition'
 import { SmoothScroll } from '@/components/SmoothScroll'
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SmoothScroll />
         <Preloader />
         <RouteTransition />
+        <HeaderGround />
         <Header />
         {children}
         <Footer />
