@@ -57,7 +57,10 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
       {state !== 'closed' && (
         <nav
           aria-label="Primary"
-          className="absolute right-0 top-full mt-4 hidden flex-col items-end gap-1 md:flex"
+          /* top-full is the TOGGLE's bottom (55.5px down a 76px bar), not the bar's — mt-4 put the
+             first pill 4.5px ABOVE the bar's edge, so it read as glued to it over dark sections.
+             24px clears it by ~4px — the same gap the pills keep between themselves. */
+          className="absolute right-0 top-full mt-6 hidden flex-col items-end gap-1 md:flex"
         >
           {items.map((item, i) => (
             <span key={item.label} className="inline-block overflow-hidden">

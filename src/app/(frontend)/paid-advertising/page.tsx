@@ -166,7 +166,8 @@ export default async function PaidAdvertisingPage() {
         aria-label="Paid advertising"
         // Figma frame: px 48, pt 0, pb 160, with the header's own 20px padding + 160 gap putting the
         // copy 188px down. The navbar is fixed and out of flow here, so that 188 has to be padding.
-        className="hero-dark relative flex w-full flex-col overflow-hidden border-b border-[#544D49] bg-[#292624] px-5 pt-[124px] pb-20 sm:px-10 md:px-12 md:pt-[188px] md:pb-40"
+        // Mobile (2234:3799): px 20, pb 112, and 20 pad + 28 logo + 112 gap = the copy 160px down.
+        className="hero-dark relative flex w-full flex-col overflow-hidden border-b border-[#544D49] bg-[#292624] px-5 pt-[160px] pb-28 sm:px-10 md:px-12 md:pt-[188px] md:pb-40"
       >
         {/* 20% is the design's own opacity — the photo is a texture, not a subject, so it is
             decorative (empty alt) and carries no blur placeholder cost worth paying.
@@ -188,18 +189,20 @@ export default async function PaidAdvertisingPage() {
         />
 
         {/* Figma hero section: px 144 at 1440 -> a 1056 column, same cap the home hero uses. */}
-        <div className="relative mx-auto flex w-full max-w-[1056px] flex-col items-center gap-6 text-center 3xl:max-w-[1200px]">
+        {/* mobile stacks on a 32px rhythm (Figma "Hero Text Container"), desktop on 24 */}
+        <div className="relative mx-auto flex w-full max-w-[1056px] flex-col items-center gap-8 text-center md:gap-6 3xl:max-w-[1200px]">
           {/* Brackets are authored characters here, not BracketLabel: that component spreads its
               brackets to the row's edges, and this one hugs the words. */}
           <p
-            className="entry-copy font-mono text-base font-normal uppercase leading-[1.4] tracking-[0.06em] text-[#FF6D6A] md:text-2xl md:tracking-[1px]"
+            className="entry-copy font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#FF6D6A] md:text-2xl"
             style={{ animationDelay: '0.7s' }}
           >
             [ Pay Per Performance ]
           </p>
 
           <h1
-            className="hero-heading entry-copy font-display text-[44px] font-normal leading-[1.1] tracking-tight text-[#FFFCF9] md:text-7xl md:font-medium md:leading-none md:tracking-[-1px] 3xl:text-8xl"
+            // 338px is Figma's mobile text width, and it is what breaks the line after "when"
+            className="hero-heading entry-copy max-w-[338px] font-display text-[44px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:max-w-none md:text-7xl md:font-medium md:leading-none md:tracking-[-1px] 3xl:text-8xl"
             style={{ animationDelay: '0.8s' }}
           >
             You only pay when we deliver.
@@ -214,7 +217,7 @@ export default async function PaidAdvertisingPage() {
             {PILLS.map((pill) => (
               <li
                 key={pill.label}
-                className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 font-display text-xs font-normal leading-[1.25] text-[#E7DCD4] shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]"
+                className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 font-display text-[10px] font-normal leading-[1.25] text-[#E7DCD4] md:text-xs shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]"
                 style={{ backgroundImage: PILL_BG }}
               >
                 {/* star.svg as a mask, same trick as the Strategy badges — one asset, four tints */}
@@ -241,7 +244,7 @@ export default async function PaidAdvertisingPage() {
           </ul>
 
           <p
-            className="hero-desc entry-copy max-w-[880px] font-sans text-xl font-normal leading-[1.25] text-[#F7F1EE] md:text-[28px]"
+            className="hero-desc entry-copy max-w-[338px] font-sans text-xl md:max-w-[880px] font-normal leading-[1.25] text-[#F7F1EE] md:text-[28px]"
             style={{ animationDelay: '1.05s' }}
           >
             We build your website, run your ads, handle your calls, filter your leads, and only send
@@ -258,9 +261,12 @@ export default async function PaidAdvertisingPage() {
             className="hero-cta entry-copy flex justify-center"
             style={{ animationDelay: '1.2s' }}
           >
-            {/* Figma sets this label at 20px; the shared Button ships 16/18, so it is overridden on
-                the instance exactly like the home hero's CTA. */}
-            <Button variant="primary" className="md:[&>span]:text-xl md:[&>span]:leading-[25px]">
+            {/* Figma sets this label at 18px mobile / 20px desktop; the shared Button ships 16/18,
+                so it is overridden on the instance exactly like the home hero's CTA. */}
+            <Button
+              variant="primary"
+              className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
+            >
               LET&rsquo;S BEGIN
             </Button>
           </div>
