@@ -132,9 +132,12 @@ export type HomeContent = {
   note: NoteContent
 }
 
-// Header global.
+// Header global. socials/copyright are only rendered by the mobile dropdown (Figma 3038:1661) —
+// the desktop bar is nav-only, so they stay optional and that variant just doesn't get them.
 export type HeaderContent = {
   nav: Required<LinkField>[]
+  socials?: SocialLink[]
+  copyright?: string
 }
 
 // Footer global — logo + nav column + contact column + copyright line.

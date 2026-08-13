@@ -118,10 +118,11 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
   const sliding = incoming !== null && phase !== 'idle'
 
   return (
-    // md+: the About section's own 32 gap spaces this, so no top margin of its own.
-    // px-36 is Figma's Team Section inset (144) — it sits INSIDE the section's own 160, so the card
-    // is narrower than the copy above it. Desktop only; mobile keeps the section's 20.
-    <div className="section-media-reveal mt-8 text-left md:mt-0 md:px-36">
+    // md+: the About section's own gap spaces this, so no top margin of its own.
+    // 600 fixed and centred, not an inset off the 1120 shell — Figma pins the card at 600 (node
+    // 2017:5127 sits at x=420 in a 1440 frame). An inset kept growing it with the viewport, which is
+    // the "oversized on a laptop" the designer was looking at. Mobile still runs full width.
+    <div className="section-media-reveal mt-8 text-left md:mx-auto md:mt-0 md:w-[600px]">
       {/* mobile only — swipe affordance, sits above the card (no on-card arrows on small screens) */}
       <div className="mb-2 flex items-center justify-end gap-1.5 text-[#FF8A88] md:hidden">
         {/* Fira Code 400 / 10 / 100% / no tracking / #FF8A88 */}
@@ -130,12 +131,10 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
         <NavArrowIcon className="w-[9.14px] h-2" />
       </div>
 
-      {/* photo block — fixed height at both sizes: 430 mobile, 450 md+. The old md ratio (112:75)
-          grew the card with the viewport; the design pins it, so a wide screen gets a letterbox
-          rather than a 900px-tall headshot.
+      {/* photo block — fixed height at both sizes: 430 mobile, 475 md+ (Figma 600x475).
           current photo slides out, incoming slides in from the opposite edge */}
       <div
-        className="relative h-[430px] w-full overflow-hidden md:h-[450px]"
+        className="relative h-[430px] w-full overflow-hidden md:h-[475px]"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -185,28 +184,32 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
           </div>
         )}
 
-        {/* overlay — same size, 24px padding: masked name top-left, static arrows bottom row */}
-        <div className="absolute inset-0 flex flex-col justify-between p-6 3xl:p-8">
+        {/* overlay — masked name top-left, static arrows bottom row. md+ padding is Figma's 32/20
+            (node 2017:5131), asymmetric; mobile keeps a flat 24. */}
+        <div className="absolute inset-0 flex flex-col justify-between p-6 md:px-8 md:py-5">
           <MaskText
             current={members[current].name}
             incoming={incoming !== null ? members[incoming].name : null}
             phase={phase}
             direction={direction}
             // mobile = body-2/l: New Spirit 400 / 20 / 125% / letter-spacing l / #262626
-            // 40 at md+, flat — the 3xl step up to 60 was sized for the old 750-tall card
-            className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#262626] md:text-[40px] md:leading-[1.4] md:tracking-normal"
+            // md+ = heading/h3/s: 28 / 125% / -0.5px. Was 40 — sized for the wider card.
+            className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#262626] md:text-[28px] md:tracking-[-0.5px]"
             {...T_NAME}
           />
-          {/* on-card arrows — desktop only; mobile uses swipe + the SCROLL affordance above */}
-          <div className="hidden items-end justify-between md:flex">
+          {/* on-card arrows — desktop only; mobile uses swipe + the SCROLL affordance above.
+              px-2 is Figma's Navigator inset, on top of the overlay's own 32 */}
+          <div className="hidden items-end justify-between md:flex md:px-2">
             <NavArrow direction="prev" onClick={() => advance('prev')} />
             <NavArrow direction="next" onClick={() => advance('next')} />
           </div>
         </div>
       </div>
 
-      {/* info bar — dark ground: masked role line left, static Our Story button right */}
-      <div className="flex items-center justify-between gap-4 bg-[#292624] px-6 py-5 3xl:gap-6 3xl:px-8 3xl:py-6">
+      {/* info bar — dark ground: masked role line left, static Our Story button right.
+          md+ padding is Figma's 24/6 (node 2017:5134); the 6 is what makes the bar 58 tall rather
+          than the 20 it used to carry. Mobile is unchanged — Figma only specs the desktop frame. */}
+      <div className="flex items-center justify-between gap-4 bg-[#292624] px-6 py-5 md:py-1.5">
         <div className="min-w-0 flex-1">
           <MaskText
             current={members[current].role}
@@ -214,17 +217,20 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
             phase={phase}
             direction={direction}
             // mobile = body-2/s: New Spirit 400 / 16 / 125% / letter-spacing l / #FCF7F3
-            className="whitespace-pre-line font-sans text-base font-normal leading-[1.25] tracking-[-0.01em] text-[#FCF7F3] md:text-2xl 3xl:text-[28px]"
+            // md+ = body-2/m: 18 / 125% / letter-spacing 0. Was 24 stepping to 28.
+            className="whitespace-pre-line font-sans text-base font-normal leading-[1.25] tracking-[-0.01em] text-[#FCF7F3] md:text-lg md:tracking-normal"
             {...T_ROLE}
           />
         </div>
-        {/* Button/Small/Tertiary — its own Figma spec: 6px padding all round, 1px #FCF7F3 keyline
-            on #262626, and a Neue Haas label at 16/125% rather than the mono the others use.
+        {/* Button/Small/Tertiary — its own Figma spec (node 2021:5351): 8/6 padding, 1px #FCF7F3
+            keyline, no fill, Fira Mono 18/125%. That lands the 35px height the designer asked for.
+            Padding is the shared Button's own default, so only the label size is overridden here.
+            No bg override any more — outlineInverse's hover tint needs the slot free.
             Instance-only; button styles are deliberately not uniform across the page. */}
         <Button
           variant="outlineInverse"
           href={story.href}
-          className="border-[1px]! border-[#FCF7F3]! bg-[#262626]! px-1.5! text-[#FCF7F3]! shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]! [&>span]:font-display! [&>span]:text-base! [&>span]:font-normal! [&>span]:leading-[1.25]!"
+          className="border-[1px]! border-[#FCF7F3]! text-[#FCF7F3]! shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]! [&>span]:text-lg! [&>span]:leading-[1.25]!"
         >
           {story.label}
         </Button>
@@ -235,8 +241,8 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
 
 function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean }) {
   return member.photo ? (
-    // Two crops, toggled by CSS like the Contact section's pair: the frame is 112:75 landscape at
-    // md+ but a 430px-tall column below it, so one file can't serve both.
+    // Two crops, toggled by CSS like the Contact section's pair: the frame is a 600x475 landscape
+    // at md+ but a 430px-tall column below it, so one file can't serve both.
     //
     // Both <img>s are in the DOM and display:none does NOT cancel a fetch — which is the whole
     // point of the warm-neighbour block above, and a problem here, because this component is
@@ -254,11 +260,9 @@ function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean 
       <MediaImage
         media={member.photo}
         eager={eager}
-        // object-cover scales these by width, so the box width is what matters. Between md and 3xl
-        // the section is padding-only, so the box tracks the viewport — a fixed px here understated
-        // it badly on a 1900px screen. 608 = the section's 160 sides plus this card's own 144.
-        // Above 3xl .section-shell caps the shell at 1600, so the box is a constant 1600 - 608.
-        sizes="(max-width: 1151px) 1px, (min-width: 1920px) 992px, calc(100vw - 608px)"
+        // object-cover scales these by width, so the box width is what matters — and the card is a
+        // flat 600 at every desktop size now, so this is finally just a constant.
+        sizes="(max-width: 1151px) 1px, 600px"
         className="hidden h-full w-full object-cover object-top md:block"
       />
     </>
@@ -328,8 +332,8 @@ function NavArrow({ direction, onClick }: { direction: Dir; onClick: () => void 
       className="inline-flex cursor-pointer items-center justify-center"
     >
       <NavArrowIcon
-        // 40 everywhere; the 3xl step to 56 was sized for the old 750-tall card
-        className={`h-auto w-10 ${direction === 'prev' ? '-scale-x-100' : ''}`}
+        // Figma's Arrow Container is a 20px square (node 2483:702); was 40
+        className={`h-auto w-5 ${direction === 'prev' ? '-scale-x-100' : ''}`}
       />
     </button>
   )

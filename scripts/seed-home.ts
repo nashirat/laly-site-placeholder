@@ -285,7 +285,9 @@ await payload.create({
         blockType: 'about',
         label: 'About us',
         heading: 'Your In-House\nMarketing Team.',
-        description: 'Meet the friendly faces here to nurture your brand’s growth.',
+        // the break after "nurture" is the design's — at 24px the sentence fits one row, so nothing
+        // wraps it on its own (Figma 2017:5126)
+        description: 'Meet the friendly faces here to nurture\nyour brand’s growth.',
         members,
         story: { label: 'OUR STORY' },
       },

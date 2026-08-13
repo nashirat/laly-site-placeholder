@@ -139,7 +139,9 @@ export const home: HomeContent = {
   about: {
     label: 'About us',
     heading: 'Your In-House\nMarketing Team.',
-    description: 'Meet the friendly faces here to nurture your brand’s growth.',
+    // the break after "nurture" is the design's, not the viewport's — at 24px the whole line fits
+    // in one row, so nothing wraps it on its own (rendered via whitespace-pre-line, md+ only)
+    description: 'Meet the friendly faces here to nurture\nyour brand’s growth.',
     // Photos are final; `role` is placeholder copy until the real lines land.
     // `role` is the info-bar line; the \n is the authored 2-line break (rendered via whitespace-pre-line).
     members: [

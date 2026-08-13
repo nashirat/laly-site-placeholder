@@ -31,7 +31,8 @@ export default function Header() {
         height={28}
         className="logo-light hidden h-7 w-30"
       />
-      <NavMenu items={header.nav} />
+      {/* whole global, not just nav — the mobile dropdown also renders the socials and copyright */}
+      <NavMenu {...header} />
     </header>
   )
 }

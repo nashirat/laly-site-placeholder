@@ -338,7 +338,7 @@ export interface AboutBlock {
    */
   heading: string;
   /**
-   * One line under the heading. No breaks — it wraps.
+   * Two lines under the heading — press Enter after "nurture" for the break. At 24px the whole sentence fits one row, so it will not wrap on its own.
    */
   description: string;
   /**

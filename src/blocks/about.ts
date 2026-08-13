@@ -23,7 +23,10 @@ export const AboutBlock: Block = {
       name: 'description',
       type: 'textarea',
       required: true,
-      admin: { description: 'One line under the heading. No breaks — it wraps.' },
+      admin: {
+        description:
+          'Two lines under the heading — press Enter after "nurture" for the break. At 24px the whole sentence fits one row, so it will not wrap on its own.',
+      },
     },
     {
       name: 'members',

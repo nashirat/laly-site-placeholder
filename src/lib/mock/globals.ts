@@ -8,6 +8,15 @@ export const header: HeaderContent = {
     { label: 'CONTACT', href: '/contact' },
     { label: 'ABOUT', href: '/about' },
   ],
+  // mobile dropdown only (Figma 3038:1661). hrefs are unset for the same reason the Contact
+  // block's are — the real accounts haven't been handed over yet.
+  socials: [
+    { platform: 'instagram' },
+    { platform: 'tiktok' },
+    { platform: 'youtube' },
+    { platform: 'facebook' },
+  ],
+  copyright: '© LALY AGENCY . 2026',
 }
 
 // Stand-in for the Footer global until Payload exists.
