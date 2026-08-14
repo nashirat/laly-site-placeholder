@@ -3,27 +3,43 @@ import { getPayload } from 'payload'
 import type {
   AboutBlock,
   ContactBlock,
+  FaqBlock,
+  GuaranteeBlock,
   HeroBlock,
   Media,
   NoteBlock,
+  PaidHeroBlock,
+  PricingBlock,
+  ResultsBlock,
   StrategyBlock,
+  WhatYouGetBlock,
   WhoWeAreBlock,
 } from '@/payload-types'
 import type {
   AboutContent,
   CaseStudy,
   ContactContent,
+  FaqContent,
+  GuaranteeContent,
   HeroContent,
   HomeContent,
   MediaDoc,
   NoteContent,
+  PaidContent,
+  PaidHeroContent,
+  PaidPanel,
+  PricingContent,
+  PricingTier,
+  ResultsContent,
   ServicePillar,
   StrategyContent,
   TeamMember,
+  WhatYouGetContent,
   WhoWeAreContent,
 } from '@/lib/types'
 import { BADGE_COLORS, CARD_PALETTES, STRATEGY_ACCENTS } from '@/lib/palettes'
 import { home } from '@/lib/mock/home'
+import { paid } from '@/lib/mock/paid'
 
 // Payload's generated types are permissive where our render contract is not: upload relations are
 // `string | Media` depending on query depth, and every non-required scalar is `T | null | undefined`.
@@ -197,11 +213,101 @@ export function toNoteContent(block: NoteBlock): NoteContent | null {
   return block.body ? { body: block.body } : null
 }
 
+// --- /paid-advertising ---------------------------------------------------------------------------
+
+export function toPaidHeroContent(block: PaidHeroBlock): PaidHeroContent | null {
+  const pills = (block.pills ?? []).map((p) => p.label).filter(Boolean)
+  const d = block.description
+
+  if (
+    !block.label ||
+    !block.heading ||
+    !d?.before ||
+    !d.emphasis ||
+    !d.after ||
+    !block.button?.label ||
+    pills.length === 0
+  ) {
+    return null
+  }
+
+  return {
+    label: block.label,
+    heading: block.heading,
+    pills,
+    description: { before: d.before, emphasis: d.emphasis, after: d.after },
+    button: { label: block.button.label, href: block.button.href ?? undefined },
+  }
+}
+
+export function toGuaranteeContent(block: GuaranteeBlock): GuaranteeContent | null {
+  if (!block.body || !block.scratchLabel) return null
+  return { body: block.body, scratchLabel: block.scratchLabel }
+}
+
+export function toWhatYouGetContent(block: WhatYouGetBlock): WhatYouGetContent | null {
+  const panels = (block.panels ?? [])
+    .map((p): PaidPanel | null => {
+      const image = toMediaDoc(p.image)
+      if (!image || !p.title || !p.body) return null
+      return { title: p.title, body: p.body, image }
+    })
+    .filter(isPresent)
+
+  // Exactly four, not "at least one": the section's 1 / 2 / 1 grid is drawn by hand and the page
+  // indexes the four slots, so a short list would render an empty panel. minRows/maxRows enforce
+  // this at write time; this is the read-time backstop, and a dropped panel (bad upload) trips it.
+  if (!block.label || !block.heading || panels.length !== 4) return null
+
+  return { label: block.label, heading: block.heading, panels }
+}
+
+export function toResultsContent(block: ResultsBlock): ResultsContent | null {
+  const stats = (block.stats ?? [])
+    .filter((s) => s.value && s.label)
+    .map((s) => ({ value: s.value, label: s.label }))
+
+  if (!block.label || !block.heading || stats.length === 0) return null
+
+  return { label: block.label, heading: block.heading, stats }
+}
+
+export function toPricingContent(block: PricingBlock): PricingContent | null {
+  const tiers = (block.tiers ?? [])
+    .map((t): PricingTier | null => {
+      const items = (t.items ?? []).map((i) => i.label).filter(Boolean)
+      if (!t.label || !t.price || items.length === 0) return null
+      // '' from an untouched text field would still be falsy at render, but the card's keyline keys
+      // off this field's presence — normalise so the two can't disagree.
+      return { label: t.label, price: t.price, badge: t.badge || undefined, items }
+    })
+    .filter(isPresent)
+
+  if (!block.label || !block.heading || !block.cta?.label || tiers.length === 0) return null
+
+  return {
+    label: block.label,
+    heading: block.heading,
+    tiers,
+    cta: { label: block.cta.label, href: block.cta.href ?? undefined },
+  }
+}
+
+export function toFaqContent(block: FaqBlock): FaqContent | null {
+  const items = (block.items ?? [])
+    .filter((i) => i.question && i.answer)
+    .map((i) => ({ question: i.question, answer: i.answer }))
+
+  if (!block.label || !block.heading || items.length === 0) return null
+
+  return { label: block.label, heading: block.heading, items }
+}
+
 // Per-block fallback rather than per-page: one malformed block degrades its own section to the
 // placeholder copy instead of reverting the whole page. Silent to a visitor by design, hence the log.
-function orMock<T>(name: string, value: T | null | undefined, mock: T): T {
+function orMock<T>(slug: string, name: string, value: T | null | undefined, mock: T): T {
   if (value) return value
-  console.warn(`[cms] pages/home: no usable ${name} block — falling back to mock`)
+  console.warn(`[cms] pages/${slug}: no usable ${name} block — falling back to mock`)
   return mock
 }
 
@@ -209,20 +315,25 @@ function orMock<T>(name: string, value: T | null | undefined, mock: T): T {
 // Earns its keep three ways: the page prerenders at BUILD time (an unreachable Atlas would otherwise
 // fail the whole build), Atlas free-tier clusters auto-pause when idle, and it keeps the swap
 // revertible. The cost is that a broken query is silent to a visitor — hence the [cms] logs.
+// One doc's blocks, or none. Shared by both page loaders — the query is identical either side of the
+// slug, and the per-page work is all in which blockTypes get pulled out of the array.
+async function findBlocks(slug: string) {
+  const payload = await getPayload({ config })
+  const { docs } = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: slug } },
+    // depth 1 resolves every upload relation into a Media doc, including the ones nested inside
+    // blocks and inside those blocks' array rows — depth counts relationship hops, not nesting.
+    depth: 1,
+    limit: 1,
+    pagination: false,
+  })
+  return docs[0]?.content ?? []
+}
+
 export async function getHome(): Promise<HomeContent> {
   try {
-    const payload = await getPayload({ config })
-    const { docs } = await payload.find({
-      collection: 'pages',
-      where: { slug: { equals: 'home' } },
-      // depth 1 resolves every upload relation into a Media doc, including the ones nested inside
-      // blocks and inside those blocks' array rows — depth counts relationship hops, not nesting.
-      depth: 1,
-      limit: 1,
-      pagination: false,
-    })
-
-    const blocks = docs[0]?.content ?? []
+    const blocks = await findBlocks('home')
     // Found by blockType, not by position: the section order on / is fixed in page.tsx, and this is
     // what keeps a reorder or an inserted block in the admin from shuffling the page.
     const hero = blocks.find((b) => b.blockType === 'hero')
@@ -233,15 +344,50 @@ export async function getHome(): Promise<HomeContent> {
     const note = blocks.find((b) => b.blockType === 'note')
 
     return {
-      hero: orMock('hero', hero && toHeroContent(hero), home.hero),
-      whoWeAre: orMock('whoWeAre', whoWeAre && toWhoWeAreContent(whoWeAre), home.whoWeAre),
-      strategy: orMock('strategy', strategy && toStrategyContent(strategy), home.strategy),
-      about: orMock('about', about && toAboutContent(about), home.about),
-      contact: orMock('contact', contact && toContactContent(contact), home.contact),
-      note: orMock('note', note && toNoteContent(note), home.note),
+      hero: orMock('home', 'hero', hero && toHeroContent(hero), home.hero),
+      whoWeAre: orMock('home', 'whoWeAre', whoWeAre && toWhoWeAreContent(whoWeAre), home.whoWeAre),
+      strategy: orMock('home', 'strategy', strategy && toStrategyContent(strategy), home.strategy),
+      about: orMock('home', 'about', about && toAboutContent(about), home.about),
+      contact: orMock('home', 'contact', contact && toContactContent(contact), home.contact),
+      note: orMock('home', 'note', note && toNoteContent(note), home.note),
     }
   } catch (err) {
     console.error('[cms] pages/home query failed — falling back to mock:', err)
     return home
+  }
+}
+
+// The /paid-advertising doc's seven blocks, same per-block fallback as getHome. The Contact section
+// on that page is NOT here — it is read off the home doc so one edit moves both pages.
+export async function getPaid(): Promise<PaidContent> {
+  try {
+    const blocks = await findBlocks('paid-advertising')
+    const hero = blocks.find((b) => b.blockType === 'paidHero')
+    const guarantee = blocks.find((b) => b.blockType === 'guarantee')
+    const whatYouGet = blocks.find((b) => b.blockType === 'whatYouGet')
+    const results = blocks.find((b) => b.blockType === 'results')
+    const pricing = blocks.find((b) => b.blockType === 'pricing')
+    const faq = blocks.find((b) => b.blockType === 'faq')
+    // Shares the home page's note block — same one paragraph, this doc's own copy.
+    const note = blocks.find((b) => b.blockType === 'note')
+
+    const slug = 'paid-advertising'
+    return {
+      hero: orMock(slug, 'paidHero', hero && toPaidHeroContent(hero), paid.hero),
+      guarantee: orMock(slug, 'guarantee', guarantee && toGuaranteeContent(guarantee), paid.guarantee),
+      whatYouGet: orMock(
+        slug,
+        'whatYouGet',
+        whatYouGet && toWhatYouGetContent(whatYouGet),
+        paid.whatYouGet,
+      ),
+      results: orMock(slug, 'results', results && toResultsContent(results), paid.results),
+      pricing: orMock(slug, 'pricing', pricing && toPricingContent(pricing), paid.pricing),
+      faq: orMock(slug, 'faq', faq && toFaqContent(faq), paid.faq),
+      note: orMock(slug, 'note', note && toNoteContent(note), paid.note),
+    }
+  } catch (err) {
+    console.error('[cms] pages/paid-advertising query failed — falling back to mock:', err)
+    return paid
   }
 }

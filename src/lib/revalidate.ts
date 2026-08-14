@@ -6,9 +6,9 @@
 // cache, which is why localhost always looked correct.
 //
 // Shape is lifted from sia-cms (src/lib/revalidate/frontendRevalidate.ts), minus its locale fan-out:
-// this site is one page, so the path set is always ['/']. The hook does NOT call revalidatePath
+// the path set is derived from the saved doc's slug. The hook does NOT call revalidatePath
 // directly, even though Payload's admin runs inside this same Next app and could. The HTTP hop is
-// what lets scripts/seed-home.ts purge as well — it drives these same collection hooks from plain
+// what lets scripts/seed-paid.ts purge as well — it drives these same collection hooks from plain
 // bun, where next/cache has no store and revalidatePath throws. A fetch works from anywhere.
 //
 // Secret falls back to PAYLOAD_SECRET, so this needs no new Vercel env var to start working.
@@ -28,16 +28,26 @@ function resolveBaseUrl(): string | null {
   return null
 }
 
-export async function revalidateHome(): Promise<void> {
+// A page doc's slug is its route, with 'home' being the one that lives at '/'.
+export const pathForSlug = (slug: string): string => (slug === 'home' ? '/' : `/${slug}`)
+
+// Every prerendered route. Media has no way to know which page embeds the file being saved, so it
+// purges the lot — two paths, and a purge is cheap next to serving a stale image url.
+export const PAGE_SLUGS = ['home', 'paid-advertising']
+
+export async function revalidatePages(slugs: string[]): Promise<void> {
   const baseUrl = resolveBaseUrl()
   const secret = process.env.REVALIDATE_SECRET || process.env.PAYLOAD_SECRET
   if (!baseUrl || !secret) return
+
+  // Deduped — a caller passing the same slug twice would otherwise cost a second round trip.
+  const paths = [...new Set(slugs.map(pathForSlug))]
 
   try {
     const res = await fetch(new URL('/api/revalidate', baseUrl).toString(), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ secret, paths: ['/'] }),
+      body: JSON.stringify({ secret, paths }),
       cache: 'no-store',
     })
     if (!res.ok) console.error('[revalidate] failed:', res.status, await res.text())

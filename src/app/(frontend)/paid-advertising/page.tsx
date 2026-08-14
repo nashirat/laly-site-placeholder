@@ -1,16 +1,14 @@
 import type { Metadata } from 'next'
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties } from 'react'
 import type { StaticImageData } from 'next/image'
-import callsShot from '../../../../public/paid-advertising/calls.webp'
-import dashboardShot from '../../../../public/paid-advertising/dashboard.webp'
 import gridTexture from '../../../../public/paid-advertising/grid.webp'
 import heroBg from '../../../../public/paid-advertising/hero.webp'
-import refundShot from '../../../../public/paid-advertising/refund.webp'
-import websiteShot from '../../../../public/paid-advertising/website.webp'
 import { MediaImage } from '@/components/Media/Image'
 import Contact from '@/components/sections/Contact'
 import Note from '@/components/sections/Note'
-import { getHome } from '@/lib/cms'
+import { getHome, getPaid } from '@/lib/cms'
+import { PILL_COLORS } from '@/lib/palettes'
+import type { PaidPanel } from '@/lib/types'
 import { Button } from '@/components/ui/Button'
 import { Accordion } from '@/components/ui/Accordion'
 import { InView } from '@/components/ui/InView'
@@ -24,39 +22,33 @@ export const metadata: Metadata = {
 
 // Figma 2234:4063 — the /paid-advertising hero, i.e. where Strategy's "The Power of Paid
 // Advertisement" card points. Dark ground, photo at 20%, closes on the same 1px keyline the home
-// hero uses so the next section (not designed yet) butts against it the same way.
+// hero uses so the next section butts against it the same way.
 //
-// ponytail: copy lives here, not in Payload. Only the home Hero block is modelled (see the phase-1
-// note) and this page has no editor asking for it yet — wire it when someone needs to change a word
-// without a deploy.
-//
-// The star tints are layout, not content: the trio cycles down the row like BADGE_COLORS does in
-// Strategy, with a fourth added for the fourth pill.
-const PILLS = [
-  { label: 'Google Ads', color: '#A2A11C' },
-  { label: 'Microsoft Ads', color: '#CBB1C9' },
-  { label: 'Tik Tok Ads', color: '#FF8A88' },
-  { label: 'Meta Ads', color: '#F5C882' },
-]
+// Copy comes from the Pages 'paid-advertising' doc (see src/blocks/paid.ts), falling back per block
+// to src/lib/mock/paid.ts. Everything below is design, not content: the hero photo and the grid
+// texture are part of the layout rather than editable artwork, and the pill tints follow the row
+// position like BADGE_COLORS does in Strategy.
 
 // Same 90deg wash on every pill — a warm ember that only reaches full brand pink in the last 15%,
 // so the row reads as one gradient sampled four times rather than four separate chips.
 const PILL_BG =
   'linear-gradient(90deg, rgba(28,25,23,0.2) 35%, rgba(85,47,42,0.2) 65%, rgba(141,68,60,0.2) 85%, rgba(255,111,97,0.1) 100%)'
 
-// The four "what you get" panels each pair copy with a product mock. The mocks are flat 2x PNG
-// exports of the Figma widgets (landing page, call-attribution widgets, the dashboard, the refund
-// card), re-encoded to webp — rebuilding those in DOM would mean hundreds of nodes and 1.89px Inter
-// text that no browser renders the way Figma does, for artwork nobody interacts with.
-// ponytail: exported artwork, not a component library. If one ever needs to be live, replace that
-// one <img>.
-const shot = (img: StaticImageData, alt: string) => ({
+// The two ground textures. Static imports rather than Media docs: neither is content — one is the
+// hero's 20% photo wash, the other the faint grid behind two sections — and both are decorative
+// (empty alt), so there is nothing for an editor to change but the design itself.
+const texture = (img: StaticImageData) => ({
   url: img.src,
   width: img.width,
   height: img.height,
-  alt,
+  alt: '',
   blurDataURL: img.blurDataURL,
 })
+
+// Per-slot mock widths, in layout order. The "what you get" grid is 1 / 2 / 1 with a different
+// image width in each slot, so the count is fixed at four (the block enforces it, and
+// toWhatYouGetContent falls back to the mock if a panel is ever missing).
+const PANEL_WIDTHS = [510, 471, 458, 515]
 
 // Figma's card ground is a conic gradient at 50% layer opacity over solid #292624. The alphas below
 // are the design's own, halved — a source-over layer at 0.5 opacity is exactly its alphas halved, so
@@ -64,65 +56,22 @@ const shot = (img: StaticImageData, alt: string) => ({
 const STAT_BG =
   'conic-gradient(from 90deg, rgba(255,111,97,0.05) 0%, rgba(28,25,23,0.125) 35%, rgba(85,47,42,0.125) 65%, rgba(141,68,60,0.075) 85%, rgba(255,111,97,0.05) 100%)'
 
-// The \n is the designer's break, not a wrap — both lines are set by hand.
-const STATS = [
-  { value: '31', label: 'Qualified leads generated in a\nsingle month for one client' },
-  { value: '$0', label: "What you owe\nif we don't deliver in 6 months" },
-  { value: '100%', label: 'Of our revenue\ntied to your results' },
-]
-
-const PRICING = [
-  {
-    label: 'One-time Setup',
-    price: '$20,000',
-    items: [
-      'Business audit',
-      'Custom Scaling Roadmap',
-      'Full Website Build',
-      'Campaign Architecture',
-      'Tracking Infrastructure',
-      'Call Handling Setup',
-      'Reporting Dashboard',
-    ],
-  },
-  {
-    label: 'Per Qualified Lead',
-    price: '$1,500',
-    badge: 'PAY AS THEY COME IN',
-    items: [
-      'Only qualified leads that pass our filter and match the criteria we agreed on.',
-      'You review every lead in your dashboard.',
-      'Dispute any you disagree with.',
-      'Pay as they come in.',
-    ],
-  },
-]
-
-// ponytail: the Figma FAQ is five lorem rows with one lorem answer — the copy has not been written.
-// Shipped verbatim rather than invented, so nobody mistakes filler for approved copy. Swap q/a here.
-const FAQS = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-].map((question) => ({
-  question,
-  answer: 'This is subtext which appears after expanding the accordion.',
-}))
-
 // Figma draws an arrow button in each panel's top-right at opacity 0 — a link that does not exist
 // yet. Not rendered: an invisible control is worse than an absent one.
+//
+// The mocks are flat 2x exports of the Figma widgets (landing page, call-attribution widgets, the
+// dashboard, the refund card) — rebuilding those in DOM would mean hundreds of nodes and 1.89px
+// Inter text that no browser renders the way Figma does, for artwork nobody interacts with.
+// ponytail: exported artwork, not a component library. If one ever needs to be live, replace that
+// one image.
 function Panel({
-  title,
-  body,
-  media,
+  panel,
+  width,
   side = false,
   className = '',
 }: {
-  title: string
-  body: string
-  media: ReactNode
+  panel: PaidPanel
+  width: number // the slot's mock width at md+; see PANEL_WIDTHS
   side?: boolean // copy and mock share a row at md+, rather than the mock sitting under the copy
   className?: string
 }) {
@@ -136,28 +85,37 @@ function Panel({
       <div className="flex flex-col gap-5 md:flex-1 md:gap-6">
         {/* heading/h3/m 32 mobile — heading/h3/l 40 desktop; New Spirit / 125% / -0.5px */}
         <h3 className="font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#292624] md:text-[40px]">
-          {title}
+          {panel.title}
         </h3>
         {/* body/m 18 mobile — body/l 20 desktop; Neue Haas / 125% / 0.25px */}
         <p className="font-display text-lg font-normal leading-[1.25] tracking-[0.25px] text-[#544D49] md:text-xl">
-          {body}
+          {panel.body}
         </p>
       </div>
-      {media}
+      {/* the cap is a per-slot number, so it is an inline max-width rather than four arbitrary
+          Tailwind classes that only differ by the value */}
+      <div className={`w-full ${side ? 'shrink-0' : ''}`} style={{ maxWidth: width }}>
+        <MediaImage
+          media={panel.image}
+          sizes={`(min-width: 1152px) ${width}px, 100vw`}
+          className="h-auto w-full"
+        />
+      </div>
     </div>
   )
 }
 
-// Same ISR window as the home page — the closing Contact block is the only CMS-backed thing here,
-// and it is the same document, so the two pages should not go stale at different times.
+// Same ISR window as the home page. Both are purged on save anyway (src/lib/revalidate.ts) — this is
+// only the backstop, and the two pages share the home doc's contact block, so they should not go
+// stale at different times.
 export const revalidate = 3600
 
 export default async function PaidAdvertisingPage() {
-  // ponytail: the closing CTA is read off the home doc rather than copied. One edit in the admin
-  // moves both pages. getHome falls back to the mock per block, so an unreachable Atlas still
-  // builds — but it does pull the whole page doc for one block. Split it when a second page needs
-  // its own contact copy.
-  const { contact } = await getHome()
+  // Two docs, one round trip each, in parallel. ponytail: the closing CTA is read off the HOME doc
+  // rather than copied — one edit in the admin moves both pages. It does pull the whole home doc for
+  // one block; split it when this page needs its own contact copy. Both loaders fall back to their
+  // mock per block, so an unreachable Atlas still builds.
+  const [{ contact }, paid] = await Promise.all([getHome(), getPaid()])
 
   return (
     <main>
@@ -175,13 +133,7 @@ export default async function PaidAdvertisingPage() {
             The crop is off-centre in Figma (the frame sits ~32% down a 4096px-tall portrait), which
             is what keeps the hedge line under the heading instead of the bare sky. */}
         <MediaImage
-          media={{
-            url: heroBg.src,
-            width: heroBg.width,
-            height: heroBg.height,
-            alt: '',
-            blurDataURL: heroBg.blurDataURL,
-          }}
+          media={texture(heroBg)}
           priority
           // 20% over near-black hides re-encode artefacts, so the LCP image doesn't need q100.
           quality={60}
@@ -192,13 +144,13 @@ export default async function PaidAdvertisingPage() {
         {/* Figma hero section: px 144 at 1440 -> a 1056 column, same cap the home hero uses. */}
         {/* mobile stacks on a 32px rhythm (Figma "Hero Text Container"), desktop on 24 */}
         <div className="relative mx-auto flex w-full max-w-[1056px] flex-col items-center gap-8 text-center md:gap-6 3xl:max-w-[1200px]">
-          {/* Brackets are authored characters here, not BracketLabel: that component spreads its
-              brackets to the row's edges, and this one hugs the words. */}
+          {/* Brackets are authored here rather than stored, and not BracketLabel: that component
+              spreads its brackets to the row's edges, and this one hugs the words. */}
           <p
             className="entry-copy font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#FF6D6A] md:text-2xl"
             style={{ animationDelay: '0.7s' }}
           >
-            [ Pay Per Performance ]
+            [ {paid.hero.label} ]
           </p>
 
           <h1
@@ -206,7 +158,7 @@ export default async function PaidAdvertisingPage() {
             className="hero-heading entry-copy max-w-[338px] font-display text-[44px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:max-w-none md:text-7xl md:font-medium md:leading-none md:tracking-[-1px] 3xl:text-8xl"
             style={{ animationDelay: '0.8s' }}
           >
-            You only pay when we deliver.
+            {paid.hero.heading}
           </h1>
 
           {/* 558px is the Figma width, and it is what breaks the four pills 4-up on desktop and
@@ -215,19 +167,20 @@ export default async function PaidAdvertisingPage() {
             className="entry-copy flex max-w-[558px] flex-wrap items-center justify-center gap-x-2 gap-y-1.5"
             style={{ animationDelay: '0.95s' }}
           >
-            {PILLS.map((pill) => (
+            {paid.hero.pills.map((label, i) => (
               <li
-                key={pill.label}
+                key={label}
                 className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 font-display text-[10px] font-normal leading-[1.25] text-[#E7DCD4] md:text-xs shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]"
                 style={{ backgroundImage: PILL_BG }}
               >
-                {/* star.svg as a mask, same trick as the Strategy badges — one asset, four tints */}
+                {/* star.svg as a mask, same trick as the Strategy badges — one asset, four tints.
+                    The tint is the row position, so it cycles rather than coming from the CMS. */}
                 <span
                   aria-hidden
                   className="h-[6.5px] w-[6px] shrink-0"
                   style={
                     {
-                      backgroundColor: pill.color,
+                      backgroundColor: PILL_COLORS[i % PILL_COLORS.length],
                       maskImage: 'url(/star.svg)',
                       maskSize: 'contain',
                       maskRepeat: 'no-repeat',
@@ -239,7 +192,7 @@ export default async function PaidAdvertisingPage() {
                     } as CSSProperties
                   }
                 />
-                {pill.label}
+                {label}
               </li>
             ))}
           </ul>
@@ -248,14 +201,14 @@ export default async function PaidAdvertisingPage() {
             className="hero-desc entry-copy max-w-[338px] font-sans text-xl md:max-w-[880px] font-normal leading-[1.25] text-[#F7F1EE] md:text-[28px]"
             style={{ animationDelay: '1.05s' }}
           >
-            We build your website, run your ads, handle your calls, filter your leads, and only send
-            you the ones worth signing.{' '}
+            {paid.hero.description.before}
             {/* the designer set this phrase in Neue Haas bold at 24 against the 28px serif — a
-                deliberate voice change mid-sentence, so it is markup rather than a token */}
+                deliberate voice change mid-sentence, so the CMS stores the sentence in three parts
+                rather than shipping a markup parser */}
             <strong className="font-display text-lg font-bold tracking-[0.25px] md:text-2xl">
-              You pay per qualified lead
+              {paid.hero.description.emphasis}
             </strong>
-            . If we don&rsquo;t deliver in 6 months, you get your setup fee back.
+            {paid.hero.description.after}
           </p>
 
           <div
@@ -266,9 +219,10 @@ export default async function PaidAdvertisingPage() {
                 so it is overridden on the instance exactly like the home hero's CTA. */}
             <Button
               variant="primary"
+              href={paid.hero.button.href}
               className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
             >
-              LET&rsquo;S BEGIN
+              {paid.hero.button.label}
             </Button>
           </div>
         </div>
@@ -279,15 +233,14 @@ export default async function PaidAdvertisingPage() {
           the two states, so the cover never changes the section's height when it goes.
           The copy is plain DOM: ScratchCover only paints over it. */}
       <section aria-label="Our guarantee" className="relative w-full overflow-hidden bg-[#FCF7F3] px-5 py-12">
-        {/* the break is authored — the designer set two lines, it is not a wrap.
+        {/* whitespace-pre-line, so the break the editor typed is the break that renders — the
+            designer set two lines, it is not a wrap.
             28px at every width: mobile (2581:2753) sets the same heading/h3/s as desktop, so the
             second line runs to the padding on a 375px phone and wraps once more there. */}
-        <p className="text-center font-sans text-[28px] leading-[1.25] tracking-[-0.5px] text-[#FF6D6A]">
-          Zero leads in 6 months?
-          <br />
-          Full refund. No questions asked.
+        <p className="whitespace-pre-line text-center font-sans text-[28px] leading-[1.25] tracking-[-0.5px] text-[#FF6D6A]">
+          {paid.guarantee.body}
         </p>
-        <ScratchCover label="Scratch To Reveal" />
+        <ScratchCover label={paid.guarantee.scratchLabel} />
       </section>
 
       {/* Figma 2148:498 — "What you get". Cream ground under a faint grid texture, then four
@@ -300,7 +253,7 @@ export default async function PaidAdvertisingPage() {
         className="relative w-full overflow-hidden border-t border-[#544D49] bg-[#FCF7F3] px-4 py-12 md:p-28"
       >
         <MediaImage
-          media={shot(gridTexture, '')}
+          media={texture(gridTexture)}
           quality={60}
           sizes="100vw"
           className="pointer-events-none absolute inset-0 size-full object-cover opacity-15"
@@ -309,68 +262,36 @@ export default async function PaidAdvertisingPage() {
         <div className="relative mx-auto flex w-full max-w-[1232px] flex-col gap-10 md:gap-12">
           <div className="flex flex-col items-center gap-6 text-center md:gap-8">
             <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-              [ What You Get ]
+              [ {paid.whatYouGet.label} ]
             </p>
             {/* heading/h1/xs 40 mobile — heading/h1/xl 64 desktop; Neue Haas 450 (→400, only
                 400/500/700 ship) / 110% / -1px. 876px is Figma's own width, and it is what puts the
                 break after "and". */}
             <h2 className="max-w-[876px] font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
-              Everything built, managed, and filtered for you.
+              {paid.whatYouGet.heading}
             </h2>
           </div>
 
+          {/* The four panels are indexed, not mapped: the 1 / 2 / 1 arrangement and the borders
+              between the slots are the design, so the shape stays in the markup and only the copy
+              and the mock come from the CMS. */}
           <div className="w-full border border-[#E7DCD4] bg-[#FFFCF9]">
-            <Panel
-              side
-              title="A brand new website, built to convert."
-              body="Included in your setup fee. We design and develop a conversion-optimized website from scratch: fast, mobile-first, and engineered specifically to turn ad clicks into phone calls and form submissions. No templates. No DIY builders. A custom site built for your practice."
-              media={
-                <MediaImage
-                  media={shot(websiteShot, 'Preview of a conversion-optimised landing page')}
-                  sizes="(min-width: 1152px) 510px, 100vw"
-                  className="h-auto w-full max-w-[510px] shrink-0"
-                />
-              }
-            />
+            <Panel side panel={paid.whatYouGet.panels[0]} width={PANEL_WIDTHS[0]} />
 
             <div className="grid border-t border-[#E7DCD4] md:grid-cols-2">
-              <Panel
-                title="We answer every call and filter every lead."
-                body="Our team handles every inbound call and form submission generated by your campaigns. We qualify each one using criteria we define together at onboarding. Junk calls, tire kickers, wrong practice area? We filter them out. You only hear from leads worth your time."
-                media={
-                  <MediaImage
-                    media={shot(callsShot, 'Call attribution breakdown and total call count widgets')}
-                    sizes="(min-width: 1152px) 471px, 100vw"
-                    className="h-auto w-full max-w-[471px]"
-                  />
-                }
-              />
+              <Panel panel={paid.whatYouGet.panels[1]} width={PANEL_WIDTHS[1]} />
               <Panel
                 className="border-t border-[#E7DCD4] md:border-t-0 md:border-l"
-                title="A real-time dashboard to track, dispute, and pay as you go."
-                body="No surprise invoices. Your dashboard shows every lead as it comes in, with full transparency. See your lead count, review details, dispute any lead you disagree with, and pay throughout the month. You're always in control of what you owe."
-                media={
-                  <MediaImage
-                    media={shot(dashboardShot, 'Lead dashboard showing call volume over time')}
-                    sizes="(min-width: 1152px) 458px, 100vw"
-                    className="h-auto w-full max-w-[458px]"
-                  />
-                }
+                panel={paid.whatYouGet.panels[2]}
+                width={PANEL_WIDTHS[2]}
               />
             </div>
 
             <Panel
               side
               className="border-t border-[#E7DCD4]"
-              title="Money-back guarantee. Zero risk."
-              body="If we don't generate a single qualified lead within 6 months of campaign launch, your $20,000 setup fee is refunded in full. You maintain your minimum ad spend, we do the rest. If it doesn't work, you walk away whole."
-              media={
-                <MediaImage
-                  media={shot(refundShot, 'Full refund card marked zero risk')}
-                  sizes="(min-width: 1152px) 515px, 100vw"
-                  className="h-auto w-full max-w-[515px] shrink-0"
-                />
-              }
+              panel={paid.whatYouGet.panels[3]}
+              width={PANEL_WIDTHS[3]}
             />
           </div>
         </div>
@@ -387,15 +308,15 @@ export default async function PaidAdvertisingPage() {
         <InView className="mx-auto flex w-full max-w-[1280px] flex-col gap-16">
           <div className="flex flex-col gap-6 text-center">
             <p className="section-text-reveal font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#FF6D6A] md:text-2xl">
-              [ Results ]
+              [ {paid.results.label} ]
             </p>
             <h2 className="section-text-reveal font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FCF7F3] md:text-[64px]">
-              The numbers speak.
+              {paid.results.heading}
             </h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3 md:gap-8">
-            {STATS.map((stat, i) => (
+            {paid.results.stats.map((stat, i) => (
               <div
                 key={stat.value}
                 // the inline animation-delay longhand beats the stylesheet's `animation` shorthand,
@@ -427,18 +348,19 @@ export default async function PaidAdvertisingPage() {
         <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-16">
           <div className="flex flex-col gap-6 text-center">
             <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-              [ Pricing ]
+              [ {paid.pricing.label} ]
             </p>
-            {/* the break after "Transparent." is authored, not a wrap */}
+            {/* the break after "Transparent." is authored, not a wrap — whitespace-pre-line keeps
+                the editor's Enter */}
             <h2 className="whitespace-pre-line font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
-              {'Simple. Transparent.\nPerformance-based.'}
+              {paid.pricing.heading}
             </h2>
           </div>
 
           {/* items-stretch (grid's default) is what lets the shorter card match the taller one, and
               justify-between then parks both CTAs on the same line */}
           <div className="grid gap-6 md:grid-cols-2 md:gap-8">
-            {PRICING.map((tier) => (
+            {paid.pricing.tiers.map((tier) => (
               <div
                 key={tier.label}
                 className={`relative flex flex-col justify-between gap-8 border bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
@@ -474,8 +396,11 @@ export default async function PaidAdvertisingPage() {
 
                 <div className="flex">
                   {/* Figma sets this label at 18px mobile / 20px desktop; the Button ships 16/18 */}
-                  <Button className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]">
-                    BOOK A CALL
+                  <Button
+                    href={paid.pricing.cta.href}
+                    className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
+                  >
+                    {paid.pricing.cta.label}
                   </Button>
                 </div>
               </div>
@@ -493,7 +418,7 @@ export default async function PaidAdvertisingPage() {
         className="relative w-full overflow-hidden border-y border-[#544D49] bg-[#FCF7F3] px-5 pt-12 pb-24 md:px-40 md:py-28"
       >
         <MediaImage
-          media={shot(gridTexture, '')}
+          media={texture(gridTexture)}
           quality={60}
           sizes="100vw"
           className="pointer-events-none absolute inset-0 size-full object-cover opacity-15"
@@ -502,23 +427,25 @@ export default async function PaidAdvertisingPage() {
         <div className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 md:gap-12">
           <div className="flex flex-col gap-6 text-center">
             <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-              [ FAQ ]
+              [ {paid.faq.label} ]
             </p>
             <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#292624] md:text-[56px]">
-              Frequently Asked Questions
+              {paid.faq.heading}
             </h2>
           </div>
 
           <div className="flex w-full flex-col gap-4 border border-[#E7DCD4] bg-[#FFFCF9] px-3 py-6 md:p-6">
-            {FAQS.map((faq, i) => (
+            {paid.faq.items.map((faq, i) => (
               <Accordion
-                // identical placeholder questions, so the index is the only stable key
+                // the placeholder rows are identical copy, so the index is the only stable key
                 key={i}
                 id={`faq-${i}`}
                 question={faq.question}
                 answer={faq.answer}
                 // last row drops the rule — Figma ends the stack on the container's own border
-                className={`px-4 py-6 ${i < FAQS.length - 1 ? 'border-b border-[#E7DCD4]' : ''}`}
+                className={`px-4 py-6 ${
+                  i < paid.faq.items.length - 1 ? 'border-b border-[#E7DCD4]' : ''
+                }`}
               />
             ))}
           </div>
@@ -527,15 +454,10 @@ export default async function PaidAdvertisingPage() {
 
       <Contact content={contact} />
 
-      {/* Figma 2148:620 — the same dark qualifier band the home page closes on, with this page's own
-          copy. Not from the CMS: the home doc's note block says something else, and this one is
-          page-specific. 458 is Figma's text width, and it is what breaks the line after "have". */}
-      <Note
-        content={{
-          body: 'You have revenue from ads. Now build the brand that makes every future dollar cheaper to acquire.',
-        }}
-        className="mx-auto max-w-[458px]"
-      />
+      {/* Figma 2148:620 — the same dark qualifier band the home page closes on, reusing the same
+          `note` block from this page's own doc: the copy is page-specific, the shape is not.
+          458 is Figma's text width, and it is what breaks the line after "have". */}
+      <Note content={paid.note} className="mx-auto max-w-[458px]" />
     </main>
   )
 }

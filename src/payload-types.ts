@@ -170,13 +170,26 @@ export interface Page {
    */
   title: string;
   /**
-   * The home page is 'home'.
+   * The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising' is the one that exists.
    */
   slug: string;
   /**
-   * The home page renders these by type, not by the order below — its section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy.
+   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Paid Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising).
    */
-  content: (HeroBlock | WhoWeAreBlock | StrategyBlock | AboutBlock | ContactBlock | NoteBlock)[];
+  content: (
+    | HeroBlock
+    | WhoWeAreBlock
+    | StrategyBlock
+    | AboutBlock
+    | ContactBlock
+    | NoteBlock
+    | PaidHeroBlock
+    | GuaranteeBlock
+    | WhatYouGetBlock
+    | ResultsBlock
+    | PricingBlock
+    | FaqBlock
+  )[];
   updatedAt: string;
   createdAt: string;
 }
@@ -435,6 +448,190 @@ export interface NoteBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PaidHeroBlock".
+ */
+export interface PaidHeroBlock {
+  /**
+   * Bare text, e.g. "Pay Per Performance".
+   */
+  label: string;
+  /**
+   * One line at desktop; on a phone it breaks itself at the text width.
+   */
+  heading: string;
+  /**
+   * Ad platforms. The star colour comes from the row position, not from here — four rows fill the design’s trio-plus-one.
+   */
+  pills: {
+    label: string;
+    id?: string | null;
+  }[];
+  /**
+   * One sentence set in three parts: the middle one is the bold Neue Haas run the designer put mid-sentence. Mind the spaces and the full stop at the joins.
+   */
+  description: {
+    before: string;
+    /**
+     * Rendered bold and a size down, e.g. "You pay per qualified lead".
+     */
+    emphasis: string;
+    /**
+     * Starts with the punctuation that closes the emphasised phrase.
+     */
+    after: string;
+  };
+  button: {
+    label: string;
+    /**
+     * Leave empty to render an inert button (no destination yet).
+     */
+    href?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'paidHero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GuaranteeBlock".
+ */
+export interface GuaranteeBlock {
+  /**
+   * Press Enter for the authored break — the designer set two lines.
+   */
+  body: string;
+  /**
+   * Printed on the panel covering the copy above. Never seen under reduced motion, where the cover is not drawn at all.
+   */
+  scratchLabel: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'guarantee';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhatYouGetBlock".
+ */
+export interface WhatYouGetBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the page.
+   */
+  label: string;
+  /**
+   * Wraps to the column on its own — no authored break.
+   */
+  heading: string;
+  /**
+   * Exactly four, in layout order: wide, then the two side by side, then wide again. Row 1 and row 4 put their mock beside the copy; rows 2 and 3 put it underneath.
+   */
+  panels: {
+    title: string;
+    body: string;
+    /**
+     * Flat export of the product mock (2x webp). Not a live widget — replacing this file is how the artwork changes.
+     */
+    image: string | Media;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'whatYouGet';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ResultsBlock".
+ */
+export interface ResultsBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the page.
+   */
+  label: string;
+  heading: string;
+  /**
+   * Cards, left to right. They fade in in this order.
+   */
+  stats: {
+    /**
+     * The big number, e.g. "31" or "$0". Free text — not counted up.
+     */
+    value: string;
+    /**
+     * Press Enter for the desktop break. On a phone the same copy wraps instead.
+     */
+    label: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'results';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingBlock".
+ */
+export interface PricingBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the page.
+   */
+  label: string;
+  /**
+   * Press Enter for the authored break after the second sentence.
+   */
+  heading: string;
+  tiers: {
+    /**
+     * e.g. "One-time Setup".
+     */
+    label: string;
+    price: string;
+    /**
+     * The tab straddling the card’s top edge. Filling this in also gives the card the brand keyline and glow — leave it empty for the plain card.
+     */
+    badge?: string | null;
+    /**
+     * Bulleted list.
+     */
+    items: {
+      label: string;
+      id?: string | null;
+    }[];
+    id?: string | null;
+  }[];
+  cta: {
+    label: string;
+    /**
+     * Leave empty to render an inert button (no destination yet).
+     */
+    href?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pricing';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock".
+ */
+export interface FaqBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the page.
+   */
+  label: string;
+  heading: string;
+  /**
+   * Rows, top to bottom. Each opens on click and slides shut again.
+   */
+  items: {
+    question: string;
+    answer: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -551,6 +748,12 @@ export interface PagesSelect<T extends boolean = true> {
         about?: T | AboutBlockSelect<T>;
         contact?: T | ContactBlockSelect<T>;
         note?: T | NoteBlockSelect<T>;
+        paidHero?: T | PaidHeroBlockSelect<T>;
+        guarantee?: T | GuaranteeBlockSelect<T>;
+        whatYouGet?: T | WhatYouGetBlockSelect<T>;
+        results?: T | ResultsBlockSelect<T>;
+        pricing?: T | PricingBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -696,6 +899,127 @@ export interface ContactBlockSelect<T extends boolean = true> {
  */
 export interface NoteBlockSelect<T extends boolean = true> {
   body?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PaidHeroBlock_select".
+ */
+export interface PaidHeroBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  pills?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  description?:
+    | T
+    | {
+        before?: T;
+        emphasis?: T;
+        after?: T;
+      };
+  button?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GuaranteeBlock_select".
+ */
+export interface GuaranteeBlockSelect<T extends boolean = true> {
+  body?: T;
+  scratchLabel?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhatYouGetBlock_select".
+ */
+export interface WhatYouGetBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  panels?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        image?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ResultsBlock_select".
+ */
+export interface ResultsBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingBlock_select".
+ */
+export interface PricingBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  tiers?:
+    | T
+    | {
+        label?: T;
+        price?: T;
+        badge?: T;
+        items?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  cta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock_select".
+ */
+export interface FaqBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }

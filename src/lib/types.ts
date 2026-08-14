@@ -132,6 +132,85 @@ export type HomeContent = {
   note: NoteContent
 }
 
+// --- /paid-advertising ---------------------------------------------------------------------------
+// Same contract shape as the home blocks: one type per section, each one the exact set of strings an
+// editor can change. Everything the design fixes — the pill tints, the panel widths, the 1/2/1 panel
+// grid, the stat-card gradient — stays in the page and is not modelled here.
+
+// The hero's description changes voice mid-sentence (a 24px Neue Haas bold phrase inside the 28px
+// serif), so it is three fields rather than one string plus a markup parser. `emphasis` is the bold
+// run; the other two are the plain text either side of it.
+export type PaidHeroContent = {
+  label: string
+  heading: string
+  pills: string[] // star tints come from PILL_COLORS by position
+  description: { before: string; emphasis: string; after: string }
+  button: LinkField
+}
+
+// The refund band under the hero. `body`'s \n is the authored two-line break; `scratchLabel` is the
+// prompt printed on the scratch cover that hides it.
+export type GuaranteeContent = {
+  body: string
+  scratchLabel: string
+}
+
+export type PaidPanel = {
+  title: string
+  body: string
+  image: MediaDoc // flat export of the Figma product mock, not a live widget
+}
+
+// "What you get" — exactly four panels, because the section's 1 / 2 / 1 grid is drawn by hand and
+// each slot has its own width. Fewer or more falls back to the mock (see toWhatYouGetContent).
+export type WhatYouGetContent = {
+  label: string
+  heading: string
+  panels: PaidPanel[]
+}
+
+// Results — three stat cards. The \n in a label is a desktop-only break (mobile lets it wrap).
+export type ResultsContent = {
+  label: string
+  heading: string
+  stats: { value: string; label: string }[]
+}
+
+// `badge` is the tab straddling a card's top edge; the card also takes the brand keyline and glow
+// when it's set, so this one field is what makes a tier the highlighted one.
+export type PricingTier = {
+  label: string
+  price: string
+  badge?: string
+  items: string[]
+}
+
+// One CTA for both cards — the design repeats the same button, so it is one field, not one per tier.
+export type PricingContent = {
+  label: string
+  heading: string
+  tiers: PricingTier[]
+  cta: LinkField
+}
+
+export type FaqContent = {
+  label: string
+  heading: string
+  items: { question: string; answer: string }[]
+}
+
+// The whole /paid-advertising page. `contact` is deliberately absent — that section is read off the
+// home doc so one edit moves both pages (see the page component).
+export type PaidContent = {
+  hero: PaidHeroContent
+  guarantee: GuaranteeContent
+  whatYouGet: WhatYouGetContent
+  results: ResultsContent
+  pricing: PricingContent
+  faq: FaqContent
+  note: NoteContent
+}
+
 // Header global. socials/copyright are only rendered by the mobile dropdown (Figma 3038:1661) —
 // the desktop bar is nav-only, so they stay optional and that variant just doesn't get them.
 export type HeaderContent = {

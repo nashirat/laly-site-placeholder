@@ -20,3 +20,7 @@ export const STRATEGY_ACCENTS = {
 // tint is layout rather than per-badge content and doesn't belong in the CMS at all. Cycles, so a
 // fourth badge starts over rather than rendering an invisible star.
 export const BADGE_COLORS = ['#A2A11C', '#F3E8F2', '#F5C882'] as const
+
+// /paid-advertising hero pills. Same deal as BADGE_COLORS — the tint follows the position in the
+// row, not the ad platform, so the CMS stores four labels and nothing else.
+export const PILL_COLORS = ['#A2A11C', '#CBB1C9', '#FF8A88', '#F5C882'] as const

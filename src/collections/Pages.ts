@@ -1,11 +1,24 @@
 import type { CollectionConfig } from 'payload'
-import { revalidateHome } from '../lib/revalidate'
+import { revalidatePages } from '../lib/revalidate'
 import { AboutBlock } from '../blocks/about'
 import { ContactBlock } from '../blocks/contact'
 import { HeroBlock } from '../blocks/hero'
 import { NoteBlock } from '../blocks/note'
+import {
+  FaqBlock,
+  GuaranteeBlock,
+  PaidHeroBlock,
+  PricingBlock,
+  ResultsBlock,
+  WhatYouGetBlock,
+} from '../blocks/paid'
 import { StrategyBlock } from '../blocks/strategy'
 import { WhoWeAreBlock } from '../blocks/whoWeAre'
+
+// Which routes a saved doc invalidates. Its own, always — plus /paid-advertising when it's the home
+// doc, because that page renders the home contact block (see the page component).
+const affects = (slug: string): string[] =>
+  slug === 'home' ? ['home', 'paid-advertising'] : [slug]
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -14,21 +27,21 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
   },
-  // Purge the prerendered home html on every save, so /admin edits show up on Vercel immediately
-  // instead of whenever the hour-long ISR window happens to lapse. See src/lib/revalidate.ts.
+  // Purge the prerendered html on every save, so /admin edits show up on Vercel immediately instead
+  // of whenever the hour-long ISR window happens to lapse. See src/lib/revalidate.ts.
   //
-  // skipRevalidation is for bulk writers: scripts/seed-home.ts touches ~40 docs in one run and would
-  // otherwise fire ~40 purges of the same single path. It sets the flag and purges once at the end.
+  // skipRevalidation is for bulk writers: scripts/seed-paid.ts touches ~10 docs in one run and would
+  // otherwise fire a purge of the same path for each. It sets the flag and purges once at the end.
   hooks: {
     afterChange: [
       async ({ doc, context }) => {
-        if (!context?.skipRevalidation) await revalidateHome()
+        if (!context?.skipRevalidation) await revalidatePages(affects(doc.slug))
         return doc
       },
     ],
     afterDelete: [
       async ({ doc, context }) => {
-        if (!context?.skipRevalidation) await revalidateHome()
+        if (!context?.skipRevalidation) await revalidatePages(affects(doc.slug))
         return doc
       },
     ],
@@ -50,7 +63,10 @@ export const Pages: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
-      admin: { description: "The home page is 'home'." },
+      admin: {
+        description:
+          "The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising' is the one that exists.",
+      },
     },
     {
       name: 'content',
@@ -59,9 +75,22 @@ export const Pages: CollectionConfig = {
       minRows: 1,
       admin: {
         description:
-          'The home page renders these by type, not by the order below — its section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy.',
+          'Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Paid Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising).',
       },
-      blocks: [HeroBlock, WhoWeAreBlock, StrategyBlock, AboutBlock, ContactBlock, NoteBlock],
+      blocks: [
+        HeroBlock,
+        WhoWeAreBlock,
+        StrategyBlock,
+        AboutBlock,
+        ContactBlock,
+        NoteBlock,
+        PaidHeroBlock,
+        GuaranteeBlock,
+        WhatYouGetBlock,
+        ResultsBlock,
+        PricingBlock,
+        FaqBlock,
+      ],
     },
   ],
 }

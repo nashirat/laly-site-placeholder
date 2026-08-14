@@ -2,7 +2,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import type { CollectionConfig } from 'payload'
 import sharp from 'sharp'
-import { revalidateHome } from '../lib/revalidate'
+import { PAGE_SLUGS, revalidatePages } from '../lib/revalidate'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -50,13 +50,13 @@ export const Media: CollectionConfig = {
     // alt has to purge the page too — not just editing the Pages doc. skipRevalidation as in Pages.ts.
     afterChange: [
       async ({ doc, context }) => {
-        if (!context?.skipRevalidation) await revalidateHome()
+        if (!context?.skipRevalidation) await revalidatePages(PAGE_SLUGS)
         return doc
       },
     ],
     afterDelete: [
       async ({ doc, context }) => {
-        if (!context?.skipRevalidation) await revalidateHome()
+        if (!context?.skipRevalidation) await revalidatePages(PAGE_SLUGS)
         return doc
       },
     ],
