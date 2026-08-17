@@ -118,7 +118,7 @@ export const home: HomeContent = {
         ],
         hook: 'If your business depends on\nreferrals, this is for you.',
         body: 'Selling a service gets you one-time clients; selling a brand gets you loyal customers. Build and establish your brand on search engines, social media, and beyond, with a clear, recognizable offering that everyone remembers.',
-        link: { label: 'Explore branding' },
+        link: { label: 'Explore branding', href: '/branding' },
         fg: '#DFA854',
       },
       {

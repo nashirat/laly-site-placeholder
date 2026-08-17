@@ -24,3 +24,9 @@ export const BADGE_COLORS = ['#A2A11C', '#F3E8F2', '#F5C882'] as const
 // /paid-advertising hero pills. Same deal as BADGE_COLORS — the tint follows the position in the
 // row, not the ad platform, so the CMS stores four labels and nothing else.
 export const PILL_COLORS = ['#A2A11C', '#CBB1C9', '#FF8A88', '#F5C882'] as const
+
+// The warm ember wash the dark sections put behind a panel: near-black on the left, full brand pink
+// at the right edge. The hero pills fade it out to 0.1; every panel that uses it holds 0.25 the
+// whole way, so this is that flat version. Same 90deg stops in Figma either way.
+export const EMBER_WASH =
+  'linear-gradient(90deg, rgba(28,25,23,0.25) 35%, rgba(85,47,42,0.25) 65%, rgba(141,68,60,0.25) 85%, rgba(255,111,97,0.25) 100%)'

@@ -27,10 +27,15 @@ export const neueHaas = localFont({
   variable: '--font-neue-haas',
 })
 
-/** New Spirit Condensed — serif, body text. Exposed as --font-sans in @theme (body default). */
+/** New Spirit Condensed — serif, body text. Exposed as --font-sans in @theme (body default).
+ *  400 = every body paragraph. 500 = the /branding flow-chain card titles. 700 = the bolded run in
+ *  that section's copy. All three are below the fold on the only page that uses 500/700; if the
+ *  preload cost shows up, split them out the way the neueHaas note describes. */
 export const newSpirit = localFont({
   src: [
     { path: '../../../../fonts/new-spirit-condensed-regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../../../fonts/new-spirit-condensed-medium.woff2', weight: '500', style: 'normal' },
+    { path: '../../../../fonts/new-spirit-condensed-bold.woff2', weight: '700', style: 'normal' },
   ],
   display: 'swap',
   preload: true,

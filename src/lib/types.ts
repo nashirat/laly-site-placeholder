@@ -137,14 +137,21 @@ export type HomeContent = {
 // editor can change. Everything the design fixes — the pill tints, the panel widths, the 1/2/1 panel
 // grid, the stat-card gradient — stays in the page and is not modelled here.
 
-// The hero's description changes voice mid-sentence (a 24px Neue Haas bold phrase inside the 28px
-// serif), so it is three fields rather than one string plus a markup parser. `emphasis` is the bold
-// run; the other two are the plain text either side of it.
+// A sentence that changes voice mid-way — a 24px Neue Haas phrase set inside the 28px serif. The
+// designer does it in both service heroes and again in the branding scratch band, so it is three
+// fields rather than one string plus a markup parser. `emphasis` is the run that switches face; the
+// other two are the plain text either side of it.
+export type EmphasisedSentence = {
+  before: string
+  emphasis: string
+  after: string
+}
+
 export type PaidHeroContent = {
   label: string
   heading: string
   pills: string[] // star tints come from PILL_COLORS by position
-  description: { before: string; emphasis: string; after: string }
+  description: EmphasisedSentence
   button: LinkField
 }
 
@@ -209,6 +216,76 @@ export type PaidContent = {
   pricing: PricingContent
   faq: FaqContent
   note: NoteContent
+}
+
+// The /branding page, section by section as they are built. It reuses PaidHeroContent rather than
+// cloning it — Figma draws one hero component for both service pages, and ServiceHero renders it for
+// both. `positioning` is the same scratch band /paid-advertising puts its refund promise in, so it
+// carries a scratchLabel too; its copy switches face mid-sentence where paid's breaks in two.
+export type BrandingContent = {
+  hero: PaidHeroContent
+  positioning: {
+    body: EmphasisedSentence
+    scratchLabel: string
+  }
+  system: SystemContent
+  channels: ChannelsContent
+  compound: CompoundContent
+  // Figma draws Pricing and FAQ identically on both service pages, so these reuse the /paid types.
+  // Its own copy of the values, not an import of the paid mock: the two pages are separate docs once
+  // the CMS lands, and a fallback that silently tracked the other page's would hide that.
+  pricing: PricingContent
+  faq: FaqContent
+  note: NoteContent
+}
+
+// "The Compound Effect" — label/heading/copy on the left, one phase card in the middle, and a
+// vertical rail of the phases on the right that selects it. The rail renders every phase; the card
+// renders whichever is selected, and skips its title/body while a phase has no copy yet.
+export type CompoundContent = {
+  label: string
+  heading: string // \n is the designer's hard break
+  body: string // \n\n are authored paragraph gaps
+  phases: CompoundPhase[]
+}
+
+export type CompoundPhase = {
+  period: string // the rail label, and the tab above the card
+  title?: string
+  body?: string
+}
+
+// "The Channels" — label/heading over a one-card carousel, arrows either side. One slide per channel;
+// the arrows wrap, so the count is whatever the CMS gives (with 1 they are inert).
+export type ChannelsContent = {
+  label: string
+  heading: string
+  slides: ChannelSlide[]
+}
+
+// `lede` is the serif pull-quote under the title, `body` the smaller sans paragraph. `stats` is a
+// pair in the design but not fixed here — the panel stacks however many it is given.
+export type ChannelSlide = {
+  title: string
+  lede: string
+  body: string
+  stats: { value: string; label: string }[]
+  quote: string
+}
+
+// "The System" — label/heading over a two-column row: the argument on the left, three stacked cards
+// on the right. `chain` is fixed at three and ordered back-to-front, because the cards overlap: the
+// last one sits on top and is the only one drawn in full colour. Its blurb changes face mid-sentence
+// (one italic word) where the other two are plain, so only it takes an EmphasisedSentence.
+export type SystemContent = {
+  label: string
+  heading: string // \n is the designer's hard break
+  body: EmphasisedSentence // \n\n are authored paragraph gaps
+  chain: [
+    { title: string; blurb: string },
+    { title: string; blurb: string },
+    { title: string; blurb: EmphasisedSentence },
+  ]
 }
 
 // Header global. socials/copyright are only rendered by the mobile dropdown (Figma 3038:1661) —
