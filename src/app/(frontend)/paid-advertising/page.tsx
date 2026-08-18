@@ -83,8 +83,10 @@ function Panel({
       } ${className}`}
     >
       <div className="flex flex-col gap-5 md:flex-1 md:gap-6">
-        {/* heading/h3/m 32 mobile — heading/h3/l 40 desktop; New Spirit / 125% / -0.5px */}
-        <h3 className="font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#292624] md:text-[40px]">
+        {/* heading/h3/m 32 mobile — heading/h3/l 40 desktop; New Spirit / 125% / -0.5px.
+            whitespace-pre-line, so an Enter in the CMS is a real break here too, the way it already
+            is on the guarantee and the pricing heading. No break authored = it just wraps. */}
+        <h3 className="whitespace-pre-line font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#292624] md:text-[40px]">
           {panel.title}
         </h3>
         {/* body/m 18 mobile — body/l 20 desktop; Neue Haas / 125% / 0.25px */}

@@ -116,7 +116,15 @@ export const WhatYouGetBlock: Block = {
           'Exactly four, in layout order: wide, then the two side by side, then wide again. Row 1 and row 4 put their mock beside the copy; rows 2 and 3 put it underneath.',
       },
       fields: [
-        { name: 'title', type: 'textarea', required: true },
+        {
+          name: 'title',
+          type: 'textarea',
+          required: true,
+          admin: {
+            description:
+              'Every Enter you press is a real line break. Leave it as one line and it wraps on its own.',
+          },
+        },
         { name: 'body', type: 'textarea', required: true },
         {
           name: 'image',
