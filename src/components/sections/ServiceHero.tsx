@@ -88,14 +88,17 @@ export function ServiceHero({
         {/* 558px is the Figma width, and it is what breaks the four pills 4-up on desktop and
             2-up on a phone — a max, not a fixed width, so it can shrink below it. */}
         <ul
-          className="entry-copy flex max-w-[558px] flex-wrap items-center justify-center gap-x-2 gap-y-1.5"
-          style={{ animationDelay: '0.95s' }}
+          // hero-pills: each pill fades in from the left, left to right, and the run goes LAST —
+          // after the description and the button. Both delays live in styles.css: the start has to
+          // track the heading mode the way .hero-desc / .hero-cta do, and --pill-delay below only
+          // has to say which pill this is.
+          className="hero-pills flex max-w-[558px] flex-wrap items-center justify-center gap-x-2 gap-y-1.5"
         >
           {content.pills.map((pill, i) => (
             <li
               key={pill}
               className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 font-display text-[10px] font-normal leading-[1.25] text-[#E7DCD4] md:text-xs shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]"
-              style={{ backgroundImage: PILL_BG }}
+              style={{ backgroundImage: PILL_BG, '--pill-delay': `${i * 0.08}s` } as CSSProperties}
             >
               {/* star.svg as a mask, same trick as the Strategy badges — one asset, four tints.
                   The tint is the row position, so it cycles rather than coming from the CMS. */}

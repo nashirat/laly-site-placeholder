@@ -275,6 +275,57 @@ html.anim-heading-mix.preloader-done .entry-fade {
   }
 }
 
+/* Service-hero pills ("Google Ads", "Meta Ads", ...) — client feedback: fade in FROM THE LEFT, left
+   to right, and go last, after the description and the button have played, rather than in the middle
+   of the stack. The animation is per-<li> rather than on the <ul>, which is what buys the stagger;
+   the list itself just carries the timing.
+
+   --pills-start is the run's start and follows whichever heading mode is on (each figure is that
+   mode's .hero-cta delay plus ~0.15s, so the pills come in over the button's tail rather than after
+   a gap). --pill-delay is the per-pill offset, set inline from the index. Same two-var arrangement
+   as the heading's char-rise. */
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.hero-pills {
+  --pills-start: 1.35s;
+}
+html.anim-heading-letters .hero-pills {
+  --pills-start: 2.3s;
+}
+html.anim-heading-mix .hero-pills {
+  --pills-start: 1.25s;
+}
+.hero-pills > li {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+html.preloading-done .hero-pills > li,
+html.preloader-done .hero-pills > li {
+  animation-name: fade-in-left;
+  animation-duration: 0.7s;
+  animation-delay: calc(var(--pills-start) + var(--pill-delay, 0s));
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint, as the rest of the entry */
+  animation-fill-mode: forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-pills > li {
+    opacity: 1;
+    transform: none;
+  }
+  html.preloading-done .hero-pills > li,
+  html.preloader-done .hero-pills > li {
+    animation: none;
+  }
+}
+
 /* Masked slide-in from the right (menu items). Wrapper clips; inner slides translateX -> 0. */
 @keyframes slide-in-right {
   from {
