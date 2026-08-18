@@ -1,6 +1,7 @@
 import { Accordion } from '@/components/ui/Accordion'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { GridBackdrop } from '@/components/ui/GridBackdrop'
+import { InView } from '@/components/ui/InView'
 import type { FaqContent } from '@/lib/types'
 
 // Figma 2724:3687 — FAQ on /branding. Cream under the faint grid.
@@ -30,19 +31,23 @@ export function Faq({ content }: { content: FaqContent }) {
           </h2>
         </div>
 
-        <div className="flex w-full flex-col gap-4 border border-[#E7DCD4] bg-[#FFFCF9] px-3 py-6 md:p-6">
-          {content.items.map((faq, i) => (
-            <Accordion
-              // the placeholder rows are identical copy, so the index is the only stable key
-              key={i}
-              id={`faq-${i}`}
-              question={faq.question}
-              answer={faq.answer}
-              // last row drops the rule — Figma ends the stack on the container's own border
-              className={`px-4 py-6 ${i < content.items.length - 1 ? 'border-b border-[#E7DCD4]' : ''}`}
-            />
-          ))}
-        </div>
+        {/* below md the whole box travels as one — border, rows and all — rather than the rows
+            sliding inside a border that stays put */}
+        <InView rootMargin="0px 0px -15% 0px">
+          <div className="mobile-reveal flex w-full flex-col gap-4 border border-[#E7DCD4] bg-[#FFFCF9] px-3 py-6 md:p-6">
+            {content.items.map((faq, i) => (
+              <Accordion
+                // the placeholder rows are identical copy, so the index is the only stable key
+                key={i}
+                id={`faq-${i}`}
+                question={faq.question}
+                answer={faq.answer}
+                // last row drops the rule — Figma ends the stack on the container's own border
+                className={`px-4 py-6 ${i < content.items.length - 1 ? 'border-b border-[#E7DCD4]' : ''}`}
+              />
+            ))}
+          </div>
+        </InView>
       </div>
     </section>
   )

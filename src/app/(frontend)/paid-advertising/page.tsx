@@ -81,36 +81,47 @@ function Panel({
   graphic?: ReactNode
 }) {
   return (
-    <div
-      // mobile (2234:3824 and siblings): px 16 / py 40, copy over mock, gap 40 between them
-      className={`flex flex-col gap-10 px-4 py-10 md:px-10 md:py-16 ${
-        side ? 'md:flex-row md:items-start md:justify-between' : 'md:items-center'
-      } ${className}`}
-    >
-      <div className="flex flex-col gap-5 md:flex-1 md:gap-6">
-        {/* heading/h3/m 32 mobile — heading/h3/l 40 desktop; New Spirit / 125% / -0.5px.
-            whitespace-pre-line, so an Enter in the CMS is a real break here too, the way it already
-            is on the guarantee and the pricing heading. No break authored = it just wraps. */}
-        <h3 className="whitespace-pre-line font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#292624] md:text-[40px]">
-          {panel.title}
-        </h3>
-        {/* body/m 18 mobile — body/l 20 desktop; Neue Haas / 125% / 0.25px */}
-        <p className="font-display text-lg font-normal leading-[1.25] tracking-[0.25px] text-[#544D49] md:text-xl">
-          {panel.body}
-        </p>
+    // mobile only: the whole panel slides up on its own gate, on the Results cards' clock (designer
+    // note on 2148:498). The gate carries the slot's borders and h-full, so the keylines stay put
+    // while the panel's contents travel. A panel is most of a phone screen tall, hence the inset.
+    <InView className={`h-full ${className}`} rootMargin="0px 0px -20% 0px">
+      <div
+        // mobile (2234:3824 and siblings): px 16 / py 40, copy over mock, gap 40 between them
+        // tablet: the stack centres in the frame — client note, 600px up to the md switch
+        className={`mobile-reveal flex h-full flex-col gap-10 px-4 py-10 tablet:items-center tablet:text-center md:px-10 md:py-16 ${
+          side ? 'md:flex-row md:items-start md:justify-between' : 'md:items-center'
+        }`}
+      >
+        <div className="flex flex-col gap-5 md:flex-1 md:gap-6">
+          {/* heading/h3/m 32 mobile — heading/h3/l 40 desktop; New Spirit / 125% / -0.5px.
+              whitespace-pre-line, so an Enter in the CMS is a real break here too, the way it already
+              is on the guarantee and the pricing heading. No break authored = it just wraps. */}
+          <h3 className="whitespace-pre-line font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#292624] md:text-[40px]">
+            {panel.title}
+          </h3>
+          {/* body/m 18 mobile — body/l 20 desktop; Neue Haas / 125% / 0.25px */}
+          <p className="font-display text-lg font-normal leading-[1.25] tracking-[0.25px] text-[#544D49] md:text-xl">
+            {panel.body}
+          </p>
+        </div>
+        {/* the cap is a per-slot number, so it is an inline max-width rather than four arbitrary
+            Tailwind classes that only differ by the value.
+            .graphic-fade is the client's second note: below md the mock fades in on its own, a beat
+            after the panel it sits in. */}
+        <div
+          className={`graphic-fade w-full ${side ? 'shrink-0' : ''}`}
+          style={{ maxWidth: width }}
+        >
+          {graphic ?? (
+            <MediaImage
+              media={panel.image}
+              sizes={`(min-width: 1152px) ${width}px, 100vw`}
+              className="h-auto w-full"
+            />
+          )}
+        </div>
       </div>
-      {/* the cap is a per-slot number, so it is an inline max-width rather than four arbitrary
-          Tailwind classes that only differ by the value */}
-      <div className={`w-full ${side ? 'shrink-0' : ''}`} style={{ maxWidth: width }}>
-        {graphic ?? (
-          <MediaImage
-            media={panel.image}
-            sizes={`(min-width: 1152px) ${width}px, 100vw`}
-            className="h-auto w-full"
-          />
-        )}
-      </div>
-    </div>
+    </InView>
   )
 }
 
@@ -451,21 +462,25 @@ export default async function PaidAdvertisingPage() {
             </h2>
           </div>
 
-          <div className="flex w-full flex-col gap-4 border border-[#E7DCD4] bg-[#FFFCF9] px-3 py-6 md:p-6">
-            {paid.faq.items.map((faq, i) => (
-              <Accordion
-                // the placeholder rows are identical copy, so the index is the only stable key
-                key={i}
-                id={`faq-${i}`}
-                question={faq.question}
-                answer={faq.answer}
-                // last row drops the rule — Figma ends the stack on the container's own border
-                className={`px-4 py-6 ${
-                  i < paid.faq.items.length - 1 ? 'border-b border-[#E7DCD4]' : ''
-                }`}
-              />
-            ))}
-          </div>
+          {/* below md the whole box travels as one — border, rows and all — rather than the rows
+              sliding inside a border that stays put */}
+          <InView rootMargin="0px 0px -15% 0px">
+            <div className="mobile-reveal flex w-full flex-col gap-4 border border-[#E7DCD4] bg-[#FFFCF9] px-3 py-6 md:p-6">
+              {paid.faq.items.map((faq, i) => (
+                <Accordion
+                  // the placeholder rows are identical copy, so the index is the only stable key
+                  key={i}
+                  id={`faq-${i}`}
+                  question={faq.question}
+                  answer={faq.answer}
+                  // last row drops the rule — Figma ends the stack on the container's own border
+                  className={`px-4 py-6 ${
+                    i < paid.faq.items.length - 1 ? 'border-b border-[#E7DCD4]' : ''
+                  }`}
+                />
+              ))}
+            </div>
+          </InView>
         </div>
       </section>
 

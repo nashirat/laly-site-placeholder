@@ -19,6 +19,13 @@
   --breakpoint-4xl: 160rem; /* 2560px — QHD/ultrawide */
 }
 
+/* Tablet window. The design has two layouts, so everything from a 600px portrait tablet up to the
+   `md` switch renders the mobile stack at a width it was never drawn for — copy on the left, a wide
+   mock under it, and a lot of air on the right. The client's note asks for that band to centre its
+   contents instead. Their range reads "600 to 1024"; it ends at `md` here rather than 1024, because
+   1024–1152 is the same stack with the same problem and a seam there would be visible. */
+@custom-variant tablet (@media (min-width: 37.5rem) and (width < 72rem));
+
 /* Every section is authored padding-only against Figma's 1440 frame, so past 1440 they just keep
    stretching — at 1920 WhoWeAre's 160px sides leave a 1600px content row where the design has 1120.
    This caps the shell and centres it; each section keeps its own padding, so the inner proportions
@@ -466,6 +473,43 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
 }
 
+/* Mobile-only slide-up for the blocks that sit inside a border: the "What you get" panels, the FAQ
+   rows. Same gesture and clock as the Results cards, but on the section's own <InView> rather than
+   the dev-panel .section-*-reveal classes, so it always runs. Desktop is untouched — those stacks
+   were signed off flat, and the note that asked for this was a mobile note.
+   --card-delay staggers a group from the index, the same knob the pricing cards use.
+   The cut is `md`, which is 1152 here — not the 768 a hand-written media query defaults to.
+
+   .graphic-fade is the second note on the same panels: the mock fades on its own, a beat behind the
+   panel it sits in. Opacity only — the panel is already carrying the travel, and moving the mock a
+   second time inside a moving parent reads as a stutter. */
+@media (width < 72rem) {
+  .mobile-reveal {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  .reveal-gate.is-visible .mobile-reveal {
+    animation: fade-up-strong 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--card-delay, 0s) forwards;
+  }
+  .graphic-fade {
+    opacity: 0;
+  }
+  .reveal-gate.is-visible .graphic-fade {
+    animation: fade-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobile-reveal,
+  .graphic-fade {
+    opacity: 1;
+    transform: none;
+  }
+  .reveal-gate.is-visible .mobile-reveal,
+  .reveal-gate.is-visible .graphic-fade {
+    animation: none;
+  }
+}
+
 /* Scroll gate (see InView.tsx). Bracket label always uses its own base hidden state, released when
    InView adds .is-visible. Media-only mode waits until its own block reaches 4% viewport intersection. */
 @media (prefers-reduced-motion: reduce) {
@@ -525,9 +569,21 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint, as the rest */
   animation-fill-mode: forwards;
 }
+/* mobile only: the cards travel as well as fade, so the pricing pair reads like the panels and the
+   FAQ rows above it. Desktop keeps the opacity-only fade the client asked for.
+   The cut is `md`, which is 1152 here — not the 768 the media query would be on stock Tailwind. */
+@media (width < 72rem) {
+  .card-fade {
+    transform: translateY(32px);
+  }
+  .reveal-gate.is-visible .card-fade {
+    animation-name: fade-up-strong;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .card-fade {
     opacity: 1;
+    transform: none;
   }
   .reveal-gate.is-visible .card-fade {
     animation: none;
