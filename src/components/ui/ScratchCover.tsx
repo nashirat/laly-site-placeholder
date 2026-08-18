@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react'
 const COVER = '#292624' // color/neutral-variant/10 — the unscratched ground
 const NOISE = 18 // ± per channel; the design's sub-hero-noise, radius 4
 const BRUSH = 30 // scratch radius in CSS px
+const CORE = 0.45 // fraction of BRUSH that erases fully; past it the stamp ramps to nothing
 
 export function ScratchCover({ label }: { label: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -87,18 +88,31 @@ export function ScratchCover({ label }: { label: string }) {
     const y = (e.clientY - rect.top) * dpr
 
     ctx.globalCompositeOperation = 'destination-out'
-    // a dot plus a line to the previous point: at speed the pointermoves are far enough apart that
-    // dots alone leave a dotted trail instead of a stroke
-    ctx.beginPath()
-    ctx.arc(x, y, BRUSH * dpr, 0, Math.PI * 2)
-    ctx.fill()
-    if (last.current) {
-      ctx.lineWidth = BRUSH * 2 * dpr
-      ctx.lineCap = 'round'
+    const r = BRUSH * dpr
+    // The brush is a radial gradient rather than a flat disc: destination-out subtracts the stamp's
+    // own alpha, so the ramp from CORE out to the rim leaves a feathered edge instead of a cut one.
+    // Overlapping passes keep eating the leftover partial alpha, the way a coin does.
+    const stamp = (x: number, y: number) => {
+      const g = ctx.createRadialGradient(x, y, r * CORE, x, y, r)
+      g.addColorStop(0, 'rgba(0,0,0,1)')
+      g.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = g
       ctx.beginPath()
-      ctx.moveTo(last.current.x, last.current.y)
-      ctx.lineTo(x, y)
-      ctx.stroke()
+      ctx.arc(x, y, r, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    // stamps along the segment rather than one stroked line: a line has a single hard width, and at
+    // speed the pointermoves are far enough apart that a lone dot per event leaves a dotted trail.
+    // A third of the radius per step is close enough that the soft rims overlap into one stroke.
+    const from = last.current
+    if (from) {
+      const dx = x - from.x
+      const dy = y - from.y
+      const steps = Math.ceil(Math.hypot(dx, dy) / (r / 3))
+      for (let i = 1; i <= steps; i++) stamp(from.x + (dx * i) / steps, from.y + (dy * i) / steps)
+    } else {
+      stamp(x, y)
     }
     last.current = { x, y }
     if (!started) setStarted(true)
