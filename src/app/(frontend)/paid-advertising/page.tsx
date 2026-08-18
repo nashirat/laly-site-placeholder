@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type { StaticImageData } from 'next/image'
 import heroBg from '../../../../public/paid-advertising/hero.webp'
 import { MediaImage } from '@/components/Media/Image'
+import { CallsWidget } from '@/components/sections/CallsWidget'
 import Contact from '@/components/sections/Contact'
 import Note from '@/components/sections/Note'
 import { getHome, getPaid } from '@/lib/cms'
@@ -70,11 +71,14 @@ function Panel({
   width,
   side = false,
   className = '',
+  graphic,
 }: {
   panel: PaidPanel
   width: number // the slot's mock width at md+; see PANEL_WIDTHS
   side?: boolean // copy and mock share a row at md+, rather than the mock sitting under the copy
   className?: string
+  // live DOM in place of panel.image, for the one slot that animates (see CallsWidget)
+  graphic?: ReactNode
 }) {
   return (
     <div
@@ -98,11 +102,13 @@ function Panel({
       {/* the cap is a per-slot number, so it is an inline max-width rather than four arbitrary
           Tailwind classes that only differ by the value */}
       <div className={`w-full ${side ? 'shrink-0' : ''}`} style={{ maxWidth: width }}>
-        <MediaImage
-          media={panel.image}
-          sizes={`(min-width: 1152px) ${width}px, 100vw`}
-          className="h-auto w-full"
-        />
+        {graphic ?? (
+          <MediaImage
+            media={panel.image}
+            sizes={`(min-width: 1152px) ${width}px, 100vw`}
+            className="h-auto w-full"
+          />
+        )}
       </div>
     </div>
   )
@@ -280,7 +286,14 @@ export default async function PaidAdvertisingPage() {
             <Panel side panel={paid.whatYouGet.panels[0]} width={PANEL_WIDTHS[0]} />
 
             <div className="grid border-t border-[#E7DCD4] md:grid-cols-2">
-              <Panel panel={paid.whatYouGet.panels[1]} width={PANEL_WIDTHS[1]} />
+              {/* the one mock that is live DOM — the pie wipes in and the total counts up. Its
+                  panel.image is still in the CMS as the fallback nobody renders; delete it there
+                  once this has been signed off. */}
+              <Panel
+                panel={paid.whatYouGet.panels[1]}
+                width={PANEL_WIDTHS[1]}
+                graphic={<CallsWidget />}
+              />
               <Panel
                 className="border-t border-[#E7DCD4] md:border-t-0 md:border-l"
                 panel={paid.whatYouGet.panels[2]}

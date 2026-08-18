@@ -534,6 +534,32 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   }
 }
 
+/* Call-attribution pie (see CallsWidget.tsx) — wipes in clockwise from 12 o'clock. The mask is a
+   conic gradient with both stops on the same angle, so the boundary is a hard edge that sweeps
+   rather than a gradient that fades; --pie-sweep drives it from 0 to a full turn.
+
+   @property is what makes a plain transition work here: an unregistered custom property is an
+   untyped string and will not interpolate. Same reason the bracket labels register --x-translate. */
+@property --pie-sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.pie-sweep {
+  --pie-sweep: 0deg;
+  mask-image: conic-gradient(from 0deg, #000 0deg var(--pie-sweep), transparent var(--pie-sweep));
+  transition: --pie-sweep 1.4s cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint, as the count-up */
+}
+.calls-widget.is-visible .pie-sweep {
+  --pie-sweep: 360deg;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pie-sweep {
+    --pie-sweep: 360deg;
+    transition: none;
+  }
+}
+
 /* Typewriter caret (see Typewriter.tsx) — steps(1) so it snaps on/off instead of fading, which is
    what reads as a terminal cursor. Reduced motion keeps it lit rather than hiding it: it's the
    leading edge of the heading, not decoration. */
