@@ -1,4 +1,5 @@
 import { GridBackdrop } from '@/components/ui/GridBackdrop'
+import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { SystemContent } from '@/lib/types'
 
 // Figma 2767:9520 — "The System" on /branding. Cream ground under a faint grid, the argument on the
@@ -91,9 +92,9 @@ export function BrandSystem({ content }: { content: SystemContent }) {
 
       <div className="relative mx-auto flex w-full max-w-[1216px] flex-col gap-10 md:gap-24">
         <div className="flex flex-col gap-6 text-center md:gap-8">
-          <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-            [ {content.label} ]
-          </p>
+          <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
+            {content.label}
+          </BracketLabel>
           {/* heading/h1/xl: Neue Haas 450 (→400) / 64 / 110% / -1px. Per-line spans, same as
               Strategy — the \n is a break the designer set, not a wrap. */}
           <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#292624] md:text-[64px]">

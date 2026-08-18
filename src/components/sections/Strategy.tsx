@@ -27,7 +27,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
       className="w-full bg-[#292624] py-16 md:py-28"
     >
       <InView className="section-shell px-5 text-center sm:px-10 md:px-12">
-        <BracketLabel className="mb-5 w-44 text-[#ff6d6a] md:mb-8 md:w-80">
+        <BracketLabel className="mx-auto mb-5 w-44 text-[#ff6d6a] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
         <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#fffcf9] md:text-6xl xl:text-7xl">

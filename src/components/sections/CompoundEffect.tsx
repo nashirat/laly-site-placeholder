@@ -2,6 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { EMBER_WASH } from '@/lib/palettes'
+import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { CompoundContent } from '@/lib/types'
 
 // Figma 2767:9349 — "The Compound Effect" on /branding. Argument on the left, one phase card in the
@@ -38,9 +39,11 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
             md+, where there is room to put the rail against the section's right edge. */}
         <div className="flex w-full flex-col gap-8 md:w-[538px]">
           <div className="flex flex-col gap-6">
-            <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#FF6D6A] md:text-lg">
-              [ {content.label} ]
-            </p>
+            {/* the one eyebrow that is not centred — this column is left-aligned, so no mx-auto.
+                Widest label on the site, hence the bigger travel box. */}
+            <BracketLabel className="w-72 text-[#FF6D6A] md:w-[460px]">
+              {content.label}
+            </BracketLabel>
             <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:text-[64px]">
               {content.heading.split('\n').map((line) => (
                 <span key={line} className="block">

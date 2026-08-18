@@ -18,7 +18,7 @@ export default function About({ content }: { content: AboutContent }) {
       {/* two gaps, not one: 32 from the caption down to the copy, 24 from the copy down to the
           carousel. The shell carries the 24 and the caption pays the extra 8 itself. */}
       <InView className="section-shell flex flex-col px-5 text-center sm:px-10 md:gap-6 md:px-40">
-        <BracketLabel className="mb-5 w-44 text-[#867A72] md:mb-2 md:w-80">
+        <BracketLabel className="mx-auto mb-5 w-44 text-[#867A72] md:mb-2 md:w-80">
           {label}
         </BracketLabel>
 

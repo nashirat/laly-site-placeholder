@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { EMBER_WASH } from '@/lib/palettes'
+import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { ChannelsContent } from '@/lib/types'
 
 // Figma 2796:9847 — "The Channels" on /branding. Dark ground, label/heading, then one card at a time
@@ -62,9 +63,9 @@ export function Channels({ content }: { content: ChannelsContent }) {
     >
       <div className="mx-auto flex w-full max-w-[1216px] flex-col items-center gap-8 md:gap-12">
         <div className="flex w-full flex-col items-center gap-6 text-center md:gap-8">
-          <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#FF6D6A] md:text-2xl">
-            [ {content.label} ]
-          </p>
+          <BracketLabel className="mx-auto w-52 text-[#FF6D6A] md:w-[360px]">
+            {content.label}
+          </BracketLabel>
           {/* 876px is Figma's own width, and it is what puts the break after "actually" */}
           <h2 className="max-w-[876px] font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:text-[64px]">
             {content.heading}

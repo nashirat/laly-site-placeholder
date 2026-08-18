@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/Button'
+import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { PricingContent } from '@/lib/types'
 
 // Figma 2796:9967 — Pricing on /branding. Cream ground, two cards; the second carries the brand
@@ -16,9 +17,9 @@ export function Pricing({ content }: { content: PricingContent }) {
     >
       <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-16">
         <div className="flex flex-col gap-6 text-center">
-          <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-            [ {content.label} ]
-          </p>
+          <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
+            {content.label}
+          </BracketLabel>
           {/* the break after "Transparent." is authored, not a wrap — whitespace-pre-line keeps
               the editor's Enter */}
           <h2 className="whitespace-pre-line font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">

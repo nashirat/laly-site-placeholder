@@ -13,6 +13,7 @@ import { Accordion } from '@/components/ui/Accordion'
 import { InView } from '@/components/ui/InView'
 import { ScratchCover } from '@/components/ui/ScratchCover'
 import { GridBackdrop } from '@/components/ui/GridBackdrop'
+import { BracketLabel } from '@/components/ui/BracketLabel'
 
 export const metadata: Metadata = {
   title: 'Paid Advertising | Laly Agency',
@@ -258,9 +259,9 @@ export default async function PaidAdvertisingPage() {
 
         <div className="relative mx-auto flex w-full max-w-[1232px] flex-col gap-10 md:gap-12">
           <div className="flex flex-col items-center gap-6 text-center md:gap-8">
-            <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-              [ {paid.whatYouGet.label} ]
-            </p>
+            <BracketLabel className="mx-auto w-52 text-[#867A72] md:w-[360px]">
+              {paid.whatYouGet.label}
+            </BracketLabel>
             {/* heading/h1/xs 40 mobile — heading/h1/xl 64 desktop; Neue Haas 450 (→400, only
                 400/500/700 ship) / 110% / -1px. 876px is Figma's own width, and it is what puts the
                 break after "and". */}
@@ -304,9 +305,9 @@ export default async function PaidAdvertisingPage() {
       >
         <InView className="mx-auto flex w-full max-w-[1280px] flex-col gap-16">
           <div className="flex flex-col gap-6 text-center">
-            <p className="section-text-reveal font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#FF6D6A] md:text-2xl">
-              [ {paid.results.label} ]
-            </p>
+            <BracketLabel className="mx-auto w-44 text-[#FF6D6A] md:w-80">
+              {paid.results.label}
+            </BracketLabel>
             <h2 className="section-text-reveal font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FCF7F3] md:text-[64px]">
               {paid.results.heading}
             </h2>
@@ -344,9 +345,9 @@ export default async function PaidAdvertisingPage() {
       >
         <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-16">
           <div className="flex flex-col gap-6 text-center">
-            <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-              [ {paid.pricing.label} ]
-            </p>
+            <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
+              {paid.pricing.label}
+            </BracketLabel>
             {/* the break after "Transparent." is authored, not a wrap — whitespace-pre-line keeps
                 the editor's Enter */}
             <h2 className="whitespace-pre-line font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
@@ -418,9 +419,9 @@ export default async function PaidAdvertisingPage() {
 
         <div className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 md:gap-12">
           <div className="flex flex-col gap-6 text-center">
-            <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-              [ {paid.faq.label} ]
-            </p>
+            <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
+              {paid.faq.label}
+            </BracketLabel>
             <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#292624] md:text-[56px]">
               {paid.faq.heading}
             </h2>

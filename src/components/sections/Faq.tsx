@@ -1,4 +1,5 @@
 import { Accordion } from '@/components/ui/Accordion'
+import { BracketLabel } from '@/components/ui/BracketLabel'
 import { GridBackdrop } from '@/components/ui/GridBackdrop'
 import type { FaqContent } from '@/lib/types'
 
@@ -21,9 +22,9 @@ export function Faq({ content }: { content: FaqContent }) {
 
       <div className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 md:gap-12">
         <div className="flex flex-col gap-6 text-center">
-          <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-            [ {content.label} ]
-          </p>
+          <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
+            {content.label}
+          </BracketLabel>
           <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#292624] md:text-[56px]">
             {content.heading}
           </h2>

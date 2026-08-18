@@ -383,10 +383,16 @@ html.anim-heading-mix.preloader-done .entry-fade {
     clip-path 1s cubic-bezier(0.87, 0, 0.13, 1);
   transition-delay: 0.1s; /* text trails the brackets, same offset as theirs */
 }
-.reveal-gate.is-visible .bracket-label {
+/* Two ways in: the section's <InView> gate (home, where the eyebrow shares one observer and one
+   clock with the copy under it), or the label's own observer (the service pages, whose sections have
+   no gate). Both land on the same end state, so a label inside a gate can hold both and nothing
+   fights. */
+.reveal-gate.is-visible .bracket-label,
+.bracket-label.is-visible {
   --x-translate: 0;
 }
-.reveal-gate.is-visible .bracket-label > * {
+.reveal-gate.is-visible .bracket-label > *,
+.bracket-label.is-visible > * {
   transform: translateY(0);
   clip-path: inset(0 0 0 0);
 }
