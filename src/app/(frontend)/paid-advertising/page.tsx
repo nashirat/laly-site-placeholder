@@ -359,12 +359,20 @@ export default async function PaidAdvertisingPage() {
           </div>
 
           {/* items-stretch (grid's default) is what lets the shorter card match the taller one, and
-              justify-between then parks both CTAs on the same line */}
-          <div className="grid gap-6 md:grid-cols-2 md:gap-8">
-            {paid.pricing.tiers.map((tier) => (
+              justify-between then parks both CTAs on the same line.
+              The <InView> gate is what fades the pair in on scroll — client feedback, opacity only,
+              second card trailing the first by --card-delay. */}
+          <InView
+            className="grid gap-6 md:grid-cols-2 md:gap-8"
+            // the grid is most of a screen tall, so without this it trips at the viewport
+            // bottom and the fade is finished before the cards are in frame
+            rootMargin="0px 0px -25% 0px"
+          >
+            {paid.pricing.tiers.map((tier, i) => (
               <div
                 key={tier.label}
-                className={`relative flex flex-col justify-between gap-8 border bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
+                style={{ '--card-delay': `${i * 0.15}s` } as CSSProperties}
+                className={`card-fade relative flex flex-col justify-between gap-8 border bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
                   tier.badge
                     ? 'border-[#FF6D6A] shadow-[0_0_6px_0_rgba(66,55,48,0.2),1px_1px_6px_0_rgba(66,55,48,0.2)]'
                     : 'border-[#E7DCD4]'
@@ -406,7 +414,7 @@ export default async function PaidAdvertisingPage() {
                 </div>
               </div>
             ))}
-          </div>
+          </InView>
         </div>
       </section>
 

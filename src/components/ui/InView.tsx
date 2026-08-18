@@ -7,7 +7,18 @@ import { type ReactNode, useEffect, useRef, useState } from 'react'
 //
 // Fires ONCE: disconnect on the first intersection, no rearm. Replaying the reveal every time you
 // scroll back past a section read as tacky (team review), so once it's played it's done.
-export function InView({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function InView({
+  children,
+  className = '',
+  // Shrinks the observer's root, so the gate trips once the element is properly on screen rather
+  // than the instant its top edge touches the viewport bottom. Tall blocks need it: a card grid is
+  // most of a screen high, so without it the reveal is over before you have scrolled to look at it.
+  rootMargin,
+}: {
+  children: ReactNode
+  className?: string
+  rootMargin?: string
+}) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
   const [mediaVisible, setMediaVisible] = useState(false)
@@ -15,15 +26,18 @@ export function InView({ children, className = '' }: { children: ReactNode; clas
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        setVisible(true)
-        io.disconnect() // played once — never rearm
-      }
-    })
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisible(true)
+          io.disconnect() // played once — never rearm
+        }
+      },
+      { rootMargin },
+    )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [rootMargin])
 
   useEffect(() => {
     const el = ref.current?.querySelector('.section-media-reveal')

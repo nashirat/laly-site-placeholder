@@ -508,6 +508,32 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   }
 }
 
+/* Pricing cards (both service pages) — client feedback: a plain 0 -> 100 opacity fade on scroll-in,
+   the second card trailing the first. Opacity only, no lift: these are big bordered panels and a
+   translate on them reads as the whole section jumping.
+
+   Rides the section's <InView> gate rather than the dev-panel .section-*-reveal classes, because
+   those are behind html.anim-sections-* and this one always runs. --card-delay is set inline from
+   the index. */
+.card-fade {
+  opacity: 0;
+}
+.reveal-gate.is-visible .card-fade {
+  animation-name: fade-in;
+  animation-duration: 0.7s;
+  animation-delay: var(--card-delay, 0s);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint, as the rest */
+  animation-fill-mode: forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-fade {
+    opacity: 1;
+  }
+  .reveal-gate.is-visible .card-fade {
+    animation: none;
+  }
+}
+
 /* Typewriter caret (see Typewriter.tsx) — steps(1) so it snaps on/off instead of fading, which is
    what reads as a terminal cursor. Reduced motion keeps it lit rather than hiding it: it's the
    leading edge of the heading, not decoration. */
