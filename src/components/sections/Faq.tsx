@@ -1,7 +1,5 @@
-import gridTexture from '../../../public/branding/grid.webp'
-import { MediaImage } from '@/components/Media/Image'
-import { texture } from '@/components/sections/ServiceHero'
 import { Accordion } from '@/components/ui/Accordion'
+import { GridBackdrop } from '@/components/ui/GridBackdrop'
 import type { FaqContent } from '@/lib/types'
 
 // Figma 2724:3687 — FAQ on /branding. Cream under the faint grid.
@@ -19,12 +17,7 @@ export function Faq({ content }: { content: FaqContent }) {
       // mobile (2739:9048): px 20, pt 48 / pb 96, 32 between the header and the container
       className="relative w-full overflow-hidden border-y border-[#544D49] bg-[#FCF7F3] px-5 pt-12 pb-24 md:px-40 md:py-28"
     >
-      <MediaImage
-        media={texture(gridTexture)}
-        quality={60}
-        sizes="100vw"
-        className="pointer-events-none absolute inset-0 size-full object-cover opacity-15"
-      />
+      <GridBackdrop />
 
       <div className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 md:gap-12">
         <div className="flex flex-col gap-6 text-center">

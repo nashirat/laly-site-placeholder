@@ -1,6 +1,4 @@
-import gridTexture from '../../../public/branding/grid.webp'
-import { MediaImage } from '@/components/Media/Image'
-import { texture } from '@/components/sections/ServiceHero'
+import { GridBackdrop } from '@/components/ui/GridBackdrop'
 import type { SystemContent } from '@/lib/types'
 
 // Figma 2767:9520 — "The System" on /branding. Cream ground under a faint grid, the argument on the
@@ -72,12 +70,7 @@ export function BrandSystem({ content }: { content: SystemContent }) {
       // the same px 16 / py 48 the other cream sections use.
       className="relative w-full overflow-hidden bg-[#FCF7F3] px-4 py-12 md:px-28 md:pt-28 md:pb-36"
     >
-      <MediaImage
-        media={texture(gridTexture)}
-        quality={60}
-        sizes="100vw"
-        className="pointer-events-none absolute inset-0 size-full object-cover opacity-15"
-      />
+      <GridBackdrop />
 
       {/* Two doodles the designer drops in the margins, at the Figma frame's own offsets. Decorative
           and purely desktop — below md there is no margin to put them in. Plain <img>: they are

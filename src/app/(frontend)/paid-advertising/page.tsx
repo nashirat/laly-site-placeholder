@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import type { CSSProperties } from 'react'
 import type { StaticImageData } from 'next/image'
-import gridTexture from '../../../../public/paid-advertising/grid.webp'
 import heroBg from '../../../../public/paid-advertising/hero.webp'
 import { MediaImage } from '@/components/Media/Image'
 import Contact from '@/components/sections/Contact'
@@ -13,6 +12,7 @@ import { Button } from '@/components/ui/Button'
 import { Accordion } from '@/components/ui/Accordion'
 import { InView } from '@/components/ui/InView'
 import { ScratchCover } from '@/components/ui/ScratchCover'
+import { GridBackdrop } from '@/components/ui/GridBackdrop'
 
 export const metadata: Metadata = {
   title: 'Paid Advertising | Laly Agency',
@@ -252,12 +252,7 @@ export default async function PaidAdvertisingPage() {
         // mobile (2234:3818): px 16 / py 48, groups 40 apart
         className="relative w-full overflow-hidden border-t border-[#544D49] bg-[#FCF7F3] px-4 py-12 md:p-28"
       >
-        <MediaImage
-          media={texture(gridTexture)}
-          quality={60}
-          sizes="100vw"
-          className="pointer-events-none absolute inset-0 size-full object-cover opacity-15"
-        />
+        <GridBackdrop />
 
         <div className="relative mx-auto flex w-full max-w-[1232px] flex-col gap-10 md:gap-12">
           <div className="flex flex-col items-center gap-6 text-center md:gap-8">
@@ -417,12 +412,7 @@ export default async function PaidAdvertisingPage() {
         // mobile (2739:9048): px 20, pt 48 / pb 96, 32 between the header and the container
         className="relative w-full overflow-hidden border-y border-[#544D49] bg-[#FCF7F3] px-5 pt-12 pb-24 md:px-40 md:py-28"
       >
-        <MediaImage
-          media={texture(gridTexture)}
-          quality={60}
-          sizes="100vw"
-          className="pointer-events-none absolute inset-0 size-full object-cover opacity-15"
-        />
+        <GridBackdrop />
 
         <div className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 md:gap-12">
           <div className="flex flex-col gap-6 text-center">
