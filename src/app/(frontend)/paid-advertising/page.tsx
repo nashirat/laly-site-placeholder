@@ -216,14 +216,18 @@ export default async function PaidAdvertisingPage() {
           </ul>
 
           <p
-            className="hero-desc entry-copy max-w-[338px] font-sans text-xl md:max-w-[880px] font-normal leading-[1.25] text-[#F7F1EE] md:text-[28px]"
+            // tablet: the 338px mobile cap is what turned three lines into five on an iPad (client
+            // note). In the tablet band the paragraph gets the desktop cap and a size that tracks
+            // the viewport, so the ratio that gives desktop its three lines — 880 of copy at 28px —
+            // holds from 600px up to the md switch.
+            className="hero-desc entry-copy max-w-[338px] font-sans text-xl font-normal leading-[1.25] text-[#F7F1EE] tablet:max-w-[880px] tablet:text-[clamp(18px,3vw,28px)] md:max-w-[880px] md:text-[28px]"
             style={{ animationDelay: '1.05s' }}
           >
             {paid.hero.description.before}
             {/* the designer set this phrase in Neue Haas bold at 24 against the 28px serif — a
                 deliberate voice change mid-sentence, so the CMS stores the sentence in three parts
                 rather than shipping a markup parser */}
-            <strong className="font-display text-lg font-bold tracking-[0.25px] md:text-2xl">
+            <strong className="font-display text-lg font-bold tracking-[0.25px] tablet:text-[clamp(16px,2.6vw,24px)] md:text-2xl">
               {paid.hero.description.emphasis}
             </strong>
             {paid.hero.description.after}

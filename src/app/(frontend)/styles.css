@@ -477,14 +477,18 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   0% {
     transform: none;
     box-shadow: none;
+    background-color: #d1cf95;
   }
   45% {
     transform: translateY(3%) scale(0.96);
     box-shadow: inset 0 0.25cqw 0.6cqw rgba(66, 55, 48, 0.3);
+    /* the client's own value for the pressed state — the mock's olive two shades down */
+    background-color: #807f0d;
   }
   100% {
     transform: none;
     box-shadow: none;
+    background-color: #d1cf95;
   }
 }
 /* The refund mock's ring reveals around the dollar sign (client note on 2148:498) — see RefundMock,
