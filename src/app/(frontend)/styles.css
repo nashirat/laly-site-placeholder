@@ -333,36 +333,6 @@ html.preloader-done .hero-pills > li {
   }
 }
 
-/* Masked slide-in from the right (menu items). Wrapper clips; inner slides translateX -> 0. */
-@keyframes slide-in-right {
-  from {
-    transform: translateX(160px);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-.slide-in-right {
-  animation: slide-in-right 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@keyframes slide-out-right {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(160px);
-  }
-}
-.slide-out-right {
-  animation: slide-out-right 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .slide-in-right,
-  .slide-out-right {
-    animation: none;
-  }
-}
-
 /* Masked label swap (see Button.tsx altLabel) — MENU <-> CLOSE inside the pill. Both labels sit in
    the same grid cell, so the wrapper is as wide/tall as the wider one and the pill never resizes
    mid-swap; overflow clips the pair to that one line. The two slide together: out the top on
