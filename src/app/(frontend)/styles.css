@@ -509,7 +509,9 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     #000 0deg calc(360deg - var(--arrow-sweep)),
     transparent calc(360deg - var(--arrow-sweep)) 360deg
   );
-  transition: --arrow-sweep 1.6s cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint */
+  /* 0.15s in: the gate trips as the mock arrives, and starting on the same frame reads as the ring
+     already having been drawn rather than drawing */
+  transition: --arrow-sweep 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s; /* easeOutQuint */
 }
 /* A full turn, not the 340 that looked like enough: the arrowhead straddles twelve o'clock and
    reaches back past the tail it starts from, so a short sweep leaves a corner of it unpainted —

@@ -21,7 +21,16 @@ import type { MediaDoc } from '@/lib/types'
 // Geometry is measured off the 1031x511 export: ring centre 637,346, band 160 to 300 out from it —
 // wide enough for the arrowhead, which overshoots the stroke on both sides. Radii are cqw so they
 // track the mock's width: 515px in the panel, full-bleed on a phone.
-const BAND = 'circle at 61.78% 67.71%, transparent 0 15.52cqw, #000 15.52cqw 29.1cqw, transparent 29.1cqw'
+const CENTRE = '61.78% 67.71%'
+const BAND = `radial-gradient(circle at ${CENTRE}, transparent 0 15.52cqw, #000 15.52cqw 29.1cqw, transparent 29.1cqw)`
+// The arrowhead is not on the stroke's band: it is a chevron, and its inner tip reaches 90 out from
+// the centre where the band starts at 160. That tip was the bit of arrow left showing before the
+// sweep had started, which is what the client flagged. It gets its own cover, 88 to 162 out and only
+// across the head's own sector — the dollar sign reaches 138 elsewhere but only 81 straight up, so
+// this takes the head's tip without touching it. Sector measured off the export: 342 to 12 degrees,
+// widened by 4 either side.
+const HEAD_SECTOR = `conic-gradient(from 338deg at ${CENTRE}, #000 0deg 38deg, transparent 38deg)`
+const HEAD_BAND = `radial-gradient(circle at ${CENTRE}, transparent 0 8.53cqw, #000 8.53cqw 15.71cqw, transparent 15.71cqw)`
 // export rows 0, 100, 160 and 310 of 511, sampled clear of the artwork
 const GROUND = 'linear-gradient(#F9F3F1 0%, #FCF5F3 20%, #FCF8F5 31%, #FFFCF9 61%)'
 
@@ -36,14 +45,17 @@ export function RefundMock({ media, width }: { media: MediaDoc; width: number })
         className="block h-auto w-full"
       />
 
-      {/* the band the cover is allowed to paint in — nothing outside the ring is ever touched */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{ maskImage: `radial-gradient(${BAND})` }}
-      >
-        {/* the cone that closes; --arrow-sweep is registered in styles.css so it can be transitioned */}
-        <div className="arrow-sweep absolute inset-0" style={{ background: GROUND }} />
+      {/* The cone that closes — outermost now, so everything under it retreats on the same clock.
+          --arrow-sweep is registered in styles.css so it can be transitioned. */}
+      <div aria-hidden className="arrow-sweep absolute inset-0">
+        {/* the stroke's band: nothing outside the ring is ever touched */}
+        <div className="absolute inset-0" style={{ maskImage: BAND, background: GROUND }} />
+
+        {/* and the arrowhead's tip, inside it. Two masks, so two elements — nesting intersects them
+            without mask-composite, same as everywhere else on this page. */}
+        <div className="absolute inset-0" style={{ maskImage: HEAD_SECTOR }}>
+          <div className="absolute inset-0" style={{ maskImage: HEAD_BAND, background: GROUND }} />
+        </div>
       </div>
     </InView>
   )
