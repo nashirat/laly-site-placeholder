@@ -4,6 +4,9 @@ import type { StaticImageData } from 'next/image'
 import heroBg from '../../../../public/paid-advertising/hero.webp'
 import { MediaImage } from '@/components/Media/Image'
 import { CallsWidget } from '@/components/sections/CallsWidget'
+import { DashboardMock } from '@/components/sections/DashboardMock'
+import { RefundMock } from '@/components/sections/RefundMock'
+import { WebsiteMock } from '@/components/sections/WebsiteMock'
 import Contact from '@/components/sections/Contact'
 import Note from '@/components/sections/Note'
 import { getHome, getPaid } from '@/lib/cms'
@@ -81,47 +84,39 @@ function Panel({
   graphic?: ReactNode
 }) {
   return (
-    // mobile only: the whole panel slides up on its own gate, on the Results cards' clock (designer
-    // note on 2148:498). The gate carries the slot's borders and h-full, so the keylines stay put
-    // while the panel's contents travel. A panel is most of a phone screen tall, hence the inset.
-    <InView className={`h-full ${className}`} rootMargin="0px 0px -20% 0px">
-      <div
-        // mobile (2234:3824 and siblings): px 16 / py 40, copy over mock, gap 40 between them
-        // tablet: the stack centres in the frame — client note, 600px up to the md switch
-        className={`mobile-reveal flex h-full flex-col gap-10 px-4 py-10 tablet:items-center tablet:text-center md:px-10 md:py-16 ${
-          side ? 'md:flex-row md:items-start md:justify-between' : 'md:items-center'
-        }`}
-      >
-        <div className="flex flex-col gap-5 md:flex-1 md:gap-6">
-          {/* heading/h3/m 32 mobile — heading/h3/l 40 desktop; New Spirit / 125% / -0.5px.
-              whitespace-pre-line, so an Enter in the CMS is a real break here too, the way it already
-              is on the guarantee and the pricing heading. No break authored = it just wraps. */}
-          <h3 className="whitespace-pre-line font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#292624] md:text-[40px]">
-            {panel.title}
-          </h3>
-          {/* body/m 18 mobile — body/l 20 desktop; Neue Haas / 125% / 0.25px */}
-          <p className="font-display text-lg font-normal leading-[1.25] tracking-[0.25px] text-[#544D49] md:text-xl">
-            {panel.body}
-          </p>
-        </div>
-        {/* the cap is a per-slot number, so it is an inline max-width rather than four arbitrary
-            Tailwind classes that only differ by the value.
-            .graphic-fade is the client's second note: below md the mock fades in on its own, a beat
-            after the panel it sits in. */}
-        <div
-          className={`graphic-fade w-full ${side ? 'shrink-0' : ''}`}
-          style={{ maxWidth: width }}
-        >
-          {graphic ?? (
-            <MediaImage
-              media={panel.image}
-              sizes={`(min-width: 1152px) ${width}px, 100vw`}
-              className="h-auto w-full"
-            />
-          )}
-        </div>
+    // No gate of its own: the whole bordered container slides up as one element (designer note on
+    // 2148:498), so the reveal lives on the container's <InView> below.
+    <div
+      // mobile (2234:3824 and siblings): px 16 / py 40, copy over mock, gap 40 between them
+      // tablet: the stack centres in the frame — client note, 600px up to the md switch
+      className={`flex h-full flex-col gap-10 px-4 py-10 tablet:items-center tablet:text-center md:px-10 md:py-16 ${
+        side ? 'md:flex-row md:items-start md:justify-between' : 'md:items-center'
+      } ${className}`}
+    >
+      <div className="flex flex-col gap-5 md:flex-1 md:gap-6">
+        {/* heading/h3/m 32 mobile — heading/h3/l 40 desktop; New Spirit / 125% / -0.5px.
+            whitespace-pre-line, so an Enter in the CMS is a real break here too, the way it already
+            is on the guarantee and the pricing heading. No break authored = it just wraps. */}
+        <h3 className="whitespace-pre-line font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#292624] md:text-[40px]">
+          {panel.title}
+        </h3>
+        {/* body/m 18 mobile — body/l 20 desktop; Neue Haas / 125% / 0.25px */}
+        <p className="font-display text-lg font-normal leading-[1.25] tracking-[0.25px] text-[#544D49] md:text-xl">
+          {panel.body}
+        </p>
       </div>
-    </InView>
+      {/* the cap is a per-slot number, so it is an inline max-width rather than four arbitrary
+          Tailwind classes that only differ by the value */}
+      <div className={`w-full ${side ? 'shrink-0' : ''}`} style={{ maxWidth: width }}>
+        {graphic ?? (
+          <MediaImage
+            media={panel.image}
+            sizes={`(min-width: 1152px) ${width}px, 100vw`}
+            className="h-auto w-full"
+          />
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -293,32 +288,55 @@ export default async function PaidAdvertisingPage() {
           {/* The four panels are indexed, not mapped: the 1 / 2 / 1 arrangement and the borders
               between the slots are the design, so the shape stays in the markup and only the copy
               and the mock come from the CMS. */}
-          <div className="w-full border border-[#E7DCD4] bg-[#FFFCF9]">
-            <Panel side panel={paid.whatYouGet.panels[0]} width={PANEL_WIDTHS[0]} />
-
-            <div className="grid border-t border-[#E7DCD4] md:grid-cols-2">
-              {/* the one mock that is live DOM — the pie wipes in and the total counts up. Its
-                  panel.image is still in the CMS as the fallback nobody renders; delete it there
-                  once this has been signed off. */}
+          {/* one gate for the lot: the whole bordered frame slides up as a single element, the way
+              the FAQ box does — not four panels each on their own trip line.
+              InView observes this wrapper, so the trip is on the frame's TOP edge, and the frame is
+              three or four screens tall on a phone. -25% is the balance: deep enough that the move
+              is not over before you reach it, shallow enough that it does not sit there waiting. */}
+          <InView rootMargin="0px 0px -25% 0px">
+            <div className="mobile-reveal w-full border border-[#E7DCD4] bg-[#FFFCF9]">
+              {/* the export plus one live button, which presses itself once when the mock arrives */}
               <Panel
-                panel={paid.whatYouGet.panels[1]}
-                width={PANEL_WIDTHS[1]}
-                graphic={<CallsWidget />}
+                side
+                panel={paid.whatYouGet.panels[0]}
+                width={PANEL_WIDTHS[0]}
+                graphic={
+                  <WebsiteMock media={paid.whatYouGet.panels[0].image} width={PANEL_WIDTHS[0]} />
+                }
               />
+
+              <div className="grid border-t border-[#E7DCD4] md:grid-cols-2">
+                {/* the one mock that is live DOM — the pie wipes in and the total counts up. Its
+                    panel.image is still in the CMS as the fallback nobody renders; delete it there
+                    once this has been signed off. */}
+                <Panel
+                  panel={paid.whatYouGet.panels[1]}
+                  width={PANEL_WIDTHS[1]}
+                  graphic={<CallsWidget />}
+                />
+                {/* the export plus the wipe that draws its call-volume line in */}
+                <Panel
+                  className="border-t border-[#E7DCD4] md:border-t-0 md:border-l"
+                  panel={paid.whatYouGet.panels[2]}
+                  width={PANEL_WIDTHS[2]}
+                  graphic={
+                    <DashboardMock media={paid.whatYouGet.panels[2].image} width={PANEL_WIDTHS[2]} />
+                  }
+                />
+              </div>
+
+              {/* the export plus the cone that reveals its ring around the dollar sign */}
               <Panel
-                className="border-t border-[#E7DCD4] md:border-t-0 md:border-l"
-                panel={paid.whatYouGet.panels[2]}
-                width={PANEL_WIDTHS[2]}
+                side
+                className="border-t border-[#E7DCD4]"
+                panel={paid.whatYouGet.panels[3]}
+                width={PANEL_WIDTHS[3]}
+                graphic={
+                  <RefundMock media={paid.whatYouGet.panels[3].image} width={PANEL_WIDTHS[3]} />
+                }
               />
             </div>
-
-            <Panel
-              side
-              className="border-t border-[#E7DCD4]"
-              panel={paid.whatYouGet.panels[3]}
-              width={PANEL_WIDTHS[3]}
-            />
-          </div>
+          </InView>
         </div>
       </section>
 
@@ -395,7 +413,8 @@ export default async function PaidAdvertisingPage() {
             {paid.pricing.tiers.map((tier, i) => (
               <div
                 key={tier.label}
-                style={{ '--card-delay': `${i * 0.15}s` } as CSSProperties}
+                // 0.3s per card, up from 0.15 — client asked the second card to trail further
+                style={{ '--card-delay': `${i * 0.3}s` } as CSSProperties}
                 className={`card-fade relative flex flex-col justify-between gap-8 border bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
                   tier.badge
                     ? 'border-[#FF6D6A] shadow-[0_0_6px_0_rgba(66,55,48,0.2),1px_1px_6px_0_rgba(66,55,48,0.2)]'

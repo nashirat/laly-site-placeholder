@@ -42,7 +42,8 @@ export function Pricing({ content }: { content: PricingContent }) {
           {content.tiers.map((tier, i) => (
             <div
               key={tier.label}
-              style={{ '--card-delay': `${i * 0.15}s` } as CSSProperties}
+              // 0.3s per card, up from 0.15 — client asked the second card to trail further
+              style={{ '--card-delay': `${i * 0.3}s` } as CSSProperties}
               className={`card-fade relative flex flex-col justify-between gap-8 border bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
                 tier.badge
                   ? 'border-[#FF6D6A] shadow-[0_0_6px_0_rgba(66,55,48,0.2),1px_1px_6px_0_rgba(66,55,48,0.2)]'

@@ -473,16 +473,13 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
 }
 
-/* Mobile-only slide-up for the blocks that sit inside a border: the "What you get" panels, the FAQ
-   rows. Same gesture and clock as the Results cards, but on the section's own <InView> rather than
+/* Mobile-only slide-up for the blocks that sit inside a border: the "What you get" frame, the FAQ
+   box. One gate per frame, whole thing at once — not per card, per row or per graphic.
+   Same gesture and clock as the Results cards, but on the section's own <InView> rather than
    the dev-panel .section-*-reveal classes, so it always runs. Desktop is untouched — those stacks
    were signed off flat, and the note that asked for this was a mobile note.
    --card-delay staggers a group from the index, the same knob the pricing cards use.
-   The cut is `md`, which is 1152 here — not the 768 a hand-written media query defaults to.
-
-   .graphic-fade is the second note on the same panels: the mock fades on its own, a beat behind the
-   panel it sits in. Opacity only — the panel is already carrying the travel, and moving the mock a
-   second time inside a moving parent reads as a stutter. */
+   The cut is `md`, which is 1152 here — not the 768 a hand-written media query defaults to. */
 @media (width < 72rem) {
   .mobile-reveal {
     opacity: 0;
@@ -491,21 +488,101 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   .reveal-gate.is-visible .mobile-reveal {
     animation: fade-up-strong 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--card-delay, 0s) forwards;
   }
-  .graphic-fade {
-    opacity: 0;
-  }
-  .reveal-gate.is-visible .graphic-fade {
-    animation: fade-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .mobile-reveal,
-  .graphic-fade {
+  .mobile-reveal {
     opacity: 1;
     transform: none;
   }
-  .reveal-gate.is-visible .mobile-reveal,
-  .reveal-gate.is-visible .graphic-fade {
+  .reveal-gate.is-visible .mobile-reveal {
+    animation: none;
+  }
+}
+
+/* The landing-page mock's CTA presses itself once, a beat after its panel has arrived (client note
+   on 2148:498). Down, in and darker, then back — ease-in-out, because a press is a round trip and
+   the page's usual easeOutQuint would land it and leave it. The button is live DOM over the flat
+   export (see WebsiteMock); the shadow is inset so nothing grows outside the patch behind it. */
+@keyframes button-press {
+  0% {
+    transform: none;
+    box-shadow: none;
+  }
+  45% {
+    transform: translateY(3%) scale(0.96);
+    box-shadow: inset 0 0.25cqw 0.6cqw rgba(66, 55, 48, 0.3);
+  }
+  100% {
+    transform: none;
+    box-shadow: none;
+  }
+}
+/* The refund mock's ring reveals around the dollar sign (client note on 2148:498) — see RefundMock,
+   where a patch of the card's ground covers the arrow. This is the cone that patch still covers: it
+   starts at the arrow's tail (316 degrees) and retreats anticlockwise, which is the direction the
+   arrow is drawn, so the arrowhead is the last thing to land.
+   Anticlockwise from a clockwise gradient: the covered wedge is the slice that ENDS at 360deg, so
+   it gives ground backwards from the start angle. Registered property, same reason as --pie-sweep. */
+@property --arrow-sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.arrow-sweep {
+  --arrow-sweep: 0deg;
+  mask-image: conic-gradient(
+    from 316deg at 61.78% 67.71%,
+    #000 0deg calc(360deg - var(--arrow-sweep)),
+    transparent calc(360deg - var(--arrow-sweep)) 360deg
+  );
+  transition: --arrow-sweep 1.6s cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint */
+}
+/* A full turn, not the 340 that looked like enough: the arrowhead straddles twelve o'clock and
+   reaches back past the tail it starts from, so a short sweep leaves a corner of it unpainted —
+   which reads as a white bite out of the arrow. The head is still the last thing to land. */
+.mock-gate.is-visible .arrow-sweep {
+  --arrow-sweep: 360deg;
+}
+@media (prefers-reduced-motion: reduce) {
+  .arrow-sweep {
+    --arrow-sweep: 360deg;
+    transition: none;
+  }
+}
+
+/* The dashboard mock's call-volume line draws itself left to right (client note on 2148:498). The
+   patch over it is the chart's own ground, so retracting it to the right is the line arriving —
+   see DashboardMock. Origin right, because the covered part has to shrink from the left. */
+@keyframes chart-wipe {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+.chart-wipe {
+  transform-origin: right;
+}
+.mock-gate.is-visible .chart-wipe {
+  animation: chart-wipe 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chart-wipe {
+    transform: scaleX(0);
+  }
+  .mock-gate.is-visible .chart-wipe {
+    animation: none;
+  }
+}
+
+/* .mock-gate, not any .reveal-gate: the mock carries its own <InView>, and keying off the panel's
+   would fire this while the button is still a screen below the fold on a phone. */
+.mock-gate.is-visible .button-press {
+  animation: button-press 0.9s ease-in-out 0.5s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mock-gate.is-visible .button-press {
     animation: none;
   }
 }

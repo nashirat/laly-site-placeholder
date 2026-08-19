@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { NavMenu } from '@/components/NavMenu'
 import { header } from '@/lib/mock/globals'
 
@@ -17,20 +18,24 @@ import { header } from '@/lib/mock/globals'
 export default function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-19 items-center justify-between bg-[#fffcf9] px-5 sm:px-10">
-      <img
-        src="/primarylogo.svg"
-        alt="Laly"
-        width={120}
-        height={28}
-        className="logo-dark h-7 w-30"
-      />
-      <img
-        src="/primarylogo-light.svg"
-        alt="Laly"
-        width={120}
-        height={28}
-        className="logo-light hidden h-7 w-30"
-      />
+      {/* home link — a plain next/link, which is all the curtain transition needs: RouteTransition
+          intercepts every internal <a> at the document, so nothing else has to be wired up */}
+      <Link href="/" aria-label="Laly Agency — home" className="flex items-center">
+        <img
+          src="/primarylogo.svg"
+          alt="Laly"
+          width={120}
+          height={28}
+          className="logo-dark h-7 w-30"
+        />
+        <img
+          src="/primarylogo-light.svg"
+          alt="Laly"
+          width={120}
+          height={28}
+          className="logo-light hidden h-7 w-30"
+        />
+      </Link>
       {/* whole global, not just nav — the mobile dropdown also renders the socials and copyright */}
       <NavMenu {...header} />
     </header>
