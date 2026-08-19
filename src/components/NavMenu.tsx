@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/Button'
 import type { HeaderContent } from '@/lib/types'
@@ -22,6 +22,24 @@ import type { HeaderContent } from '@/lib/types'
 // eye reads at the end. Slightly front-loaded (0.5,0 not 0.37,0) so the tap still feels answered.
 export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) {
   const [open, setOpen] = useState(false)
+
+  // The dark-hero pages run the bar transparent with a light logo, which is unreadable once this
+  // cream sheet is down behind it. styles.css owns that swap off <body>, so this only has to say
+  // when the sheet is open — same shape as HeaderGround's data-past-hero.
+  //
+  // On the way out the flag is held 675ms: the bar stays cream while the sheet is most of the way
+  // up, then fades back to transparent, rather than turning transparent over a sheet still sitting
+  // over it. It is a timer here rather than a transition-delay in the CSS because that
+  // delay would also land on the scroll swap, and scrolling back up into the hero would then sit on
+  // a cream bar for most of a second.
+  useEffect(() => {
+    if (open) {
+      document.body.toggleAttribute('data-menu-open', true)
+      return
+    }
+    const t = setTimeout(() => document.body.removeAttribute('data-menu-open'), 675)
+    return () => clearTimeout(t)
+  }, [open])
 
   return (
     <div className="relative">

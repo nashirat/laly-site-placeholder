@@ -46,26 +46,38 @@
    the whole page's ground here — there is nothing to swap back to mid-scroll.
    Only while the hero is still the ground under the bar: HeaderGround stamps `data-past-hero` on
    <body> once it has scrolled by, and everything below reverts to the shipped cream bar — otherwise
-   the light logo ends up on a cream section with the page showing through. */
+   the light logo ends up on a cream section with the page showing through.
+   And only while the menu is shut: NavMenu stamps `data-menu-open` on <body> while the sheet is
+   down, and the bar goes back to cream under it — the sheet IS cream, so a transparent bar over it
+   is a seam, and the light logo and light MENU toggle would be invisible against it. Everything
+   here transitions, so opening the menu fades the bar, the logo and the toggle together. */
 body:has(.hero-dark) header {
   transition: background-color 250ms ease;
 }
-body:has(.hero-dark):not([data-past-hero]) header {
+header .logo-dark,
+header .logo-light {
+  transition: opacity 250ms ease;
+}
+/* the light logo is stacked over the dark one (see Header.tsx), so this is a cross-fade */
+header .logo-light {
+  opacity: 0;
+}
+body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header {
   background-color: transparent;
 }
-body:has(.hero-dark):not([data-past-hero]) header .logo-dark {
-  display: none;
+body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header .logo-dark {
+  opacity: 0;
 }
-body:has(.hero-dark):not([data-past-hero]) header .logo-light {
-  display: block;
+body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header .logo-light {
+  opacity: 1;
 }
 /* the MENU toggle, i.e. Button's `outline` variant flipped to `outlineInverse` without threading a
-   prop through NavMenu for one page */
-body:has(.hero-dark):not([data-past-hero]) header button {
+   prop through NavMenu for one page. Button ships transition-colors, so this fades on its own. */
+body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header button {
   border-color: #e7dcd4;
   color: #e7dcd4;
 }
-body:has(.hero-dark):not([data-past-hero]) header button:hover {
+body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header button:hover {
   background-color: rgb(255 255 255 / 0.1);
 }
 

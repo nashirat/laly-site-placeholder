@@ -20,20 +20,17 @@ export default function Header() {
     <header className="fixed inset-x-0 top-0 z-50 flex h-19 items-center justify-between bg-[#fffcf9] px-5 sm:px-10">
       {/* home link — a plain next/link, which is all the curtain transition needs: RouteTransition
           intercepts every internal <a> at the document, so nothing else has to be wired up */}
-      <Link href="/" aria-label="Laly Agency — home" className="flex items-center">
-        <img
-          src="/primarylogo.svg"
-          alt="Laly"
-          width={120}
-          height={28}
-          className="logo-dark h-7 w-30"
-        />
+      {/* The two logos are stacked, not swapped in and out of flow: styles.css cross-fades them on
+          the bar's own 250ms, and a display swap would land the new one in one frame partway through
+          that fade. The link carries the accessible name, so both images are decorative. */}
+      <Link href="/" aria-label="Laly Agency — home" className="relative flex items-center">
+        <img src="/primarylogo.svg" alt="" width={120} height={28} className="logo-dark h-7 w-30" />
         <img
           src="/primarylogo-light.svg"
-          alt="Laly"
+          alt=""
           width={120}
           height={28}
-          className="logo-light hidden h-7 w-30"
+          className="logo-light absolute inset-0 h-7 w-30"
         />
       </Link>
       {/* whole global, not just nav — the mobile dropdown also renders the socials and copyright */}
