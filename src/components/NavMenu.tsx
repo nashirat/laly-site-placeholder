@@ -10,9 +10,9 @@ import type { HeaderContent } from '@/lib/types'
 // The panel drops down from under the header bar carrying its own cream ground and keyline. md+ used
 // to get something else entirely: four pills sliding in from the right, staggered, each with its own
 // rounded surface. That read as pills floating over whatever was scrolled behind them, which is the
-// contrast problem the designer flagged on mobile — so desktop now takes the same sheet. The ground
-// runs the full width at both sizes; only the contents change side, centred below md and right
-// aligned at md+, under the toggle they came out of.
+// contrast problem the designer flagged on mobile — so desktop now takes the same sheet. Ground and
+// contents both centre at every width; the only thing that changes is the links' axis, stacked on a
+// phone and one row across the middle of the sheet at md+.
 //
 // bajgartoffice.com (the reference the designer sent) grows the panel's height from 0 under the
 // bar. This slides the whole sheet down out of the bar instead — same read, but the keyline can
@@ -55,19 +55,19 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
         inert={!open}
       >
         {/* Figma: 20 padding, 48 between groups. The bar above already contributes 24 under the
-            logo, so the top inset is the missing 44 rather than another 20.
-            md+ right-aligns and takes the header's own 40px side inset, so the links land under the
-            toggle rather than in the middle of an empty sheet. */}
+            logo, so the top inset is the missing 44 rather than another 20. */}
         <nav
           aria-label="Primary"
-          className={`pointer-events-auto flex flex-col items-center gap-12 border-b border-[#544D49] bg-[#fffcf9] px-5 pt-11 pb-5 transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none sm:px-10 md:items-end ${
+          className={`pointer-events-auto flex flex-col items-center gap-12 border-b border-[#544D49] bg-[#fffcf9] px-5 pt-11 pb-5 transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none sm:px-10 ${
             open ? 'translate-y-0' : '-translate-y-full'
           }`}
         >
           {/* one handler on the wrapper instead of per link: the header lives in the layout, so a
               route change never unmounts this and the panel would stay open behind the new page */}
+          {/* stacked on a phone, one centred row at md+ — the sheet is the full width there and the
+              links sit in the middle of it, not under the toggle */}
           <div
-            className="flex flex-col items-center gap-5 md:items-end"
+            className="flex flex-col items-center gap-5 md:flex-row md:gap-5"
             onClick={() => setOpen(false)}
           >
             {items.map((item) => (
@@ -78,7 +78,7 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
           </div>
 
           {socials.length > 0 && (
-            <div className="flex items-center justify-center gap-3 md:justify-end">
+            <div className="flex items-center justify-center gap-3">
               {socials.map((s) => (
                 <a
                   key={s.platform}
@@ -99,7 +99,7 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
           )}
 
           {copyright && (
-            <p className="text-center font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#9F9188] md:text-right">
+            <p className="text-center font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#9F9188]">
               {copyright}
             </p>
           )}
