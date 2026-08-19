@@ -72,8 +72,8 @@ export const branding: BrandingContent = {
       },
     ],
   },
-  // Figma 2767:9349. The rail names all four phases; only Months 1–6 has been written, so the other
-  // three render their tab and an empty card until the copy lands.
+  // Figma 2767:9349 (desktop) / 2739:8985 (mobile) — all four phases, copy off the mobile frame,
+  // which is where the designer wrote them out.
   compound: {
     label: 'The Compound Effect',
     heading: 'Every month\nbuilds on the last.',
@@ -84,9 +84,21 @@ export const branding: BrandingContent = {
         title: 'Foundation',
         body: 'Site optimization, content creation, social launch, OOH placements go live. Google begins indexing and recognizing your site. Brand awareness seeds planted.',
       },
-      { period: 'Months 6–12' },
-      { period: 'Months 12–18' },
-      { period: 'Year 2+' },
+      {
+        period: 'Months 6–12',
+        title: 'Traction',
+        body: 'First organic rankings appear. Social engagement compounds. Brand name searches begin increasing. Direct leads start flowing from organic search.',
+      },
+      {
+        period: 'Months 12–18',
+        title: 'Momentum',
+        body: 'Organic traffic rival paid ad volume. Cost per acquisition drops. Referrals increase with community recognition and social proof. Ad dependency decreases.',
+      },
+      {
+        period: 'Year 2+',
+        title: 'Dominance',
+        body: 'Multi-channel acceleration in full effect. You own page one of search, the social media feed, and local recognition. Competitors can’t replicate 18 months of compounding in a single quarter.',
+      },
     ],
   },
   // Figma 2796:9967. Identical to /paid-advertising's pricing block, copy included — kept as its own

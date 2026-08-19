@@ -5,8 +5,14 @@ import { EMBER_WASH } from '@/lib/palettes'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { CompoundContent } from '@/lib/types'
 
-// Figma 2767:9349 — "The Compound Effect" on /branding. Argument on the left, one phase card in the
-// middle, and a vertical progress rail on the right that picks which phase the card shows.
+// Figma 2767:9349 (desktop) / 2739:8985 (mobile) — "The Compound Effect" on /branding. Argument on
+// the left, one phase card in the middle, and a vertical progress rail on the right that picks which
+// phase the card shows.
+//
+// The phone frame has no rail and no picker: it centres the argument and then lists all four phases,
+// tab and card, one under the other. So the rail is desktop-only and the cards are all rendered at
+// both sizes — md+ just hides the three that are not current. One list, one set of markup, and the
+// phases stay in the document on a phone where there is nothing to click them with.
 //
 // The rail's dots are two 28px svgs in Figma; they are a ring, a fill and a 4px dot, so they are
 // CSS here rather than two more files in /public.
@@ -24,24 +30,22 @@ const hardBreaks = (text: string) =>
 
 export function CompoundEffect({ content }: { content: CompoundContent }) {
   const [active, setActive] = useState(0)
-  const phase = content.phases[active]
   const last = content.phases.length - 1
 
   return (
     <section
       aria-label={content.label}
       // Figma frame: pl 112, pr 24 (the rail's labels carry their own inset), py 112, and it opens
-      // on the same 1px keyline the hero closes with. Mobile has no frame yet — px 16 / py 48.
-      className="w-full border-t border-[#544D49] bg-[#292624] px-4 py-12 md:py-28 md:pr-6 md:pl-28"
+      // on the same 1px keyline the hero closes with. Mobile (2739:8985): px 20, pt 48, pb 96.
+      className="w-full border-t border-[#544D49] bg-[#292624] px-5 pt-12 pb-24 md:py-28 md:pr-6 md:pl-28"
     >
-      <div className="mx-auto flex w-full max-w-[1304px] flex-col gap-10 md:flex-row md:items-center md:gap-16">
-        {/* 538px is Figma's column. Order is copy / rail / card on a phone and copy / card / rail at
-            md+, where there is room to put the rail against the section's right edge. */}
-        <div className="flex w-full flex-col gap-8 md:w-[538px]">
+      <div className="mx-auto flex w-full max-w-[1304px] flex-col gap-12 md:flex-row md:items-center md:gap-16">
+        {/* 538px is Figma's column. Centred on a phone, where the copy is the whole width; left
+            against the card and rail once there is room for all three. */}
+        <div className="flex w-full flex-col gap-6 text-center md:w-[538px] md:gap-8 md:text-left">
           <div className="flex flex-col gap-6">
-            {/* the one eyebrow that is not centred — this column is left-aligned, so no mx-auto.
-                Widest label on the site, hence the bigger travel box. */}
-            <BracketLabel className="w-72 text-[#FF6D6A] md:w-[460px]">
+            {/* Widest label on the site, hence the bigger travel box */}
+            <BracketLabel className="mx-auto w-72 text-[#FF6D6A] md:mx-0 md:w-[460px]">
               {content.label}
             </BracketLabel>
             <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:text-[64px]">
@@ -57,10 +61,10 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
           </p>
         </div>
 
-        {/* The rail. One control set for both layouts: at md+ it is the vertical progress column
-            Figma draws, and below it collapses to a scrollable row of the same labels with the
-            connectors dropped, because there is no height to draw them against. */}
-        <ol className="order-2 flex w-full gap-6 overflow-x-auto md:order-3 md:ml-auto md:w-auto md:flex-col md:gap-0 md:self-stretch md:overflow-visible">
+        {/* The rail — the vertical progress column Figma draws, and the picker for the card beside
+            it. Desktop only: the phone frame lists every phase instead, so there is nothing left for
+            it to choose. */}
+        <ol className="order-2 hidden md:order-3 md:ml-auto md:flex md:w-auto md:flex-col md:gap-0 md:self-stretch">
           {content.phases.map((p, i) => {
             const selected = i === active
             return (
@@ -99,32 +103,40 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
           })}
         </ol>
 
-        {/* 458px is Figma's column. The tab hugs its label and shares the card's top edge — three
-            borders on the tab, four on the card, so the seam between them stays 1px. */}
-        <div className="order-3 flex w-full flex-col items-start md:order-2 md:w-[458px]">
-          <div
-            className="border-x border-t border-[#3C3734] px-2 py-1"
-            style={{ backgroundImage: EMBER_WASH }}
-          >
-            <p className="font-mono text-sm font-normal whitespace-nowrap uppercase leading-[1.4] tracking-[1px] text-[#FCF7F3] md:text-lg">
-              {phase.period}
-            </p>
-          </div>
+        {/* 458px is Figma's column. Every phase is here; md+ leaves only the one the rail points at.
+            The tab hugs its label and shares its card's top edge — three borders on the tab, four on
+            the card, so the seam between them stays 1px. */}
+        <div className="order-3 flex w-full flex-col gap-4 md:order-2 md:w-[458px] md:gap-0">
+          {content.phases.map((phase, i) => (
+            <div
+              key={phase.period}
+              className={`flex w-full flex-col items-start ${i === active ? '' : 'md:hidden'}`}
+            >
+              <div
+                className="border-x border-t border-[#3C3734] px-2 py-1"
+                style={{ backgroundImage: EMBER_WASH }}
+              >
+                <p className="font-mono text-sm font-normal whitespace-nowrap uppercase leading-[1.4] tracking-[1px] text-[#FCF7F3] md:text-lg">
+                  {phase.period}
+                </p>
+              </div>
 
-          <div className="flex w-full flex-col gap-3 border border-[#3C3734] bg-[rgba(21,20,20,0.32)] p-6">
-            {/* A phase with no copy yet renders the tab and an empty card rather than inventing a
-                headline for it. Fill in mock/branding.ts as the copy lands. */}
-            {phase.title && (
-              <p className="w-full font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3] md:text-[40px]">
-                {hardBreaks(phase.title)}
-              </p>
-            )}
-            {phase.body && (
-              <p className="w-full font-display text-lg font-normal leading-[1.25] tracking-[0.25px] text-[#E7DCD4] md:text-2xl">
-                {phase.body}
-              </p>
-            )}
-          </div>
+              <div className="flex w-full flex-col gap-3 border border-[#3C3734] bg-[rgba(21,20,20,0.32)] p-6">
+                {/* A phase with no copy yet renders the tab and an empty card rather than inventing
+                    a headline for it. Fill in mock/branding.ts as the copy lands. */}
+                {phase.title && (
+                  <p className="w-full font-sans text-[40px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3]">
+                    {hardBreaks(phase.title)}
+                  </p>
+                )}
+                {phase.body && (
+                  <p className="w-full font-display text-xl font-normal leading-[1.25] tracking-[0.25px] text-[#E7DCD4] md:text-2xl">
+                    {phase.body}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
