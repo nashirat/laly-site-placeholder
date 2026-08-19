@@ -54,18 +54,24 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
         className="pointer-events-none fixed inset-x-0 top-19 bottom-0 z-40 overflow-hidden"
         inert={!open}
       >
-        {/* Figma: 20 padding, 48 between groups. The bar above already contributes 24 under the
-            logo, so the top inset is the missing 44 rather than another 20. */}
+        {/* Figma 3039:2055 — panel padding 20, groups 48 apart, and the sheet closes on the
+            #544D49 keyline. That frame draws the bar inside itself and measures the first 48 from
+            the logo's bottom edge; ours is a 76px bar that this sheet hangs under, and the logo
+            bottoms out 24px above it — so the top inset is the 24 that is left, not another 20. */}
         <nav
           aria-label="Primary"
-          className={`pointer-events-auto flex flex-col items-center gap-12 border-b border-[#544D49] bg-[#fffcf9] px-5 pt-11 pb-5 transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none sm:px-10 ${
+          className={`pointer-events-auto flex flex-col items-center gap-12 border-b border-[#544D49] bg-[#fffcf9] px-5 pt-11 pb-5 transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none sm:px-10 md:pt-6 ${
             open ? 'translate-y-0' : '-translate-y-full'
           }`}
         >
           {/* one handler on the wrapper instead of per link: the header lives in the layout, so a
               route change never unmounts this and the panel would stay open behind the new page */}
-          {/* stacked on a phone, one centred row at md+ — the sheet is the full width there and the
-              links sit in the middle of it, not under the toggle */}
+          {/* Stacked on a phone, one centred row 20 apart at md+ (Figma 3039:2055). The 430px frame
+              draws that row on a phone too, but it only fits at 430 — narrower phones wrap it, and
+              the stack is what shipped and works, so the row stays a desktop thing.
+              Figma keylines these pills #292624 where Button's outline variant ships #262626 — three
+              values on one channel, and overriding it here would be one arbitrary border-colour
+              utility fighting another for cascade order. Left alone. */}
           <div
             className="flex flex-col items-center gap-5 md:flex-row md:gap-5"
             onClick={() => setOpen(false)}
