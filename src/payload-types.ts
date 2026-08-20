@@ -170,11 +170,11 @@ export interface Page {
    */
   title: string;
   /**
-   * The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising' is the one that exists.
+   * The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising' and 'branding' are the ones that exist.
    */
   slug: string;
   /**
-   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Paid Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising).
+   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding).
    */
   content: (
     | HeroBlock
@@ -645,9 +645,12 @@ export interface PositioningBlock {
   /**
    * One sentence in three parts: the middle one is the medium-weight run set against the serif. Mind the spaces at the joins.
    */
-  body?: {
+  body: {
     before: string;
     emphasis: string;
+    /**
+     * Starts with the punctuation that closes the emphasised phrase.
+     */
     after: string;
   };
   /**
@@ -663,18 +666,42 @@ export interface PositioningBlock {
  * via the `definition` "SystemBlock".
  */
 export interface SystemBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the section.
+   */
   label: string;
+  /**
+   * Press Enter for the authored break — the designer set two lines.
+   */
   heading: string;
-  body?: {
+  /**
+   * The argument, in three parts: the middle one is the bold thesis. Leave a blank line for a paragraph gap.
+   */
+  body: {
     before: string;
     emphasis: string;
+    /**
+     * Starts with the punctuation that closes the emphasised phrase.
+     */
     after: string;
   };
+  /**
+   * The three cards, back to front — the last row starts on top, and the deck cycles from there so each takes the front in turn. Each row keeps its own colour, which comes from its position here.
+   */
   chain: {
     title: string;
-    blurb?: {
+    /**
+     * Usually just "Before". Fill in Emphasis and After as well to set one word in italics mid-sentence, the way the design does on the front card.
+     */
+    blurb: {
       before: string;
+      /**
+       * Optional. Rendered italic.
+       */
       emphasis?: string | null;
+      /**
+       * Only read when Emphasis is filled in.
+       */
       after?: string | null;
     };
     id?: string | null;
@@ -688,17 +715,35 @@ export interface SystemBlock {
  * via the `definition` "ChannelsBlock".
  */
 export interface ChannelsBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the section.
+   */
   label: string;
   heading: string;
+  /**
+   * One card per channel. The arrows cycle round, so any number works — with one they go nowhere. Every card is laid out at the height of the tallest, so a much longer row grows all three.
+   */
   slides: {
     title: string;
+    /**
+     * The pull-quote under the title, a size up from the paragraph.
+     */
     lede: string;
     body: string;
+    /**
+     * The figures in the panel beside the copy. A pair in the design.
+     */
     stats: {
+      /**
+       * The big number, e.g. "260%". Free text — not counted up.
+       */
       value: string;
       label: string;
       id?: string | null;
     }[];
+    /**
+     * Closes the panel, under a rule. Type the quotation marks.
+     */
     quote: string;
     id?: string | null;
   }[];
@@ -711,11 +756,29 @@ export interface ChannelsBlock {
  * via the `definition` "CompoundBlock".
  */
 export interface CompoundBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the section.
+   */
   label: string;
+  /**
+   * Press Enter for the authored break — the designer set two lines.
+   */
   heading: string;
+  /**
+   * Leave a blank line between paragraphs; both gaps are authored.
+   */
   body: string;
+  /**
+   * The timeline, earliest first. On desktop the section holds the page and each scroll moves one phase; on a phone they are simply listed. Adding a row lengthens both.
+   */
   phases: {
+    /**
+     * The rail label and the tab above the card, e.g. "Months 1–6".
+     */
     period: string;
+    /**
+     * Every Enter you press is a real line break.
+     */
     title: string;
     body: string;
     id?: string | null;
