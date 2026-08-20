@@ -94,9 +94,11 @@ html.lenis body {
 .lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain; /* opt-out hook: nested scrollers (modals, code blocks) keep native */
 }
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
+/* Upstream ships `.lenis-stopped { overflow: hidden }` here. Dropped on purpose: it takes the
+   scrollbar away the moment CompoundEffect stops the page, and the reflow that follows is a
+   visible layout shift on every phase pin. Lenis' stop already cancels the wheel and touch
+   events it receives, so the page is held without it — and leaving the scrollbar live keeps the
+   drag and the keyboard as escape hatches, which that section wants anyway. */
 .lenis.lenis-smooth iframe {
   pointer-events: none; /* an iframe would swallow the wheel events mid-scroll */
 }
@@ -718,5 +720,107 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
 @media (min-width: 768px) {
   .grid-backdrop {
     --grid-cell: 88px;
+  }
+}
+
+/* "The System" stack builds itself back to front (client reference: the card deck on
+   teak.io/product). Framer runs that one as an appear animation per card — opacity .001 and
+   scale .5 to rest, spring bounce 0 / 1.2s, each card 0.15s behind the last, and the one card in
+   full colour landing last. bounce 0 is a spring with nothing to overshoot, i.e. a decelerate, so
+   it ports to the same ease-out curve the rest of this file uses rather than a spring library.
+   Transform only, so the negative margins that build the overlap never move. */
+@keyframes card-stack {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.system-card {
+  opacity: 0;
+  transform: translateY(24px) scale(0.5);
+  /* the colours are the other half of the cycle: a card moving to the front warms up to its own
+     full hue and gains its keyline over the same beat it travels */
+  transition:
+    background-color 800ms ease,
+    border-color 800ms ease,
+    color 800ms ease;
+}
+/* The slot the card sits in. Scale grows from the top edge so a back card shrinking never leaves
+   its position, and the whole travel — up the stack, or the front card retiring to the back — is
+   this one transition. 800ms inside teak's 3s dwell. */
+.system-slot {
+  transform-origin: top center;
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-gate.is-visible .system-card {
+  animation: card-stack 1.2s cubic-bezier(0.22, 1, 0.36, 1) var(--card-delay, 0s) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .system-card {
+    opacity: 1;
+    transform: none;
+  }
+  .system-slot,
+  .system-card {
+    transition: none;
+  }
+  .reveal-gate.is-visible .system-card {
+    animation: none;
+  }
+}
+
+/* The Channels track. The phone swipes its own scroll container, so the transform only exists at
+   md+ where that scroll is off — an inline transform would apply at both and fight the swipe.
+   --i is the active index, set on the element. */
+@media (width >= 72rem) {
+  .channel-track {
+    /* one step is a card plus the gap between them (md:gap-12) — the cards are separate objects
+       passing the window, not one sheet, so the gap has to travel with them */
+    transform: translateX(calc(var(--i, 0) * (-100% - 3rem)));
+    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+/* the frame where the position is rewound into the middle copy: same pixels, no travel */
+.channel-track.is-snapping {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .channel-track {
+    transition: none;
+  }
+}
+
+/* "The Compound Effect" phase cards (see CompoundEffect.tsx). At md+ all four sit in one grid cell
+   and travel vertically: the card for the phase after this one waits a card-height-plus-gap below
+   the window and rises into it, which is the direction the story is being read in. Stacking them
+   also means they are all the height of the tallest, so the frame does not resize between phases.
+   --o is how many phases away this card is, set on the element.
+   Below md — and under reduced motion, where the section never takes the scroll and the picker
+   would be the only way to reach phases 2-4 — they stay the stacked list the mobile frame draws. */
+@media (width >= 72rem) {
+  .phase-stack {
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+  }
+  .phase-stack > * {
+    grid-area: 1 / 1;
+    transform: translateY(calc(var(--o, 0) * (100% + 3rem)));
+    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phase-stack {
+    display: flex;
+    overflow: visible;
+  }
+  .phase-stack > * {
+    grid-area: auto;
+    transform: none;
+    transition: none;
   }
 }

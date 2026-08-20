@@ -2,6 +2,7 @@
 
 import Lenis from 'lenis'
 import { useEffect } from 'react'
+import { setLenis } from '@/lib/lenis'
 
 // Scroll behaviour for the whole app. Renders nothing: it pins the page to the top on load and
 // drives Lenis' rAF loop for the page's lifetime.
@@ -24,6 +25,8 @@ export function SmoothScroll() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const lenis = new Lenis()
+    // published for CompoundEffect, which stops the page while its phases play
+    setLenis(lenis)
     let frame = 0
     const raf = (time: number) => {
       lenis.raf(time)
@@ -33,6 +36,7 @@ export function SmoothScroll() {
 
     return () => {
       cancelAnimationFrame(frame)
+      setLenis(null)
       lenis.destroy()
     }
   }, [])

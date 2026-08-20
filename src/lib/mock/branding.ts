@@ -52,9 +52,8 @@ export const branding: BrandingContent = {
       },
     ],
   },
-  // Figma 2796:9847. The section draws one slide (Search Visibility); Social and Physical are the
-  // other two channels "The System" names, and their copy has not been handed over yet — the
-  // carousel wraps on whatever it is given, so it renders correctly with one and with three.
+  // Figma 2796:9847. Three slides, one per channel "The System" names. Copy handed over by the
+  // client, not read off the frame — the frame only ever drew Search Visibility.
   channels: {
     label: 'The Channels',
     heading: 'What each channel actually does for your firm.',
@@ -69,6 +68,28 @@ export const branding: BrandingContent = {
         ],
         quote:
           '"The pages we built months ago are still generating calls today. That\'s the difference between renting leads and owning a pipeline."',
+      },
+      {
+        title: 'Social Media',
+        lede: 'Authority, relatability, and referrals from people who feel like they already know you.',
+        body: 'People hire people they trust. We build your online presence so that when someone in your market asks "know a good lawyer?", your name is the first answer. From creative content generation, to community engagement, to collaborator partnerships, we are constantly testing and adapting your strategy, because that\'s what actually grows an audience.',
+        stats: [
+          { value: '71%', label: 'Of law firms report gaining new leads through social media' },
+          { value: '74%', label: "Of potential clients check a firm's online profiles before calling" },
+        ],
+        quote:
+          '"Social doesn\'t replace ads. It makes everything else work better: SEO clicks convert higher, billboards get searched, referrals come faster."',
+      },
+      {
+        title: 'Out-of-Home',
+        lede: 'Physical dominance in your market. The kind of presence that makes competitors irrelevant.',
+        body: 'Billboards, events, sponsorships, merchandise, community activations. When your name is on the highway, at community events, on the athletic field, and beyond, you stop being "an option" and become "the only option." Morgan & Morgan didn\'t become the biggest PI firm in America through Google Ads alone. They\'re the largest OOH advertiser in the entire country.',
+        stats: [
+          { value: '76%', label: 'Of consumers take action after seeing an out-of-home ad' },
+          { value: '90%', label: 'Of adults notice OOH advertising monthly' },
+        ],
+        quote:
+          '"Legal services is the fastest-growing OOH spending category in America. The firms investing now are building moats their competitors can\'t replicate."',
       },
     ],
   },
