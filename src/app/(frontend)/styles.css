@@ -794,13 +794,16 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   }
 }
 
+
 /* "The Compound Effect" phase cards (see CompoundEffect.tsx). At md+ all four sit in one grid cell
    and travel vertically: the card for the phase after this one waits a card-height-plus-gap below
    the window and rises into it, which is the direction the story is being read in. Stacking them
    also means they are all the height of the tallest, so the frame does not resize between phases.
-   --o is how many phases away this card is, set on the element.
+   The grid children are each card's own <InView> gate, so the travel is one level down; --o, how
+   many phases away this card is, is set on the card itself.
    Below md — and under reduced motion, where the section never takes the scroll and the picker
-   would be the only way to reach phases 2-4 — they stay the stacked list the mobile frame draws. */
+   would be the only way to reach phases 2-4 — they stay the stacked list the mobile frame draws,
+   and each one slides up on its own gate (.mobile-reveal). */
 @media (width >= 72rem) {
   .phase-stack {
     display: grid;
@@ -809,6 +812,8 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   }
   .phase-stack > * {
     grid-area: 1 / 1;
+  }
+  .phase-stack > * > * {
     transform: translateY(calc(var(--o, 0) * (100% + 3rem)));
     transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -820,6 +825,8 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   }
   .phase-stack > * {
     grid-area: auto;
+  }
+  .phase-stack > * > * {
     transform: none;
     transition: none;
   }

@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { EMBER_WASH } from '@/lib/palettes'
+import { InView } from '@/components/ui/InView'
 import { getLenis } from '@/lib/lenis'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { CompoundContent } from '@/lib/types'
@@ -230,40 +231,45 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
             a phone it stays the stacked list the mobile frame draws. */}
         <div className="phase-stack order-3 flex w-full flex-col gap-4 md:order-2 md:w-[458px]">
           {content.phases.map((phase, i) => (
-            <div
-              key={phase.period}
-              aria-hidden={i !== active || undefined}
-              // The tab hugs its label and shares its card's top edge — three borders on the tab,
-              // four on the card, so the seam between them stays 1px.
-              className="flex w-full flex-col items-start"
-              style={{ '--o': i - active } as CSSProperties}
-            >
+            // One gate per card, not one for the list: on a phone these four are spread over several
+            // screens, so a single gate would trip on the first and play the other three off-screen.
+            // Same treatment the FAQ and the paid page's panels get, and mobile-only — at md+ the
+            // card is arriving on the pin's own transform instead.
+            <InView key={phase.period} className="w-full" rootMargin="0px 0px -25% 0px">
               <div
-                className="border-x border-t border-[#3C3734] px-2 py-1"
-                style={{ backgroundImage: EMBER_WASH }}
+                aria-hidden={i !== active || undefined}
+                // The tab hugs its label and shares its card's top edge — three borders on the tab,
+                // four on the card, so the seam between them stays 1px.
+                className="mobile-reveal flex w-full flex-col items-start md:h-full"
+                style={{ '--o': i - active } as CSSProperties}
               >
-                <p className="font-mono text-sm font-normal whitespace-nowrap uppercase leading-[1.4] tracking-[1px] text-[#FCF7F3] md:text-lg">
-                  {phase.period}
-                </p>
-              </div>
+                <div
+                  className="border-x border-t border-[#3C3734] px-2 py-1"
+                  style={{ backgroundImage: EMBER_WASH }}
+                >
+                  <p className="font-mono text-sm font-normal whitespace-nowrap uppercase leading-[1.4] tracking-[1px] text-[#FCF7F3] md:text-lg">
+                    {phase.period}
+                  </p>
+                </div>
 
-              {/* grow so every card fills the shared cell — they hold different amounts of copy and
-                  the frame around them should not change size as the phases step. */}
-              <div className="flex w-full grow flex-col gap-3 border border-[#3C3734] bg-[rgba(21,20,20,0.32)] p-6">
-                {/* A phase with no copy yet renders the tab and an empty card rather than inventing
-                    a headline for it. Fill in mock/branding.ts as the copy lands. */}
-                {phase.title && (
-                  <p className="w-full font-sans text-[40px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3]">
-                    {hardBreaks(phase.title)}
-                  </p>
-                )}
-                {phase.body && (
-                  <p className="w-full font-display text-xl font-normal leading-[1.25] tracking-[0.25px] text-[#E7DCD4] md:text-2xl">
-                    {phase.body}
-                  </p>
-                )}
+                {/* grow so every card fills the shared cell — they hold different amounts of copy and
+                    the frame around them should not change size as the phases step. */}
+                <div className="flex w-full grow flex-col gap-3 border border-[#3C3734] bg-[rgba(21,20,20,0.32)] p-6">
+                  {/* A phase with no copy yet renders the tab and an empty card rather than inventing
+                      a headline for it. Fill in mock/branding.ts as the copy lands. */}
+                  {phase.title && (
+                    <p className="w-full font-sans text-[40px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3]">
+                      {hardBreaks(phase.title)}
+                    </p>
+                  )}
+                  {phase.body && (
+                    <p className="w-full font-display text-xl font-normal leading-[1.25] tracking-[0.25px] text-[#E7DCD4] md:text-2xl">
+                      {phase.body}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            </InView>
           ))}
         </div>
       </div>
