@@ -218,16 +218,21 @@ export type PaidContent = {
   note: NoteContent
 }
 
+// The band under the hero — the same scratch panel /paid-advertising covers its refund promise with,
+// so it carries the label printed on that panel. Its own type rather than an inline shape on
+// BrandingContent, because src/lib/cms.ts converts it on its own like every other section.
+export type PositioningContent = {
+  body: EmphasisedSentence
+  scratchLabel: string
+}
+
 // The /branding page, section by section as they are built. It reuses PaidHeroContent rather than
 // cloning it — Figma draws one hero component for both service pages, and ServiceHero renders it for
 // both. `positioning` is the same scratch band /paid-advertising puts its refund promise in, so it
 // carries a scratchLabel too; its copy switches face mid-sentence where paid's breaks in two.
 export type BrandingContent = {
   hero: PaidHeroContent
-  positioning: {
-    body: EmphasisedSentence
-    scratchLabel: string
-  }
+  positioning: PositioningContent
   system: SystemContent
   channels: ChannelsContent
   compound: CompoundContent
@@ -274,19 +279,20 @@ export type ChannelSlide = {
 }
 
 // "The System" — label/heading over a two-column row: the argument on the left, three stacked cards
-// on the right. `chain` is fixed at three and ordered back-to-front, because the cards overlap: the
-// last one sits on top and is the only one drawn in full colour. Its blurb changes face mid-sentence
-// (one italic word) where the other two are plain, so only it takes an EmphasisedSentence.
+// on the right, cycling so each takes the front in turn. Ordered back-to-front: the last row starts
+// on top, and the deck rotates from there.
 export type SystemContent = {
   label: string
   heading: string // \n is the designer's hard break
   body: EmphasisedSentence // \n\n are authored paragraph gaps
-  chain: [
-    { title: string; blurb: string },
-    { title: string; blurb: string },
-    { title: string; blurb: EmphasisedSentence },
-  ]
+  chain: SystemCard[]
 }
+
+// One card in the stack. `blurb` is a plain string on the two behind and an EmphasisedSentence on
+// the one in front — the design changes face mid-sentence for one italic word there and nowhere
+// else. Not a tuple pinning that to the third row: the deck cycles which card is in front, and the
+// CMS writes all three rows through the same field, so which one carries the emphasis is content.
+export type SystemCard = { title: string; blurb: string | EmphasisedSentence }
 
 // Header global. socials/copyright are only rendered by the mobile dropdown (Figma 3038:1661) —
 // the desktop bar is nav-only, so they stay optional and that variant just doesn't get them.

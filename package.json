@@ -19,6 +19,8 @@
     "generate:importmap": "payload generate:importmap",
     "//seed": "Seeds ONLY the paid-advertising doc. Home is edited in /admin — the database is its source of truth and no script writes it any more (the old seed-home.ts is in git history if a fresh database ever needs bootstrapping).",
     "seed": "bun scripts/seed-paid.ts",
+    "//seed:branding": "Seeds ONLY the branding doc. No uploads — every image on that page is a static import.",
+    "seed:branding": "bun scripts/seed-branding.ts",
     "//seed:node": "Fallback runner on Node via Payload's own loader. Needed only if payload.config.ts ever imports @payloadcms/richtext-lexical again — its circular ESM deps break under bun.",
     "seed:node": "payload run scripts/seed-paid.ts"
   },

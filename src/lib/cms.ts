@@ -2,6 +2,8 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import type {
   AboutBlock,
+  ChannelsBlock,
+  CompoundBlock,
   ContactBlock,
   FaqBlock,
   GuaranteeBlock,
@@ -9,15 +11,21 @@ import type {
   Media,
   NoteBlock,
   PaidHeroBlock,
+  PositioningBlock,
   PricingBlock,
   ResultsBlock,
   StrategyBlock,
+  SystemBlock,
   WhatYouGetBlock,
   WhoWeAreBlock,
 } from '@/payload-types'
 import type {
   AboutContent,
+  BrandingContent,
   CaseStudy,
+  ChannelSlide,
+  ChannelsContent,
+  CompoundContent,
   ContactContent,
   FaqContent,
   GuaranteeContent,
@@ -28,11 +36,14 @@ import type {
   PaidContent,
   PaidHeroContent,
   PaidPanel,
+  PositioningContent,
   PricingContent,
   PricingTier,
   ResultsContent,
   ServicePillar,
   StrategyContent,
+  SystemCard,
+  SystemContent,
   TeamMember,
   WhatYouGetContent,
   WhoWeAreContent,
@@ -40,6 +51,7 @@ import type {
 import { BADGE_COLORS, CARD_PALETTES, STRATEGY_ACCENTS } from '@/lib/palettes'
 import { home } from '@/lib/mock/home'
 import { paid } from '@/lib/mock/paid'
+import { branding } from '@/lib/mock/branding'
 
 // Payload's generated types are permissive where our render contract is not: upload relations are
 // `string | Media` depending on query depth, and every non-required scalar is `T | null | undefined`.
@@ -389,5 +401,111 @@ export async function getPaid(): Promise<PaidContent> {
   } catch (err) {
     console.error('[cms] pages/paid-advertising query failed — falling back to mock:', err)
     return paid
+  }
+}
+
+// --- /branding -----------------------------------------------------------------------------------
+
+// Its hero, Pricing, FAQ and closing band are the paidHero/pricing/faq/note blocks — same shapes,
+// this doc's own rows — so only the four sections that exist nowhere else need converting.
+
+export function toPositioningContent(block: PositioningBlock): PositioningContent | null {
+  const b = block.body
+  if (!b?.before || !b.emphasis || !b.after || !block.scratchLabel) return null
+  return {
+    body: { before: b.before, emphasis: b.emphasis, after: b.after },
+    scratchLabel: block.scratchLabel,
+  }
+}
+
+export function toSystemContent(block: SystemBlock): SystemContent | null {
+  const chain = (block.chain ?? [])
+    .map((c): SystemCard | null => {
+      const b = c.blurb
+      if (!c.title || !b?.before) return null
+      // The emphasised form only when there is something to emphasise: an editor who fills in
+      // Before alone gets the plain string the two back cards use, and the render branches on which
+      // shape arrived rather than on the row's position.
+      return {
+        title: c.title,
+        blurb: b.emphasis ? { before: b.before, emphasis: b.emphasis, after: b.after ?? '' } : b.before,
+      }
+    })
+    .filter(isPresent)
+
+  const body = block.body
+  // Exactly three: the deck's palette, geometry and cycle are all built for three, and the block's
+  // minRows/maxRows enforce it at write time. This is the read-time backstop.
+  if (!block.label || !block.heading || !body?.before || !body.emphasis || !body.after) return null
+  if (chain.length !== 3) return null
+
+  return {
+    label: block.label,
+    heading: block.heading,
+    body: { before: body.before, emphasis: body.emphasis, after: body.after },
+    chain,
+  }
+}
+
+export function toChannelsContent(block: ChannelsBlock): ChannelsContent | null {
+  const slides = (block.slides ?? [])
+    .map((s): ChannelSlide | null => {
+      const stats = (s.stats ?? [])
+        .filter((t) => t.value && t.label)
+        .map((t) => ({ value: t.value, label: t.label }))
+      if (!s.title || !s.lede || !s.body || !s.quote || stats.length === 0) return null
+      return { title: s.title, lede: s.lede, body: s.body, stats, quote: s.quote }
+    })
+    .filter(isPresent)
+
+  if (!block.label || !block.heading || slides.length === 0) return null
+  return { label: block.label, heading: block.heading, slides }
+}
+
+export function toCompoundContent(block: CompoundBlock): CompoundContent | null {
+  const phases = (block.phases ?? [])
+    .filter((p) => p.period)
+    // title/body stay optional on CompoundPhase — the card renders a bare tab for a phase whose copy
+    // has not been written, which is how this section shipped before the timeline was finished.
+    .map((p) => ({ period: p.period, title: p.title || undefined, body: p.body || undefined }))
+
+  if (!block.label || !block.heading || !block.body || phases.length === 0) return null
+  return { label: block.label, heading: block.heading, body: block.body, phases }
+}
+
+// The /branding doc's eight blocks, same per-block fallback as the other two loaders. Contact is NOT
+// here — like /paid-advertising, it is read off the home doc so one edit moves all three pages.
+export async function getBranding(): Promise<BrandingContent> {
+  try {
+    const blocks = await findBlocks('branding')
+    // Shares paidHero with /paid-advertising: ServiceHero draws both pages off PaidHeroContent.
+    const hero = blocks.find((b) => b.blockType === 'paidHero')
+    const positioning = blocks.find((b) => b.blockType === 'positioning')
+    const system = blocks.find((b) => b.blockType === 'system')
+    const channels = blocks.find((b) => b.blockType === 'channels')
+    const compound = blocks.find((b) => b.blockType === 'compound')
+    const pricing = blocks.find((b) => b.blockType === 'pricing')
+    const faq = blocks.find((b) => b.blockType === 'faq')
+    const note = blocks.find((b) => b.blockType === 'note')
+
+    const slug = 'branding'
+    return {
+      hero: orMock(slug, 'paidHero', hero && toPaidHeroContent(hero), branding.hero),
+      positioning: orMock(
+        slug,
+        'positioning',
+        positioning && toPositioningContent(positioning),
+        branding.positioning,
+      ),
+      system: orMock(slug, 'system', system && toSystemContent(system), branding.system),
+      channels: orMock(slug, 'channels', channels && toChannelsContent(channels), branding.channels),
+      compound: orMock(slug, 'compound', compound && toCompoundContent(compound), branding.compound),
+      pricing: orMock(slug, 'pricing', pricing && toPricingContent(pricing), branding.pricing),
+      faq: orMock(slug, 'faq', faq && toFaqContent(faq), branding.faq),
+      note: orMock(slug, 'note', note && toNoteContent(note), branding.note),
+    }
+  } catch (err) {
+    console.error('[cms] pages/branding query failed — falling back to mock:', err)
+    return branding
   }
 }

@@ -2,8 +2,11 @@ import type { BrandingContent } from '@/lib/types'
 
 // Fallback for the Pages 'branding' doc — same contract as mock/paid.ts, and the same reason: the
 // page prerenders at build time, so an empty or unreachable database has to render rather than fail
-// the build. No CMS block backs it yet, so right now this is the only source; keep it byte-identical
-// to whatever the seed script writes once one exists.
+// the build. src/lib/cms.ts falls back to these values a block at a time, so one malformed block
+// degrades its own section instead of the page.
+//
+// Keep byte-identical to scripts/seed-branding.ts, which writes the same copy into the doc — that is
+// what makes the CMS swap verifiable by diffing the rendered page.
 export const branding: BrandingContent = {
   // Figma 2724:3346
   hero: {

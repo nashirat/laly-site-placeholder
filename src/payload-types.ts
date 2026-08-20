@@ -189,6 +189,10 @@ export interface Page {
     | ResultsBlock
     | PricingBlock
     | FaqBlock
+    | PositioningBlock
+    | SystemBlock
+    | ChannelsBlock
+    | CompoundBlock
   )[];
   updatedAt: string;
   createdAt: string;
@@ -635,6 +639,93 @@ export interface FaqBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PositioningBlock".
+ */
+export interface PositioningBlock {
+  /**
+   * One sentence in three parts: the middle one is the medium-weight run set against the serif. Mind the spaces at the joins.
+   */
+  body?: {
+    before: string;
+    emphasis: string;
+    after: string;
+  };
+  /**
+   * Printed on the panel covering the copy above. Never seen under reduced motion, where the cover is not drawn at all.
+   */
+  scratchLabel: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'positioning';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SystemBlock".
+ */
+export interface SystemBlock {
+  label: string;
+  heading: string;
+  body?: {
+    before: string;
+    emphasis: string;
+    after: string;
+  };
+  chain: {
+    title: string;
+    blurb?: {
+      before: string;
+      emphasis?: string | null;
+      after?: string | null;
+    };
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'system';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ChannelsBlock".
+ */
+export interface ChannelsBlock {
+  label: string;
+  heading: string;
+  slides: {
+    title: string;
+    lede: string;
+    body: string;
+    stats: {
+      value: string;
+      label: string;
+      id?: string | null;
+    }[];
+    quote: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'channels';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CompoundBlock".
+ */
+export interface CompoundBlock {
+  label: string;
+  heading: string;
+  body: string;
+  phases: {
+    period: string;
+    title: string;
+    body: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'compound';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -757,6 +848,10 @@ export interface PagesSelect<T extends boolean = true> {
         results?: T | ResultsBlockSelect<T>;
         pricing?: T | PricingBlockSelect<T>;
         faq?: T | FaqBlockSelect<T>;
+        positioning?: T | PositioningBlockSelect<T>;
+        system?: T | SystemBlockSelect<T>;
+        channels?: T | ChannelsBlockSelect<T>;
+        compound?: T | CompoundBlockSelect<T>;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1021,6 +1116,97 @@ export interface FaqBlockSelect<T extends boolean = true> {
     | {
         question?: T;
         answer?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PositioningBlock_select".
+ */
+export interface PositioningBlockSelect<T extends boolean = true> {
+  body?:
+    | T
+    | {
+        before?: T;
+        emphasis?: T;
+        after?: T;
+      };
+  scratchLabel?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SystemBlock_select".
+ */
+export interface SystemBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  body?:
+    | T
+    | {
+        before?: T;
+        emphasis?: T;
+        after?: T;
+      };
+  chain?:
+    | T
+    | {
+        title?: T;
+        blurb?:
+          | T
+          | {
+              before?: T;
+              emphasis?: T;
+              after?: T;
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ChannelsBlock_select".
+ */
+export interface ChannelsBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  slides?:
+    | T
+    | {
+        title?: T;
+        lede?: T;
+        body?: T;
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+        quote?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CompoundBlock_select".
+ */
+export interface CompoundBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  body?: T;
+  phases?:
+    | T
+    | {
+        period?: T;
+        title?: T;
+        body?: T;
         id?: T;
       };
   id?: T;

@@ -20,7 +20,9 @@ const labelField: Block['fields'][number] = {
 export const PaidHeroBlock: Block = {
   slug: 'paidHero',
   interfaceName: 'PaidHeroBlock',
-  labels: { singular: 'Paid Hero', plural: 'Paid Heroes' },
+  // Both service pages draw this hero from PaidHeroContent, so the block is shared and the label
+  // is the shared name rather than either page's.
+  labels: { singular: 'Service Hero', plural: 'Service Heroes' },
   fields: [
     { ...labelField, admin: { description: 'Bare text, e.g. "Pay Per Performance".' } },
     {

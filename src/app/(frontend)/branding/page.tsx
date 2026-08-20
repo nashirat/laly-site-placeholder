@@ -9,8 +9,7 @@ import Note from '@/components/sections/Note'
 import { Pricing } from '@/components/sections/Pricing'
 import { ScratchBand } from '@/components/sections/ScratchBand'
 import { ServiceHero } from '@/components/sections/ServiceHero'
-import { getHome } from '@/lib/cms'
-import { branding } from '@/lib/mock/branding'
+import { getBranding, getHome } from '@/lib/cms'
 
 export const metadata: Metadata = {
   title: 'Branding | Laly Agency',
@@ -23,14 +22,18 @@ export const revalidate = 3600
 
 // Figma 2724:3346 — where Strategy's "The Power of Branding" card points.
 //
-// Copy comes straight from src/lib/mock/branding.ts: there is no Pages 'branding' doc or block yet,
-// so there is nothing to fall back FROM. Wire it the way /paid-advertising is once the whole page
-// exists, rather than adding a block per section as each one ships.
+// Copy comes from the Pages 'branding' doc, falling back per block to src/lib/mock/branding.ts (see
+// src/blocks/branding.ts and getBranding in src/lib/cms.ts). Four of the eight blocks are this
+// page's own; the hero, Pricing, FAQ and the closing band are the same blocks /paid-advertising
+// uses, carrying this doc's own rows.
 //
-// The closing CTA is the exception — it is read off the HOME doc, exactly as /paid-advertising does
-// it, so one edit in the admin moves all three pages.
+// The hero photo is the exception on this page — a static import, because it is the layout's 20%
+// wash rather than artwork an editor would swap.
+//
+// The closing CTA is read off the HOME doc, exactly as /paid-advertising does it, so one edit in the
+// admin moves all three pages.
 export default async function BrandingPage() {
-  const { contact } = await getHome()
+  const [{ contact }, branding] = await Promise.all([getHome(), getBranding()])
 
   return (
     <main>

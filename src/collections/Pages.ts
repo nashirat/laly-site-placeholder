@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { revalidatePages } from '../lib/revalidate'
 import { AboutBlock } from '../blocks/about'
+import { ChannelsBlock, CompoundBlock, PositioningBlock, SystemBlock } from '../blocks/branding'
 import { ContactBlock } from '../blocks/contact'
 import { HeroBlock } from '../blocks/hero'
 import { NoteBlock } from '../blocks/note'
@@ -15,10 +16,10 @@ import {
 import { StrategyBlock } from '../blocks/strategy'
 import { WhoWeAreBlock } from '../blocks/whoWeAre'
 
-// Which routes a saved doc invalidates. Its own, always — plus /paid-advertising when it's the home
-// doc, because that page renders the home contact block (see the page component).
+// Which routes a saved doc invalidates. Its own, always — plus both service pages when it's the home
+// doc, because they render the home contact block (see those page components).
 const affects = (slug: string): string[] =>
-  slug === 'home' ? ['home', 'paid-advertising'] : [slug]
+  slug === 'home' ? ['home', 'paid-advertising', 'branding'] : [slug]
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -65,7 +66,7 @@ export const Pages: CollectionConfig = {
       index: true,
       admin: {
         description:
-          "The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising' is the one that exists.",
+          "The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising' and 'branding' are the ones that exist.",
       },
     },
     {
@@ -75,7 +76,7 @@ export const Pages: CollectionConfig = {
       minRows: 1,
       admin: {
         description:
-          'Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Paid Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising).',
+          'Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding).',
       },
       blocks: [
         HeroBlock,
@@ -90,6 +91,10 @@ export const Pages: CollectionConfig = {
         ResultsBlock,
         PricingBlock,
         FaqBlock,
+        PositioningBlock,
+        SystemBlock,
+        ChannelsBlock,
+        CompoundBlock,
       ],
     },
   ],

@@ -101,7 +101,7 @@ export function SystemDeck({ chain }: { chain: SystemContent['chain'] }) {
         {chain.map((card, d) => {
           const slot = (d + turn) % chain.length
           const front = slot === chain.length - 1
-          const skin = PALETTE[d]
+          const skin = PALETTE[d % PALETTE.length]
 
           return (
             <div
