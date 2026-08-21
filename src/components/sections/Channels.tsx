@@ -33,7 +33,7 @@ const CARD_SHADOW = '0 0 8px 0 rgba(21,20,20,0.65), 1px 8px 8px 0 rgba(21,20,20,
 // of a light texture over #292624 lands ~2 of 255 — under one step of 8-bit colour on most panels,
 // which is why it read as missing. 6% is about the lowest that reads as texture rather than as
 // nothing. CompoundEffect carries the same number so the two dark sections match.
-export const OVERLAY_OPACITY = 0.06
+export const OVERLAY_OPACITY = 0.01
 
 // Where the ground goes from the cream above to this section's dark, both measured as the section's
 // top edge in viewport heights: the sweep starts once that edge is START up the window and is done
