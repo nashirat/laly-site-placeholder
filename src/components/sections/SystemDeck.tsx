@@ -112,7 +112,7 @@ export function SystemDeck({ chain }: { chain: SystemContent['chain'] }) {
               }}
             >
               <div
-                className="system-card flex h-full w-full flex-col items-center justify-center border text-center"
+                className="system-card grain-overlay flex h-full w-full flex-col items-center justify-center border text-center"
                 style={
                   {
                     padding: `${PAD}cqw`,

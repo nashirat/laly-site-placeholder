@@ -38,10 +38,13 @@ export function ServiceHero({
   // be nudged into frame per page — Figma's own crop, not a taste call. A whole literal class
   // rather than a value, because Tailwind can't see through an interpolated arbitrary value.
   //
-  // Desktop anchors to the photo's bottom edge instead (client note): the 32% crop put the bland
-  // sky across the band and cut the flower hill off. The phone keeps 32% — its band is far taller
-  // against the 1600x2240 portrait, so a bottom anchor there lands on the water, not the flowers.
-  objectPosition = 'object-[50%_32%] md:object-bottom',
+  // Desktop is 43%, read off the 2724:3346 render rather than guessed: the photo covers a 1440x727
+  // band from 1600x2240, so it scales to 2016 tall and 1289px of it is off-frame; the ridge that
+  // sits 31.25% down the photo lands 10.6% down the band, which puts the offset at 553 of that
+  // 1289. Anchoring to the bottom edge overshot it onto the water; the old 32% undershot onto sky.
+  // The phone keeps 32% — its band is far taller against the portrait, so the same crop reads
+  // differently there and its own frame is signed off.
+  objectPosition = 'object-[50%_32%] md:object-[50%_43%]',
 }: {
   content: PaidHeroContent
   image: StaticImageData
