@@ -9,11 +9,15 @@ import type { ChannelsContent } from '@/lib/types'
 // label/heading, then the channels.
 //
 // The two frames disagree on how you get between them, so the markup carries both: md+ shows one
-// card at a time with a pixel arrow either side (same arrow asset the About carousel uses —
-// /arrow_pixel.svg is byte-for-byte the Figma export, left one just rotated), and the phone frame
-// drops the arrows entirely and lays all three out in a row you swipe, the active one centred with
-// its neighbours peeking 8px past the gutters. That is a scroll-snap strip: no JS, and the thumb is
-// already the control the mobile frame implies by having no other one.
+// card at a time with the two pixel arrows sitting in a row UNDER it, pushed to the right edge
+// (3246:1671), and the phone frame drops the arrows entirely and lays all three out in a row you
+// swipe, the active one centred with its neighbours peeking 8px past the gutters. That is a
+// scroll-snap strip: no JS, and the thumb is already the control the mobile frame implies by having
+// no other one.
+//
+// The arrows are the same glyph the About carousel uses, so /arrow_pixel.svg is reused as a mask
+// rather than copied and recoloured: the file is pink (#FF6D6A) because that is what the carousel
+// wants, and this frame draws it in warm grey. Same one-asset-many-tints trick as the hero pills.
 //
 // Figma also lays a scanline texture over the ground at 1% opacity. Not rendered: 1% of a light
 // texture over #292624 is under one step of 8-bit colour, so it would be a ~300KB asset for nothing.
@@ -25,30 +29,34 @@ import type { ChannelsContent } from '@/lib/types'
 // 0 0 8px + 1px 8px 8px, both rgba(21,20,20,0.65) — Figma's own two-layer drop shadow
 const CARD_SHADOW = '0 0 8px 0 rgba(21,20,20,0.65), 1px 8px 8px 0 rgba(21,20,20,0.65)'
 
-function Arrow({
-  label,
-  onClick,
-  back = false,
-  className = '',
-}: {
-  label: string
-  onClick: () => void
-  back?: boolean
-  className?: string
-}) {
+const ARROW_TINT = '#867A72' // color/neutral-variant/40 — the frame's own arrow colour
+
+function Arrow({ label, onClick, back = false }: { label: string; onClick: () => void; back?: boolean }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
-      // the phone frame has no arrows — the strip is swiped instead
-      className={`hidden shrink-0 cursor-pointer transition-opacity hover:opacity-70 md:block ${className}`}
+      className="shrink-0 cursor-pointer transition-opacity hover:opacity-70"
     >
-      <img
-        src="/arrow_pixel.svg"
-        alt=""
+      {/* 27.429 x 24 in the frame — the same glyph the carousel draws at 32 x 28, masked so the
+          one file can be pink there and warm grey here. */}
+      <span
         aria-hidden
-        className={`h-[28px] w-[32px] ${back ? 'rotate-180' : ''}`}
+        className={`block h-6 w-[27.429px] ${back ? 'rotate-180' : ''}`}
+        style={
+          {
+            backgroundColor: ARROW_TINT,
+            maskImage: 'url(/arrow_pixel.svg)',
+            maskSize: 'contain',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center',
+            WebkitMaskImage: 'url(/arrow_pixel.svg)',
+            WebkitMaskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+          } as CSSProperties
+        }
       />
     </button>
   )
@@ -101,15 +109,16 @@ export function Channels({ content }: { content: ChannelsContent }) {
           </h2>
         </div>
 
-        <div className="flex w-full items-center justify-center gap-8">
-          <Arrow back label="Previous channel" onClick={() => step(-1)} />
-
+        {/* 1088 is the card's own width in the frame, inside the section's 1216 column; the arrow
+            row is that same width, so the arrows land on the card's right edge. 32 between the two.
+            Mobile has neither — the strip runs the full gutter-to-gutter width. */}
+        <div className="flex w-full flex-col gap-8 md:max-w-[1088px]">
           {/* The viewport. -mx-4 cancels the section's gutters so the neighbours can show past them,
               px-4 puts them back inside, and each card is a viewport wide between them. On a phone
               this is the scroll surface itself — swipe, snap, and the browser's own inertia, no JS.
               At md+ it stops scrolling and clips instead, and the arrows slide the track under it.
               The scrollbar is hidden: this is a swipe surface, not a pane. */}
-          <div className="-mx-4 min-w-0 flex-1 snap-x snap-mandatory overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:snap-none md:overflow-hidden md:px-0 [&::-webkit-scrollbar]:hidden">
+          <div className="-mx-4 min-w-0 snap-x snap-mandatory overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:snap-none md:overflow-hidden md:px-0 [&::-webkit-scrollbar]:hidden">
             {/* Every card is in the DOM at every width — hiding all but the active one at md+ was
                 what let each card size to its own copy, so the frame jumped height between
                 channels. In one flex row they stretch to the tallest instead, and the arrows only
@@ -125,7 +134,7 @@ export function Channels({ content }: { content: ChannelsContent }) {
                   <article
                     key={`${copy}-${slide.title}`}
                     aria-hidden={copy !== 1 || undefined}
-                    // px 16 / py 40 on the phone, 40 20 on desktop. The gap between cards is real at
+                    // px 16 / py 40 on the phone, px 40 / py 64 on desktop. The gap between cards is real at
                     // every width now — with the cards flush the slide read as one long sheet moving
                     // rather than three objects passing.
                     className={`w-[calc(100vw-2rem)] shrink-0 snap-center flex-col items-center gap-10 border border-[#3C3734] bg-[rgba(21,20,20,0.32)] px-4 py-10 md:w-full md:flex-row md:justify-center md:gap-20 md:px-10 md:py-16 ${
@@ -161,19 +170,19 @@ export function Channels({ content }: { content: ChannelsContent }) {
                           // the phone sets the figure beside its label; desktop stacks and centres
                           className="flex w-full items-center gap-4 md:flex-col md:gap-2 md:text-center"
                         >
-                          <p className="shrink-0 font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3]">
+                          <p className="shrink-0 font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3] md:text-[36px]">
                             {stat.value}
                           </p>
                           {/* Figma sets this nowrap at exactly the panel's inner width. Left to wrap
                               instead: one fallback-font glyph wider and nowrap would overflow the
                               card. */}
-                          <p className="font-display text-xs font-normal leading-[1.25] tracking-[0.25px] text-[#D1C1B7] md:text-sm">
+                          <p className="font-display text-xs font-normal leading-[1.25] tracking-[0.25px] text-[#D1C1B7] md:text-base">
                             {stat.label}
                           </p>
                         </div>
                       ))}
 
-                      <p className="w-full border-t border-[#3C3734] pt-4 font-display text-xs font-normal leading-[1.25] tracking-[0.25px] text-[#9F9188] md:text-center">
+                      <p className="w-full border-t border-[#3C3734] pt-4 font-display text-xs font-normal leading-[1.25] tracking-[0.25px] text-[#9F9188] md:text-center md:text-sm">
                         {slide.quote}
                       </p>
                     </div>
@@ -183,7 +192,11 @@ export function Channels({ content }: { content: ChannelsContent }) {
             </div>
           </div>
 
-          <Arrow label="Next channel" onClick={() => step(1)} />
+          {/* px 8 in the frame, and the phone has no arrows at all */}
+          <div className="hidden w-full justify-end gap-8 px-2 md:flex">
+            <Arrow back label="Previous channel" onClick={() => step(-1)} />
+            <Arrow label="Next channel" onClick={() => step(1)} />
+          </div>
         </div>
       </div>
     </section>
