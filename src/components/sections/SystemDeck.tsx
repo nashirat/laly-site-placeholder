@@ -25,19 +25,17 @@ const OVERLAP = 17.225 // 72 of a 418px card, as cqw — same value the static s
 // Each channel keeps its own hue and carries it between slots, so the palette belongs to the card
 // and only the *state* — tinted and behind, or full and in front — belongs to the slot.
 //
-// TODO(design): only Search shipped with a front treatment (the amber) and only Physical/Social
-// shipped with a tint. The other four values are matched by eye in the same hue and are placeholders
-// for the designer's own — they are the four marked below.
+// TODO(design): Search shipped a front treatment (the amber), Physical/Social shipped tints, and
+// Physical's front lavender came back from review. Everything still marked below is matched by eye
+// in the same hue, standing in until the designer gives their own.
 const PALETTE = [
   // Physical
-  { tintBg: '#F6EEF5', tintFg: '#EBD6E9', bg: '#DDA3D2', border: '#9C6790', fg: '#4E2F49' }, // bg/border/fg placeholder
+  { tintBg: '#F6EEF5', tintFg: '#EBD6E9', bg: '#E5CBE2', border: '#9C6790', fg: '#4E2F49' }, // border/fg placeholder
   // Social
   { tintBg: '#E6E6C6', tintFg: '#CACA86', bg: '#CFCF72', border: '#8C8C43', fg: '#4A4A22' }, // bg/border/fg placeholder
   // Search
   { tintBg: '#FAECD6', tintFg: '#EFD4AA', bg: '#F2BA63', border: '#AE8340', fg: '#614A28' }, // tintBg/tintFg placeholder
 ]
-
-const BLURB_TINT = '#544D49' // the body colour the back cards have always used
 
 // Figma's own card metrics, as a percentage of the front card's width
 const PAD = 5.742 // 24
@@ -123,7 +121,9 @@ export function SystemDeck({ chain }: { chain: SystemContent['chain'] }) {
                     // the back cards have no keyline in the frame; it stays in the box at zero alpha
                     // so gaining one never changes the card's size
                     borderColor: front ? skin.border : 'transparent',
-                    color: front ? skin.fg : BLURB_TINT,
+                    // A retired card goes one flat colour: its blurb drops to the same tint its
+                    // title takes (client note), rather than staying on the old neutral body grey.
+                    color: front ? skin.fg : skin.tintFg,
                     '--card-delay': `${d * 0.15}s`,
                   } as CSSProperties
                 }
@@ -136,7 +136,8 @@ export function SystemDeck({ chain }: { chain: SystemContent['chain'] }) {
                 </p>
                 {/* 370 of 418 on desktop, 265.55 of 300 on the phone — the same 88.5%, and it is what
                     breaks the front card's blurb onto two lines. */}
-                <p className="w-full max-w-[88.5%] font-display text-[22px] leading-[1.25] md:text-[32px]">
+                {/* Neue Haas 65 Medium — the frame sets the blurb one weight up from body copy */}
+                <p className="w-full max-w-[88.5%] font-display text-[22px] font-medium leading-[1.25] md:text-[32px]">
                   {typeof card.blurb === 'string' ? (
                     card.blurb
                   ) : (

@@ -4,19 +4,21 @@ import { SystemDeck } from '@/components/sections/SystemDeck'
 import type { SystemContent } from '@/lib/types'
 
 // Figma 2767:9520 (desktop) / 2739:8892 (mobile) — "The System" on /branding. Cream ground under a
-// faint grid, the argument on the left, and the three-card deck on the right. Mobile stacks the two
-// and centres everything. The deck itself — its geometry, palette and 3s cycle — lives in
-// SystemDeck; everything here is the frame around it.
+// faint grid, then one centred column at both widths: eyebrow, heading, the argument, and the
+// three-card deck beneath it. (An earlier revision of the desktop frame set the copy and the deck
+// side by side; the frame is a single column now, so this is too.) The deck itself — its geometry,
+// palette and 3s cycle — lives in SystemDeck; everything here is the frame around it.
 
 export function BrandSystem({ content }: { content: SystemContent }) {
   return (
     <section
       aria-label={content.label}
-      // Figma frame: px 112, pt 112, pb 144, blocks 96 apart. Mobile (2739:8892): px 24, pt 48,
-      // pb 64, and the blocks 24 apart.
-      className="relative w-full overflow-hidden bg-[#FCF7F3] px-6 pt-12 pb-16 md:px-28 md:pt-28 md:pb-36"
+      // Figma frame: an even 112 all round. Mobile (2739:8892): px 24, pt 48, pb 64.
+      className="relative w-full overflow-hidden bg-[#FCF7F3] px-6 pt-12 pb-16 md:p-28"
     >
-      <GridBackdrop />
+      {/* fade runs bottom-up here (client note) — the grid builds down the section rather than
+          dropping out of it, unlike the FAQ and the /paid-advertising panels */}
+      <GridBackdrop className="grid-backdrop-flip" />
 
       {/* Two doodles the designer drops in the margins, at each frame's own offsets — the phone puts
           the large one half off the right edge beside the stack and the small one at the bottom
@@ -27,16 +29,19 @@ export function BrandSystem({ content }: { content: SystemContent }) {
         src="/branding/blob-large.svg"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute bottom-[256px] right-[-16px] h-[126.397px] w-[68.542px] rotate-[148.51deg] md:bottom-auto md:top-[251px] md:right-[84px] md:h-[189.261px] md:w-[102.631px]"
+        className="pointer-events-none absolute bottom-[256px] right-[-16px] h-[126.397px] w-[68.542px] rotate-[148.51deg] md:bottom-auto md:right-auto md:left-[calc(50%+210px)] md:top-[527px] md:h-[189.261px] md:w-[102.631px]"
       />
       <img
         src="/branding/blob-small.svg"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute bottom-[33px] left-5 h-[41.301px] w-[15.88px] rotate-[-36.07deg] md:bottom-[102px] md:left-[55.9%] md:h-[51.075px] md:w-[19.638px]"
+        className="pointer-events-none absolute bottom-[33px] left-5 h-[41.301px] w-[15.88px] rotate-[-36.07deg] md:bottom-[73px] md:left-[calc(50%-242px)] md:h-[51.075px] md:w-[19.638px]"
       />
 
-      <div className="relative mx-auto flex w-full max-w-[1216px] flex-col gap-6 md:gap-24">
+      {/* Figma stacks three groups on the centreline: the heading block, the argument, and the
+          deck. Desktop runs 32 inside the heading block, 48 down to the argument, 80 down to the
+          deck; the phone runs 24 / 24 / 32. */}
+      <div className="relative mx-auto flex w-full max-w-[1216px] flex-col gap-6 md:gap-12">
         <div className="flex flex-col gap-6 text-center md:gap-8">
           <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
             {content.label}
@@ -52,10 +57,10 @@ export function BrandSystem({ content }: { content: SystemContent }) {
           </h2>
         </div>
 
-        <div className="flex flex-col items-center gap-8 md:flex-row md:justify-center md:gap-20">
-          {/* 600px is Figma's own column. Centred under the heading on a phone, left-aligned against
-              it once the stack moves alongside. */}
-          <p className="w-full max-w-[600px] whitespace-pre-line text-center font-sans text-xl leading-[1.25] text-[#4A4A4A] md:text-left md:text-[28px]">
+        <div className="flex flex-col items-center gap-8 md:gap-20">
+          {/* The argument runs the full 1216 column, centred — no narrower cap: at 28px that is what
+              sets the breaks the frame draws. */}
+          <p className="w-full whitespace-pre-line text-center font-sans text-xl leading-[1.25] text-[#4A4A4A] md:text-[28px]">
             {content.body.before}
             {/* New Spirit Bold Condensed — the thesis, set apart from the copy either side of it */}
             <strong className="font-bold">{content.body.emphasis}</strong>

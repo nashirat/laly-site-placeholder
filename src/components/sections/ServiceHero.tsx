@@ -37,7 +37,11 @@ export function ServiceHero({
   // Both source photos are tall portraits cropped to a ~727px band, so the interesting third has to
   // be nudged into frame per page — Figma's own crop, not a taste call. A whole literal class
   // rather than a value, because Tailwind can't see through an interpolated arbitrary value.
-  objectPosition = 'object-[50%_32%]',
+  //
+  // Desktop anchors to the photo's bottom edge instead (client note): the 32% crop put the bland
+  // sky across the band and cut the flower hill off. The phone keeps 32% — its band is far taller
+  // against the 1600x2240 portrait, so a bottom anchor there lands on the water, not the flowers.
+  objectPosition = 'object-[50%_32%] md:object-bottom',
 }: {
   content: PaidHeroContent
   image: StaticImageData

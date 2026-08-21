@@ -717,6 +717,11 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   background-size: var(--grid-cell) var(--grid-cell);
   mask-image: linear-gradient(to bottom, #000 0%, #000 20%, transparent 100%);
 }
+/* Same ramp run the other way, for sections the designer wants the grid to build INTO rather than
+   fade out of. Must stay after .grid-backdrop — equal specificity, so source order decides. */
+.grid-backdrop-flip {
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 80%, #000 100%);
+}
 @media (min-width: 768px) {
   .grid-backdrop {
     --grid-cell: 88px;
