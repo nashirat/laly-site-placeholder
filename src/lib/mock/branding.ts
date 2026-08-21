@@ -101,7 +101,7 @@ export const branding: BrandingContent = {
   compound: {
     label: 'The Compound Effect',
     heading: 'Every month\nbuilds on the last.',
-    body: 'Branding is exponential. The SEO webpage published in month 1 is still generating leads in month 18. The billboard on someone’s morning commute triggers the Google search weeks later. The social post that builds trust today shortens the sales cycle six months from now.\n\nThe longer you run brand strategy, the cheaper each lead becomes and the less dependent you are on any single paid channel.',
+    body: 'The longer you run brand strategy, the cheaper each lead becomes and the less dependent you are on any single paid channel.',
     phases: [
       {
         period: 'Months 1–6',
