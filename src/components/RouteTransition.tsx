@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState, useTransition } from 'react'
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { Curtain } from '@/components/Preloader'
 import { PRELOADER_CLOSE_DURATION } from '@/lib/motion'
 
@@ -14,8 +14,13 @@ import { PRELOADER_CLOSE_DURATION } from '@/lib/motion'
 // link on the site is a plain next/link (nav, footer, the Strategy cards' ArrowCircleButton), and a
 // wrapper would mean touching all of them and remembering to use it for the next one.
 //
-// Navigation starts on click, not after the cover finishes, so the fetch overlaps the 1.2s slide and
-// a warm route reveals with no dead hold at all.
+// The FETCH starts on click so it overlaps the 1.2s slide and a warm route reveals with no dead hold;
+// the COMMIT waits for the cover to finish. Those were the same step once — router.push on click —
+// and a warm route then swapped the DOM while the curtain was still on its way up, painting the
+// destination into the strip not yet covered, at whatever scroll offset the page happened to be at.
+// reveal()'s scrollTo(0, 0) only lands after that, so it read as the target page blinking in
+// half-scrolled and then correcting itself. Prefetching on click and pushing under full cover keeps
+// the overlap and makes the swap unobservable.
 const DURATION_MS = PRELOADER_CLOSE_DURATION * 1000
 // animationend is primary; this only covers a backgrounded tab dropping the event. A stuck curtain
 // is a dead site, so both directions get one.
@@ -35,6 +40,19 @@ export function RouteTransition() {
   // isPending stays true until the destination's RSC payload has arrived and committed — i.e. it IS
   // the "target page loaded" signal, no manual load tracking needed.
   const [isPending, startTransition] = useTransition()
+  // Where the click was headed, held from the click until the cover lands. A ref, not state: it
+  // must not render anything, and it is read exactly once.
+  const target = useRef<string | null>(null)
+
+  // Fully covered: commit the navigation now. Both setState calls are in one batch, so the render
+  // that first sees phase 'hold' already sees isPending true — which is what stops the effect below
+  // from reading "held, nothing pending" and revealing an empty beat early.
+  const cover = useCallback(() => {
+    const to = target.current
+    target.current = null
+    setPhase('hold')
+    if (to) startTransition(() => router.push(to))
+  }, [router])
 
   const reveal = useCallback(() => {
     // The destination mounted behind the curtain, so its entry cascade already played to nobody.
@@ -74,8 +92,12 @@ export function RouteTransition() {
       // mid-transition clicks are dropped rather than queued: the curtain is over the link anyway
       if (phase !== 'idle') return
 
+      const to = url.pathname + url.search + url.hash
+      target.current = to
+      // Warms the route cache across the slide without committing anything. By the time cover()
+      // pushes, a prefetched route has nothing left to wait for.
+      router.prefetch(to)
       setPhase('cover')
-      startTransition(() => router.push(url.pathname + url.search + url.hash))
     }
 
     // capture, so this runs before next/link's own handler claims the event
@@ -90,9 +112,9 @@ export function RouteTransition() {
 
   useEffect(() => {
     if (phase === 'idle' || phase === 'hold') return
-    const t = setTimeout(() => (phase === 'cover' ? setPhase('hold') : setPhase('idle')), FALLBACK_MS)
+    const t = setTimeout(() => (phase === 'cover' ? cover() : setPhase('idle')), FALLBACK_MS)
     return () => clearTimeout(t)
-  }, [phase])
+  }, [phase, cover])
 
   if (phase === 'idle') return null
 
@@ -100,7 +122,7 @@ export function RouteTransition() {
     <Curtain
       className={`route-curtain ${PHASE_CLASS[phase]}`}
       onAnimationEnd={(e) => {
-        if (e.animationName.includes('curtain-in')) setPhase('hold')
+        if (e.animationName.includes('curtain-in')) cover()
         else if (e.animationName.includes('preloader-up')) setPhase('idle')
       }}
     />
