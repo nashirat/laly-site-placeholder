@@ -42,10 +42,15 @@ import type { CompoundContent } from '@/lib/types'
 // Figma lays the same 1% scanline texture over this ground as "The Channels". Not rendered, same
 // reason: 1% of it over #292624 is below one step of 8-bit colour.
 
-// The section takes the scroll once its centre is within this much of the viewport's, and does not
-// re-arm until it has left again — otherwise handing back at the last phase would immediately
-// re-take the very next event.
+// The section takes the scroll once its top edge is within this much of a viewport of its resting
+// place, and does not re-arm until it has left again — otherwise handing back at the last phase
+// would immediately re-take the very next event.
 const CATCH = 0.08
+
+// Where the section rests once caught: its top edge flush under the fixed header, measured off the
+// bar itself so this can never drift from Header.tsx's h-19 (--header-h is the same number for CSS).
+// Nothing to measure before mount or if the markup ever changes, so it degrades to 0.
+const headerHeight = () => document.querySelector('header')?.getBoundingClientRect().height ?? 0
 
 // Scroll to move one phase. Accumulated, because one trackpad flick or touch drag is dozens of
 // small deltas where a mouse wheel is a handful of ~100s; the cooldown then swallows the tail of a
@@ -100,8 +105,8 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
     // scroll event, which fires once a frame while it eases.
     const watch = () => {
       if (held.current || !desktop()) return
-      const box = el.getBoundingClientRect()
-      const off = Math.abs(box.top + box.height / 2 - window.innerHeight / 2)
+      const rest = headerHeight()
+      const off = Math.abs(el.getBoundingClientRect().top - rest)
       const inside = off < window.innerHeight * CATCH
 
       if (!armed.current) {
@@ -114,9 +119,12 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
       show(lenis.direction < 0 ? last : 0)
       held.current = true
       travel.current = 0
-      // Stops where it is. No scrollTo to settle it dead centre: that is a jump the reader did not
-      // ask for, and CATCH is tight enough that "where it is" already is the middle.
       lenis.stop()
+      // ...and settle it flush, which stopping where it happens to be cannot do. The section is
+      // exactly the visible window tall now, so anywhere inside CATCH but off the mark hides a band
+      // of it behind the header and shows a band of the next section instead (client note, on the
+      // way back up). force, because Lenis ignores a scrollTo while it is stopped.
+      lenis.scrollTo(el, { offset: -rest, duration: 0.4, force: true, lock: true })
     }
 
     // Every held gesture, already normalised by Lenis across wheel/trackpad/touch.
@@ -153,7 +161,14 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
       aria-label={content.label}
       // Figma frame: pl 112, pr 24 (the rail's labels carry their own inset), py 112, and it opens
       // on the same 1px keyline the hero closes with. Mobile (2739:8985): px 20, pt 48, pb 96.
-      className="w-full border-t border-[#544D49] bg-[#292624] px-5 pt-12 pb-24 md:py-28 md:pr-6 md:pl-28"
+      //
+      // A full window tall at md+, which is the size the pin has always implied: the section takes
+      // the scroll while it is at rest under the header, so anything shorter left a band of the next
+      // section showing while the page was frozen. The viewport MINUS the header, because that bar
+      // is fixed and opaque — a plain 100vh here puts its own first 76px behind the bar. min-, not
+      // fixed h: a phase card longer than the window still grows the section rather than spilling
+      // out of it, and the padding stays for exactly that case.
+      className="w-full border-t border-[#544D49] bg-[#292624] px-5 pt-12 pb-24 md:flex md:min-h-[calc(100vh-var(--header-h))] md:items-center md:py-28 md:pr-6 md:pl-28"
     >
       <div className="mx-auto flex w-full max-w-[1304px] flex-col gap-12 md:flex-row md:items-center md:gap-16">
         {/* 538px is Figma's column. Centred on a phone, where the copy is the whole width; left
@@ -162,7 +177,10 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
         <div className="flex w-full flex-col gap-6 text-center md:w-[538px] md:gap-8 md:text-left">
           <div className="flex flex-col gap-6">
             {/* Widest label on the site, hence the bigger travel box */}
-            <BracketLabel className="mx-auto w-72 text-[#FF6D6A] md:mx-0 md:w-[460px]">
+            <BracketLabel
+              className="mx-auto w-72 text-[#FF6D6A] md:mx-0 md:w-[460px]"
+              style={{ '--bracket-size': '18px' } as CSSProperties}
+            >
               {content.label}
             </BracketLabel>
             <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:text-[64px]">

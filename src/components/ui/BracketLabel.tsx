@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
 // Section eyebrow: "[ WHO WE ARE ]". Brackets swing out from the centre while the label wipes up.
 // The motion itself is pure CSS (styles.css, .bracket-label) — all this does is flip is-visible when
@@ -20,9 +20,11 @@ import { useEffect, useRef, useState } from 'react'
 export function BracketLabel({
   children,
   className = '',
+  style,
 }: {
   children: string
   className?: string
+  style?: CSSProperties
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -43,9 +45,15 @@ export function BracketLabel({
     <div
       ref={ref}
       aria-label={children}
+      style={style}
       // mobile 14px (caption spec), desktop 24px (Figma heading/h5/l). tracking is letter-spacing/xxxl
       // — token value unknown, eyeballed off the 1120 frame; nudge here, not per caller.
-      className={`bracket-label ${visible ? 'is-visible' : ''} flex justify-between font-mono text-[14px] font-normal uppercase leading-[1.4] tracking-[0.2em] md:text-[24px] ${className}`}
+      //
+      // The desktop size goes through a var rather than a plain class so a caller can override it:
+      // h5/l is not one number across the file — the compound-effect frame sets its eyebrow at 18 —
+      // and two arbitrary md:text-[…] classes on one element collide on source order, not on which
+      // one the caller passed last.
+      className={`bracket-label ${visible ? 'is-visible' : ''} flex justify-between font-mono text-[14px] font-normal uppercase leading-[1.4] tracking-[0.2em] md:text-[length:var(--bracket-size,24px)] ${className}`}
     >
       <p aria-hidden>{children}</p>
     </div>

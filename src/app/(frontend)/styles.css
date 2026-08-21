@@ -17,6 +17,12 @@
   /* Big-screen breakpoints on top of the defaults (2xl stays 1536px). */
   --breakpoint-3xl: 120rem; /* 1920px — FHD */
   --breakpoint-4xl: 160rem; /* 2560px — QHD/ultrawide */
+
+  /* Header.tsx's own h-19. The bar is fixed and opaque, so it covers the top of whatever is under
+     it — anything that wants to fill the *visible* window has to subtract this. Kept as a token
+     because CompoundEffect sizes itself against it; JS that needs the number measures the element
+     rather than parsing this, so the two cannot drift. */
+  --header-h: 4.75rem; /* 76px */
 }
 
 /* Tablet window. The design has two layouts, so everything from a 600px portrait tablet up to the
@@ -810,6 +816,17 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
+/* "The Channels" ground, which crossfades from the cream of the section above it to its own dark as
+   it scrolls in (client reference: instrument.com, where every section arrives by repainting the
+   page under it). --ground is 0..1, written on the element by Channels.tsx once a frame while the
+   section is near the viewport; it is never written at all under reduced motion, and the default of
+   1 is what the server renders, so with no JS and no support for color-mix the section is simply
+   the flat dark it has always been. The first declaration is that fallback — keep the pair. */
+.ground-sweep {
+  background-color: #292624;
+  background-color: color-mix(in oklab, #fcf7f3, #292624 calc(var(--ground, 1) * 100%));
+}
+
 /* the frame where the position is rewound into the middle copy: same pixels, no travel */
 .channel-track.is-snapping {
   transition: none;
