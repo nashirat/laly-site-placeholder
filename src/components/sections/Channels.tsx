@@ -19,8 +19,8 @@ import type { ChannelsContent } from '@/lib/types'
 // rather than copied and recoloured: the file is pink (#FF6D6A) because that is what the carousel
 // wants, and this frame draws it in warm grey. Same one-asset-many-tints trick as the hero pills.
 //
-// Figma also lays a scanline texture over the ground at 1% opacity. Not rendered: 1% of a light
-// texture over #292624 is under one step of 8-bit colour, so it would be a ~300KB asset for nothing.
+// The scanline texture over the ground — /branding/overlay.webp, the frame's own export re-encoded
+// (Figma ships it as a 4096px 10.9MB JPEG). Full-bleed and object-cover, as the frame has it.
 //
 // ponytail: index state, two buttons and one translated track — no carousel library. Embla was on
 // the table; it would have bought drag, which the phone already gets from the browser's own
@@ -28,6 +28,12 @@ import type { ChannelsContent } from '@/lib/types'
 
 // 0 0 8px + 1px 8px 8px, both rgba(21,20,20,0.65) — Figma's own two-layer drop shadow
 const CARD_SHADOW = '0 0 8px 0 rgba(21,20,20,0.65), 1px 8px 8px 0 rgba(21,20,20,0.65)'
+
+// Figma sets the ground texture at 1%, and the client asked for whatever actually shows instead. 1%
+// of a light texture over #292624 lands ~2 of 255 — under one step of 8-bit colour on most panels,
+// which is why it read as missing. 6% is about the lowest that reads as texture rather than as
+// nothing. CompoundEffect carries the same number so the two dark sections match.
+export const OVERLAY_OPACITY = 0.06
 
 // Where the ground goes from the cream above to this section's dark, both measured as the section's
 // top edge in viewport heights: the sweep starts once that edge is START up the window and is done
@@ -147,9 +153,19 @@ export function Channels({ content }: { content: ChannelsContent }) {
       // and it closes the section above on a keyline.
       //
       // .ground-sweep is the scroll-driven background (styles.css); the effect above drives it.
-      className="ground-sweep w-full border-t border-[#544D49] px-4 py-12 md:p-28"
+      className="ground-sweep relative w-full overflow-hidden border-t border-[#544D49] px-4 py-12 md:p-28"
     >
-      <div className="mx-auto flex w-full max-w-[1216px] flex-col items-center gap-10 md:gap-12">
+      {/* Decorative, so empty alt and a plain <img>: it is a static file in /public at a fixed
+          opacity, with nothing for next/image to choose between. */}
+      <img
+        src="/branding/overlay.webp"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
+        style={{ opacity: OVERLAY_OPACITY }}
+      />
+
+      <div className="relative mx-auto flex w-full max-w-[1216px] flex-col items-center gap-10 md:gap-12">
         <div className="flex w-full flex-col items-center gap-6 text-center md:gap-8">
           <BracketLabel className="mx-auto w-52 text-[#FF6D6A] md:w-[360px]">
             {content.label}
