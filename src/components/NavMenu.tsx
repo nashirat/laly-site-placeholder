@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/Button'
 import type { HeaderContent } from '@/lib/types'
@@ -22,6 +22,23 @@ import type { HeaderContent } from '@/lib/types'
 // eye reads at the end. Slightly front-loaded (0.5,0 not 0.37,0) so the tap still feels answered.
 export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) {
   const [open, setOpen] = useState(false)
+  const toggleRef = useRef<HTMLDivElement>(null)
+  const sheetRef = useRef<HTMLElement>(null)
+
+  // Click anywhere that is not the sheet or the MENU toggle closes the panel. pointerdown rather
+  // than click so the sheet starts leaving on press, and so a drag that ends inside the sheet does
+  // not count as an outside click. The toggle is excluded because its own onClick already flips
+  // `open` — without that exclusion the two would fire on the same tap and cancel out.
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: PointerEvent) => {
+      const target = e.target as Node
+      if (sheetRef.current?.contains(target) || toggleRef.current?.contains(target)) return
+      setOpen(false)
+    }
+    document.addEventListener('pointerdown', onDown)
+    return () => document.removeEventListener('pointerdown', onDown)
+  }, [open])
 
   // The dark-hero pages run the bar transparent with a light logo, which is unreadable once this
   // cream sheet is down behind it. styles.css owns that swap off <body>, so this only has to say
@@ -42,7 +59,7 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
   }, [open])
 
   return (
-    <div className="relative">
+    <div className="relative" ref={toggleRef}>
       {/* no scramble here — the toggle just tints on hover (transition-colors is in the shell base).
           Label masks up to CLOSE while the panel is down. */}
       <Button
@@ -77,6 +94,7 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
             the logo's bottom edge; ours is a 76px bar that this sheet hangs under, and the logo
             bottoms out 24px above it — so the top inset is the 24 that is left, not another 20. */}
         <nav
+          ref={sheetRef}
           aria-label="Primary"
           className={`pointer-events-auto flex flex-col items-center gap-12 border-b border-[#544D49] bg-[#fffcf9] px-5 pt-11 pb-5 transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none sm:px-10 md:pt-6 ${
             open ? 'translate-y-0' : '-translate-y-full'
