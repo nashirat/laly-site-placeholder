@@ -18,14 +18,14 @@ export function SectionFade({
   // ms. Named per-section only where a section wants a different clock; the default is the number
   // the branding page was signed off with.
   duration = 700,
-  // Shrinks the observer's root so the ramp trips once the section is properly on screen rather
-  // than the instant its top edge touches the viewport bottom — the sections here are all around a
-  // window tall, so without it the fade is over before you have scrolled to look at it.
-  rootMargin = '-10% 0px',
+  // How much of the section has to be on screen before the ramp trips. 0 would fire the instant its
+  // top edge touched the viewport bottom, and on the short bands (the guarantee line, the closing
+  // note) the fade would then be over before you had scrolled to look at it.
+  threshold = 0.15,
 }: {
   children: ReactNode
   duration?: number
-  rootMargin?: string
+  threshold?: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [shown, setShown] = useState(false)
@@ -42,15 +42,17 @@ export function SectionFade({
 
     const io = new IntersectionObserver(
       ([e]) => {
-        if (!e.isIntersecting) return
+        // isIntersecting alone is true at any overlap; the ratio is what the threshold is for, and
+        // the callback also fires once on observe with whatever the ratio happens to be then.
+        if (e.intersectionRatio < threshold) return
         setShown(true)
         io.disconnect()
       },
-      { rootMargin },
+      { threshold },
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [rootMargin])
+  }, [threshold])
 
   return (
     <div
