@@ -816,15 +816,29 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
-/* "The Channels" ground, which crossfades from the cream of the section above it to its own dark as
-   it scrolls in (client reference: instrument.com, where every section arrives by repainting the
-   page under it). --ground is 0..1, written on the element by Channels.tsx once a frame while the
-   section is near the viewport; it is never written at all under reduced motion, and the default of
-   1 is what the server renders, so with no JS and no support for color-mix the section is simply
-   the flat dark it has always been. The first declaration is that fallback — keep the pair. */
-.ground-sweep {
-  background-color: #292624;
-  background-color: color-mix(in oklab, #fcf7f3, #292624 calc(var(--ground, 1) * 100%));
+/* "The Channels" section reveal: the whole section fades from 0 to full once its own
+   IntersectionObserver (Channels.tsx) trips, and that is all it does — the crossfading cream-to-dark
+   ground it used to carry was cut for this. Whatever the cards and labels inside do on their own
+   gates is unaffected; this is one ramp on the <section> above them.
+   The duration comes down as --fade-ms from the component so the two live in one place. */
+.section-fade {
+  opacity: 0;
+  transition: opacity var(--fade-ms, 700ms) cubic-bezier(0.22, 1, 0.36, 1);
+}
+.section-fade.is-visible {
+  opacity: 1;
+}
+/* Without JS the observer never fires, so the section would sit at 0 forever. */
+@media (scripting: none) {
+  .section-fade {
+    opacity: 1;
+  }
+}
+/* Reduced motion: the component marks it visible on the first effect, so kill the ramp too. */
+@media (prefers-reduced-motion: reduce) {
+  .section-fade {
+    transition: none;
+  }
 }
 
 /* the frame where the position is rewound into the middle copy: same pixels, no travel */

@@ -29,24 +29,15 @@ import type { ChannelsContent } from '@/lib/types'
 // 0 0 8px + 1px 8px 8px, both rgba(21,20,20,0.65) — Figma's own two-layer drop shadow
 const CARD_SHADOW = '0 0 8px 0 rgba(21,20,20,0.65), 1px 8px 8px 0 rgba(21,20,20,0.65)'
 
-// Figma sets the ground texture at 1%, and the client asked for whatever actually shows instead. 1%
-// of a light texture over #292624 lands ~2 of 255 — under one step of 8-bit colour on most panels,
-// which is why it read as missing. 6% is about the lowest that reads as texture rather than as
-// nothing. CompoundEffect carries the same number so the two dark sections match.
+// Figma sets the ground texture at 1%, and the client asked for whatever actually shows instead.
+// CompoundEffect imports this so the two dark sections match.
 export const OVERLAY_OPACITY = 0.01
 
-// Where the ground goes from the cream above to this section's dark, both measured as the section's
-// top edge in viewport heights: the sweep starts once that edge is START up the window and is done
-// SWEEP of a viewport later — so here, from three quarters down to a third up.
-//
-// It deliberately does not start at 1.0, i.e. the moment the edge appears: down there the whole
-// thing played out in the bottom sliver of the screen and was over before it read as anything
-// (client note). Starting late puts it across the middle of the window instead.
-//
-// The easing stays front-loaded on purpose. The section's own copy is near-white, so the ground has
-// to be most of the way dark early — it is 75% there by the time the sweep is half over.
-const START = 0.75
-const SWEEP = 0.4
+// The section fades itself in as a whole — one opacity ramp on the <section>, nothing per-child, and
+// deliberately separate from whatever the cards and labels inside it do on their own gates. That is
+// the whole animation: the scroll-driven cream-to-dark ground crossfade this used to carry was cut
+// (tech lead) for this.
+const FADE_MS = 700
 
 const ARROW_TINT = '#867A72' // color/neutral-variant/40 — the frame's own arrow colour
 
@@ -85,38 +76,31 @@ export function Channels({ content }: { content: ChannelsContent }) {
   const count = content.slides.length
   const ground = useRef<HTMLElement>(null)
 
-  // The ground crossfade. Writes a CSS custom property straight onto the section rather than going
-  // through state: this runs once a frame while the section is in reach, and re-rendering nine
-  // cards for a background colour would be the whole frame budget.
+  // Fires once and disconnects: the section fades in when it first reaches the viewport and stays
+  // in. Same call as <InView> makes — replaying a reveal on the way back up reads as tacky.
   //
-  // Plain window scroll, not Lenis' event. Lenis scrolls the window itself, so this fires either
-  // way, and it keeps working on the pass where getLenis() is null — under prefers-reduced-motion,
-  // which is also the one case that opts out entirely and leaves the section flat dark.
+  // Under reduced motion it is on from the first paint, so the effect never has to run.
+  const [shown, setShown] = useState(false)
   useEffect(() => {
     const el = ground.current
     if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    let raf = 0
-    const paint = () => {
-      raf = 0
-      const edge = el.getBoundingClientRect().top / window.innerHeight
-      const t = Math.min(Math.max((START - edge) / SWEEP, 0), 1)
-      el.style.setProperty('--ground', String(1 - (1 - t) ** 2)) // ease-out: dark arrives early
-    }
-    // coalesced to one paint per frame — scroll fires far more often than that
-    const queue = () => {
-      if (!raf) raf = requestAnimationFrame(paint)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setShown(true)
+      return
     }
 
-    paint()
-    window.addEventListener('scroll', queue, { passive: true })
-    window.addEventListener('resize', queue)
-    return () => {
-      window.removeEventListener('scroll', queue)
-      window.removeEventListener('resize', queue)
-      if (raf) cancelAnimationFrame(raf)
-    }
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return
+        setShown(true)
+        io.disconnect()
+      },
+      // The section is taller than the window, so its top edge touching the viewport bottom is far
+      // too early — hold until a slice of it is actually on screen.
+      { rootMargin: '-10% 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
   }, [])
 
   // Infinite in one direction: the slides are laid out three times over and the track starts on the
@@ -152,8 +136,11 @@ export function Channels({ content }: { content: ChannelsContent }) {
       // Figma frame: p 112, blocks 48 apart. Mobile (2807:10160): px 16 / py 48, blocks 40 apart,
       // and it closes the section above on a keyline.
       //
-      // .ground-sweep is the scroll-driven background (styles.css); the effect above drives it.
-      className="ground-sweep relative w-full overflow-hidden border-t border-[#544D49] px-4 py-12 md:p-28"
+      // .section-fade is the whole-section opacity ramp (styles.css); the observer above trips it.
+      className={`section-fade relative w-full overflow-hidden border-t border-[#544D49] bg-[#292624] px-4 py-12 md:p-28 ${
+        shown ? 'is-visible' : ''
+      }`}
+      style={{ '--fade-ms': `${FADE_MS}ms` } as CSSProperties}
     >
       {/* Decorative, so empty alt and a plain <img>: it is a static file in /public at a fixed
           opacity, with nothing for next/image to choose between. */}
