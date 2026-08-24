@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties, type TransitionEvent } from 'react'
+import { useEffect, useState, type CSSProperties, type TransitionEvent } from 'react'
 import { EMBER_WASH } from '@/lib/palettes'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { ChannelsContent } from '@/lib/types'
@@ -32,12 +32,6 @@ const CARD_SHADOW = '0 0 8px 0 rgba(21,20,20,0.65), 1px 8px 8px 0 rgba(21,20,20,
 // Figma sets the ground texture at 1%, and the client asked for whatever actually shows instead.
 // CompoundEffect imports this so the two dark sections match.
 export const OVERLAY_OPACITY = 0.01
-
-// The section fades itself in as a whole — one opacity ramp on the <section>, nothing per-child, and
-// deliberately separate from whatever the cards and labels inside it do on their own gates. That is
-// the whole animation: the scroll-driven cream-to-dark ground crossfade this used to carry was cut
-// (tech lead) for this.
-const FADE_MS = 700
 
 const ARROW_TINT = '#867A72' // color/neutral-variant/40 — the frame's own arrow colour
 
@@ -74,34 +68,6 @@ function Arrow({ label, onClick, back = false }: { label: string; onClick: () =>
 
 export function Channels({ content }: { content: ChannelsContent }) {
   const count = content.slides.length
-  const ground = useRef<HTMLElement>(null)
-
-  // Fires once and disconnects: the section fades in when it first reaches the viewport and stays
-  // in. Same call as <InView> makes — replaying a reveal on the way back up reads as tacky.
-  //
-  // Under reduced motion it is on from the first paint, so the effect never has to run.
-  const [shown, setShown] = useState(false)
-  useEffect(() => {
-    const el = ground.current
-    if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setShown(true)
-      return
-    }
-
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return
-        setShown(true)
-        io.disconnect()
-      },
-      // The section is taller than the window, so its top edge touching the viewport bottom is far
-      // too early — hold until a slice of it is actually on screen.
-      { rootMargin: '-10% 0px' },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
 
   // Infinite in one direction: the slides are laid out three times over and the track starts on the
   // middle copy, so "next" off the last channel keeps travelling right into a real card instead of
@@ -130,17 +96,14 @@ export function Channels({ content }: { content: ChannelsContent }) {
 
   return (
     <section
-      ref={ground}
       aria-label={content.label}
       aria-roledescription="carousel"
       // Figma frame: p 112, blocks 48 apart. Mobile (2807:10160): px 16 / py 48, blocks 40 apart,
       // and it closes the section above on a keyline.
       //
-      // .section-fade is the whole-section opacity ramp (styles.css); the observer above trips it.
-      className={`section-fade relative w-full overflow-hidden border-t border-[#544D49] bg-[#292624] px-4 py-12 md:p-28 ${
-        shown ? 'is-visible' : ''
-      }`}
-      style={{ '--fade-ms': `${FADE_MS}ms` } as CSSProperties}
+      //
+      // The section's own reveal is the <SectionFade> the page wraps it in — nothing here.
+      className="relative w-full overflow-hidden border-t border-[#544D49] bg-[#292624] px-4 py-12 md:p-28"
     >
       {/* Decorative, so empty alt and a plain <img>: it is a static file in /public at a fixed
           opacity, with nothing for next/image to choose between. */}

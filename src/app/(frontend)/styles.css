@@ -816,11 +816,13 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
-/* "The Channels" section reveal: the whole section fades from 0 to full once its own
-   IntersectionObserver (Channels.tsx) trips, and that is all it does — the crossfading cream-to-dark
-   ground it used to carry was cut for this. Whatever the cards and labels inside do on their own
-   gates is unaffected; this is one ramp on the <section> above them.
-   The duration comes down as --fade-ms from the component so the two live in one place. */
+/* Per-section reveal: a section fades from 0 to full once the <SectionFade> wrapper around it
+   (src/components/ui/SectionFade.tsx) sees it come on screen, and that is all it does. Every section
+   on a page but the hero carries one. Whatever the cards, labels and copy inside do on their own
+   .reveal-gate clocks is unaffected — this is one ramp on the wrapper above them.
+   ("The Channels" used to carry a scroll-driven cream-to-dark ground crossfade of its own here; that
+   was cut for this.)
+   --fade-ms comes down from the wrapper, so the duration lives in one place. */
 .section-fade {
   opacity: 0;
   transition: opacity var(--fade-ms, 700ms) cubic-bezier(0.22, 1, 0.36, 1);

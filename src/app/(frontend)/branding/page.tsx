@@ -9,6 +9,7 @@ import Note from '@/components/sections/Note'
 import { Pricing } from '@/components/sections/Pricing'
 import { ScratchBand } from '@/components/sections/ScratchBand'
 import { ServiceHero } from '@/components/sections/ServiceHero'
+import { SectionFade } from '@/components/ui/SectionFade'
 import { getBranding, getHome } from '@/lib/cms'
 
 export const metadata: Metadata = {
@@ -32,6 +33,11 @@ export const revalidate = 3600
 //
 // The closing CTA is read off the HOME doc, exactly as /paid-advertising does it, so one edit in the
 // admin moves all three pages.
+//
+// Every section but the hero is wrapped in <SectionFade>: one opacity ramp per section, tripped by
+// its own observer as it comes on screen (tech lead). The hero is above the fold, so it has nothing
+// to fade in from. This is on top of, not instead of, the reveals the sections run on their own
+// contents.
 export default async function BrandingPage() {
   const [{ contact }, branding] = await Promise.all([getHome(), getBranding()])
 
@@ -41,31 +47,47 @@ export default async function BrandingPage() {
 
       {/* Figma 2724:4151 — the positioning line, under the same scratch panel the refund promise
           gets on /paid-advertising. */}
-      <ScratchBand label="Brand versus paid ads" scratchLabel={branding.positioning.scratchLabel}>
-        {branding.positioning.body.before}
-        {/* Neue Haas 65 Medium at 24 against the 28px serif — medium here, where the heroes go bold */}
-        <strong className="font-display text-2xl font-medium tracking-[0.25px]">
-          {branding.positioning.body.emphasis}
-        </strong>
-        {branding.positioning.body.after}
-      </ScratchBand>
+      <SectionFade>
+        <ScratchBand label="Brand versus paid ads" scratchLabel={branding.positioning.scratchLabel}>
+          {branding.positioning.body.before}
+          {/* Neue Haas 65 Medium at 24 against the 28px serif — medium here, where the heroes go bold */}
+          <strong className="font-display text-2xl font-medium tracking-[0.25px]">
+            {branding.positioning.body.emphasis}
+          </strong>
+          {branding.positioning.body.after}
+        </ScratchBand>
+      </SectionFade>
 
-      <BrandSystem content={branding.system} />
+      <SectionFade>
+        <BrandSystem content={branding.system} />
+      </SectionFade>
 
-      <Channels content={branding.channels} />
+      <SectionFade>
+        <Channels content={branding.channels} />
+      </SectionFade>
 
-      <CompoundEffect content={branding.compound} />
+      <SectionFade>
+        <CompoundEffect content={branding.compound} />
+      </SectionFade>
 
-      <Pricing content={branding.pricing} />
+      <SectionFade>
+        <Pricing content={branding.pricing} />
+      </SectionFade>
 
-      <Faq content={branding.faq} />
+      <SectionFade>
+        <Faq content={branding.faq} />
+      </SectionFade>
 
       {/* Figma draws Contact identically to /paid-advertising's, so it reads the same home doc. */}
-      <Contact content={contact} />
+      <SectionFade>
+        <Contact content={contact} />
+      </SectionFade>
 
       {/* Same closing band as /paid-advertising, down to the 458px column — which is what puts the
           break after "brand" that the copy also sets by hand. */}
-      <Note content={branding.note} className="mx-auto max-w-[458px]" />
+      <SectionFade>
+        <Note content={branding.note} className="mx-auto max-w-[458px]" />
+      </SectionFade>
     </main>
   )
 }
