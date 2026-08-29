@@ -2,13 +2,17 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
-import { Curtain } from '@/components/Preloader'
+import Image from 'next/image'
+import logo from '../../public/blacklogo.png'
 import { PRELOADER_CLOSE_DURATION } from '@/lib/motion'
 
-// Route transitions reuse the preloader curtain: it slides up from below to cover, holds while the
-// destination finishes loading, then keeps going up to reveal it. Same pink, same logo, same 1.2s
-// easeInOutQuint in both directions — the whole point is that a navigation reads as the same gesture
-// the page opened with.
+// Route transitions run a pink curtain: it slides up from below to cover, holds while the destination
+// finishes loading, then keeps going up to reveal it. Same pink, same logo, same 1.2s easeInOutQuint
+// in both directions.
+//
+// The curtain used to be shared with the first-paint preloader (hence the `preloader-up` keyframe
+// name it still animates on). That preloader is now ButterflyReveal, a WebGL layer, so this is the
+// only caller left and the markup lives here.
 //
 // This intercepts clicks at the document instead of shipping a <TransitionLink>: every internal
 // link on the site is a plain next/link (nav, footer, the Strategy cards' ArrowCircleButton), and a
@@ -126,5 +130,31 @@ export function RouteTransition() {
         else if (e.animationName.includes('preloader-up')) setPhase('idle')
       }}
     />
+  )
+}
+
+// The curtain itself, markup only — who slides it and when is the caller's business.
+function Curtain({
+  className = '',
+  onAnimationEnd,
+}: {
+  className?: string
+  onAnimationEnd?: (e: React.AnimationEvent<HTMLDivElement>) => void
+}) {
+  return (
+    <div
+      aria-hidden
+      onAnimationEnd={onAnimationEnd}
+      className={`fixed inset-0 z-[100] flex items-center justify-center bg-[#ff6d6a] ${className}`}
+    >
+      <Image
+        src={logo}
+        alt="Laly Agency"
+        priority
+        quality={100}
+        sizes="120px"
+        className="h-7 w-30" /* matches the navbar logo exactly (Header.tsx) */
+      />
+    </div>
   )
 }
