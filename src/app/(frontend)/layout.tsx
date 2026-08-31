@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { fontVariables } from '@/app/(frontend)/components/Fonts'
+import { ButterflyReveal } from '@/components/ButterflyReveal'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { HeaderGround } from '@/components/HeaderGround'
-import { Preloader } from '@/components/Preloader'
 import { RouteTransition } from '@/components/RouteTransition'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import './styles.css'
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="relative min-h-screen antialiased font-sans">
         <SmoothScroll />
-        <Preloader />
+        <ButterflyReveal />
         <RouteTransition />
         <HeaderGround />
         <Header />
