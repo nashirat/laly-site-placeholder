@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { Component, Suspense, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { useFrame, useLoader, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
@@ -442,6 +442,22 @@ function Rock({ progress }: { progress: Progress }) {
   )
 }
 
+// A failed model load throws out of Suspense and, with nothing to catch it, unmounts the whole
+// canvas — curtain included. That is the red screen: no hole, no scene, just the fallback fill. The
+// rock is the least important thing on screen, so it gets to fail alone.
+class ModelBoundary extends Component<{ children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  componentDidCatch(err: unknown) {
+    console.error('[ButterflyScene] model', err)
+  }
+  render() {
+    return this.state.failed ? null : this.props.children
+  }
+}
+
 export function ButterflyScene({ progress, onReady }: { progress: Progress; onReady: () => void }) {
   const trail = useMemo(() => new TouchTexture(), [])
 
@@ -459,9 +475,11 @@ export function ButterflyScene({ progress, onReady }: { progress: Progress; onRe
       <directionalLight position={[3, 4, 5]} intensity={2.6} />
       <VideoPlane src="/whoweare/vajra.mp4" progress={progress} />
       {/* The rock streams in behind the curtain, so there is nothing to show while it does. */}
-      <Suspense fallback={null}>
-        <Rock progress={progress} />
-      </Suspense>
+      <ModelBoundary>
+        <Suspense fallback={null}>
+          <Rock progress={progress} />
+        </Suspense>
+      </ModelBoundary>
       <Curtain progress={progress} trail={trail} onReady={onReady} />
     </>
   )
