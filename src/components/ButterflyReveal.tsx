@@ -9,24 +9,22 @@ import { getLenis } from '@/lib/lenis'
 // everything that is not the scene: the scroll it takes off the page, the progress it hands the
 // shader, and the copy that rides on top. ButterflyScene owns the visuals.
 //
-// The butterfly hole is fully open from the first frame; scrolling flies you through it. Two of the
-// three shader animation uniforms are still pinned in the scene — the entrance morph is deferred:
-//   uShapeReveal    pinned 1  dot -> butterfly morph (entrance, not built yet)
-//   uPulseReveal    pinned 0  bloom on the last frames of that morph (same)
-//   uScrollProgress 0 -> 1    barrel warp + zoom-through + fade, driven by scroll
+// The hole opens from a dot into the butterfly, then scrolling flies the camera through it:
+//   uShapeReveal    0 -> 1    dot -> butterfly morph, on a clock, once the mask is baked
+//   uPulseReveal    0 -> 1 -> 0  bloom over the back half of that morph
+//   uScrollProgress 0 -> 1    barrel warp + zoom past the hole, driven by scroll
 //
 // It sets `preloader-done` on <html> immediately, because the hero entry animations in styles.css are
 // gated on that class — the site underneath stays in its normal revealed state while this is up.
 
 // Viewport heights of scroll travel that take uScrollProgress 0 -> 1. The page is frozen for all of
-// it, so this is pure gesture distance, not distance moved — a little over a screen, so the reveal
-// costs a deliberate scroll rather than a flick.
-const REVEAL_TRAVEL = 1.2
+// it, so this is pure gesture distance, not distance moved. Raise it to make the whole reveal cost
+// more scroll — the zoom stretches out and the layer lives longer before it drops.
+const REVEAL_TRAVEL = 2.6
 // Exponential smoothing rate for the same, in 1/s. Podium lerps at .08/frame; at 60fps that is this.
 const SCROLL_LERP = 5
 
 export function ButterflyReveal() {
-  const hostRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const progress = useRef(0)
   const [ready, setReady] = useState(false)
@@ -110,6 +108,10 @@ export function ButterflyReveal() {
     // loading its shape, and so the release below cannot be starved by a stalled render loop.
     let raf = 0
     let last = performance.now()
+    // Latch. `done` makes this component render null, but rendering null is not unmounting — the
+    // effect below has no deps, so it never tears down, and without this the loop keeps calling
+    // setDone every frame forever. React counts those as nested updates and throws past 50.
+    let finished = false
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick)
       const dt = Math.min((now - last) / 1000, 0.05)
@@ -124,17 +126,13 @@ export function ButterflyReveal() {
       const overlay = overlayRef.current
       if (overlay) overlay.style.opacity = String(Math.max(0, 1 - p * 3))
 
-      // The shader clears its own fill, but the video and the mesh behind it have nothing to clear —
-      // they are only ever hidden by the curtain. Fade the whole layer out over the last quarter so
-      // the scene dissolves into the site instead of being cut away.
-      const host = hostRef.current
-      if (host) host.style.opacity = String(1 - Math.max(0, (p - 0.75) / 0.25))
-
       // The lerp only approaches 1, and everything is already invisible before it gets there. Hand
       // the scroll back and drop the layer — no reason to keep a canvas and a GL context alive over a
       // site you can already see. One-shot: scrolling back up does not put it back, which would
       // freeze the page again under someone who has finished with it.
-      if (p > 0.995) {
+      if (p > 0.995 && !finished) {
+        finished = true
+        cancelAnimationFrame(raf)
         releaseScroll()
         setDone(true)
       }
@@ -151,7 +149,7 @@ export function ButterflyReveal() {
   if (done) return null
 
   return (
-    <div ref={hostRef} className="pointer-events-none fixed inset-0 z-[100]">
+    <div className="pointer-events-none fixed inset-0 z-[100]">
       {/* Covers the page from first paint, while the shape rasterises and the scene compiles. Without
           it the site would show for those frames before the curtain dropped over it. Goes the moment
           the curtain can draw its own fill, or it would show through the hole the shader punches. */}

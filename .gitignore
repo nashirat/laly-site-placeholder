@@ -33,11 +33,3 @@ next-env.d.ts
 # misc
 *.tsbuildinfo
 .DS_Store
-
-# Spike assets for the butterfly reveal. rockPodium-lite.glb is podium.global's model, pulled out
-# of the HAR so the team can see the 3D-vs-2D proof of concept on the preview deploy. Third-party
-# art — swap it for our own before this branch merges. The full-fat glb and their shape mask stay
-# out: nothing loads them.
-/public/models/rockPodium.glb
-/public/models/*.ktx2
-/public/draco/draco_decoder.js

@@ -10,11 +10,11 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // visual, ordered by renderOrder, with the DOM sitting on top — the shape is not geometry, it is a
 // hole punched in a fullscreen coloured plane, so you look *through* the curtain at what is behind it.
 //
-// Behind the hole: a video plane (podium runs Mux there) and one mesh.
+// Behind the hole: a handful of scattered image cards and one mesh — the two layers podium runs.
 //
 // The mesh is podium's own rock, pulled out of the HAR. It is here to answer one question — whether
-// this scene wants to be real 3D or stay a flat canvas — and it is gitignored, not committed. It has
-// to be replaced with our own art before any of this ships.
+// this scene wants to be real 3D or stay a flat canvas. Third-party art: it has to be replaced with
+// our own before any of this ships.
 
 export const FILL = '#ff6d6a' // same pink the old curtain used
 
@@ -28,6 +28,11 @@ const SHAPE_INSET = 0.62 // butterfly occupies this fraction of the square, leav
 // bitmap ramps far steeper, and that band would land inside a single pixel — hard, jagged, and it
 // turns the trail displacement into binary noise instead of a wobble.
 const EDGE_SOFTNESS = 0.06
+// Seconds for the intro morph: circle -> butterfly. Podium's is about this long.
+const INTRO_SECONDS = 1.6
+// Radius of the opening dot, in fractions of viewport height. Podium's 0.01 is ~11px on a 1080 screen
+// — a shape you cannot see is not an intro.
+const DOT_RADIUS = 0.045
 
 // Lifted verbatim from podium's hero config — already tuned, no reason to re-derive.
 const CFG = {
@@ -35,7 +40,9 @@ const CFG = {
   noiseIntensity: 0.6,
   barrelIntensity: 6,
   uvScale: 0.85, // shape covers ~SHAPE_INSET/uvScale of the viewport's short side, so ~73%
-  pulseMult: 0.2,
+  // Podium's is .2, but it is subtracted from uvScale, and theirs is 1.4 to our .85 — the same number
+  // pumps our shape 24% instead of their 14%. Scaled to match the proportion they actually tuned.
+  pulseMult: 0.2 * (0.85 / 1.4),
 }
 
 // three injects position/uv/matrices and the float precision, so this declares neither.
@@ -54,6 +61,7 @@ uniform float uPulseReveal;
 uniform sampler2D uShapeTexture;
 uniform sampler2D uMouseTexture;
 uniform vec2 uMeshSize;
+uniform vec2 uZoomTarget;
 uniform vec3 uColor;
 varying vec2 vUv;
 
@@ -87,11 +95,16 @@ void main() {
 
   float pulse = uPulseReveal * ${CFG.pulseMult.toFixed(3)};
 
-  // Shrinking the UV about centre scales the shape up; by the end of the outro it has grown past the
-  // viewport, the fill is gone, and what is behind is fully exposed. This stands in for podium moving
-  // the mesh toward the camera — same read, and it cannot desync from the plane's own size.
-  float zoom = mix(1.0, 0.02, pow(uScrollProgress, 2.0));
-  vec2 uv = (vUv - 0.5) * (${CFG.uvScale.toFixed(3)} - pulse) * zoom + 0.5;
+  // Shrinking the UV about the focus point scales the shape up. Nothing fades any more, so this is
+  // the only thing that clears the curtain: by the end every screen pixel is sampling deep inside the
+  // hole, the mask is zero everywhere, and the fill is simply gone. That only works if uZoomTarget
+  // actually sits inside the hole — aim it with the dev panel.
+  float zoom = mix(1.0, 0.004, pow(uScrollProgress, 2.0));
+  // At rest the shape is centred as usual; as the zoom closes it pans onto uZoomTarget, so the thing
+  // that ends up filling the screen is whatever the target sits on — the open middle of the butterfly
+  // — rather than whatever happens to be at the shape's geometric centre.
+  vec2 focus = mix(uZoomTarget, vec2(0.5), zoom);
+  vec2 uv = (vUv - 0.5) * (${CFG.uvScale.toFixed(3)} - pulse) * zoom + focus;
   vec2 uvBarrel = barrelPincushion(uv, -uScrollProgress * ${CFG.barrelIntensity.toFixed(3)});
 
   // Square mask on a non-square viewport: stretch the long axis so the butterfly stays a butterfly.
@@ -115,7 +128,7 @@ void main() {
 
   vec2 circleUv = vUv - 0.5;
   circleUv.x *= meshRatio;
-  float sdf_circle = sdCircle(circleUv, 0.01);
+  float sdf_circle = sdCircle(circleUv, ${DOT_RADIUS.toFixed(3)});
   float sdf_texture = 0.5 - shapeMap.g;
 
   // The morph: a dot at uShapeReveal 0, the butterfly at 1.
@@ -136,11 +149,7 @@ void main() {
   float mask_scale_and_blur = length(circleUv) + smoothstep(-1.0, 1.0, sdf_final) + 0.3;
   mask = mix(mask, pow(mask_scale_and_blur, 4.0), uPulseReveal);
 
-  // The bloom term keeps the screen corners opaque no matter how far the shape is zoomed, so the zoom
-  // alone never clears the curtain — podium's plane physically leaves the frustum, ours cannot. Fade
-  // the whole plane over the back half of the outro so it reliably reaches zero.
-  float fade = 1.0 - smoothstep(0.6, 1.0, uScrollProgress);
-  gl_FragColor = vec4(uColor, clamp(mask, 0.0, 1.0) * fade);
+  gl_FragColor = vec4(uColor, clamp(mask, 0.0, 1.0));
 }
 `
 
@@ -242,8 +251,6 @@ function loadShapeCanvas(): Promise<HTMLCanvasElement> {
   })
 }
 
-// Both mask and trail are read as raw numbers, not as colour — an sRGB decode would move the 0.5
-// threshold the shader compares the green channel against and warp the outline.
 const asData = <T extends THREE.Texture>(t: T): T => {
   t.colorSpace = THREE.NoColorSpace
   t.minFilter = t.magFilter = THREE.LinearFilter
@@ -252,6 +259,9 @@ const asData = <T extends THREE.Texture>(t: T): T => {
 }
 
 type Progress = RefObject<number>
+// Where the outro zoom lands, in shape-UV space — dialled in by eye against the butterfly's open
+// middle. Not .5,.5: the shape does not sit dead centre in its own mask.
+const ZOOM_TARGET = { x: 0.495, y: 0.55 }
 
 function Curtain({
   progress,
@@ -264,6 +274,10 @@ function Curtain({
 }) {
   const { viewport, size } = useThree()
   const [shape, setShape] = useState<THREE.CanvasTexture | null>(null)
+  // Intro clock, started when the mask is ready. Podium lerps uShapeReveal toward 1 at .08/frame; a
+  // clock costs nothing extra and actually *arrives*, which matters because uPulseReveal has to land
+  // back on exactly 0 or the bloom term never lets go of the fill.
+  const intro = useRef(0)
 
   useEffect(() => {
     let dead = false
@@ -302,12 +316,13 @@ function Curtain({
         depthWrite: false,
         uniforms: {
           // Entrance still pinned: shape fully open, no bloom. Scroll is the only thing driving.
-          uShapeReveal: { value: 1 },
+          uShapeReveal: { value: 0 }, // driven by the intro clock below
           uPulseReveal: { value: 0 },
           uScrollProgress: { value: 0 },
           uShapeTexture: { value: null as THREE.Texture | null },
           uMouseTexture: { value: trailTex },
           uMeshSize: { value: new THREE.Vector2(1, 1) },
+          uZoomTarget: { value: new THREE.Vector2(ZOOM_TARGET.x, ZOOM_TARGET.y) },
           // A plain Vector3, not a THREE.Color. Color runs the hex through sRGB -> linear on the way
           // in, and a custom ShaderMaterial gets no matching encode on the way out, so the fill came
           // out as its own linear values: #ff6d6a rendered as rgb(255, 39, 37). Raw numbers, no
@@ -337,6 +352,18 @@ function Curtain({
     trail.update(Math.min(dt, 0.05))
     trailTex.needsUpdate = true
     material.uniforms.uScrollProgress.value = progress.current
+
+    if (shape) intro.current = Math.min(intro.current + dt / INTRO_SECONDS, 1)
+    const t = intro.current
+    // Ease in-out, not out. Ease-out is fastest at t=0, which spends the dot in about a frame and a
+    // half — you never see the circle it is supposed to open from. This holds it, opens, then settles.
+    material.uniforms.uShapeReveal.value =
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+    // Bump 0 -> 1 -> 0, peaking at t=.575 while the morph is still only ~70% open. It has to overlap
+    // the opening: run it after and you get two separate animations with a dead beat between them.
+    material.uniforms.uPulseReveal.value = Math.sin(
+      Math.PI * Math.min(Math.max((t - 0.35) / 0.45, 0), 1),
+    )
   })
 
   if (!shape) return null
@@ -351,54 +378,57 @@ function Curtain({
   )
 }
 
-// object-fit: cover, in world units. Podium's is a Mux stream; ours is a file out of /public.
-function VideoPlane({ src, progress }: { src: string; progress: Progress }) {
-  const { viewport } = useThree()
-  const group = useRef<THREE.Group>(null)
-  const [aspect, setAspect] = useState(16 / 9)
+// Podium runs about six image cards behind their hole — scattered and overlapping, not tiled. The
+// irregularity is the point: a grid reads as a contact sheet, this reads as a pile of work you are
+// looking down at. Positions are world units, z toward the camera; the rock normalises to 2 units, so
+// these sit at roughly its scale. Hand-placed because six is fewer than the code to generate six.
+const CARDS: { src: string; pos: [number, number, number]; size: [number, number] }[] = [
+  { src: '/carousel/Billboard.webp', pos: [-1.5, 0.9, -1.3], size: [2.6, 1.7] },
+  { src: '/branding/hero.webp', pos: [0.5, 1.3, -0.9], size: [2.2, 2.2] },
+  { src: '/whoweare/Senft-palceholder.webp', pos: [1.7, -0.2, -1.2], size: [2.0, 2.6] },
+  { src: '/carousel/Bus.webp', pos: [-1.2, -1.1, -0.8], size: [2.4, 1.6] },
+  { src: '/paid-advertising/hero.webp', pos: [0.3, -1.4, -1.1], size: [2.8, 1.8] },
+  { src: '/carousel/Flyer.webp', pos: [-0.2, 0.1, -0.6], size: [1.5, 1.9] },
+]
 
-  const video = useMemo(() => {
-    const v = document.createElement('video')
-    v.src = src
-    v.loop = true
-    v.muted = true // autoplay is only allowed muted
-    v.playsInline = true
-    v.preload = 'auto'
-    return v
-  }, [src])
+const CARD_SRCS = CARDS.map((c) => c.src)
 
-  const tex = useMemo(() => {
-    const t = new THREE.VideoTexture(video)
-    t.colorSpace = THREE.SRGBColorSpace
-    return t
-  }, [video])
+function Cards() {
+  const textures = useLoader(THREE.TextureLoader, CARD_SRCS)
 
+  // object-fit: cover, per card. One texture per card, so this can live on the texture rather than in
+  // UV space — nothing else samples it.
   useEffect(() => {
-    const onMeta = () => setAspect(video.videoWidth / video.videoHeight || 16 / 9)
-    video.addEventListener('loadedmetadata', onMeta)
-    void video.play().catch(() => {}) // a blocked autoplay just leaves a black plane, not an error
-    return () => {
-      video.removeEventListener('loadedmetadata', onMeta)
-      video.pause()
-      video.removeAttribute('src')
-      video.load()
-      tex.dispose()
-    }
-  }, [video, tex])
-
-  // Drifts toward the viewer as the hole opens, so the reveal has parallax rather than a flat wipe.
-  useFrame(() => {
-    group.current?.scale.setScalar(1 + progress.current * 0.35)
-  })
-
-  const cover = Math.max(viewport.width / aspect, viewport.height)
+    textures.forEach((t, i) => {
+      const card = CARDS[i]
+      if (!card) return
+      t.colorSpace = THREE.SRGBColorSpace
+      t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping
+      const target = card.size[0] / card.size[1]
+      const a = t.image.width / t.image.height
+      if (a > target) t.repeat.set(target / a, 1)
+      else t.repeat.set(1, a / target)
+      t.offset.set((1 - t.repeat.x) / 2, (1 - t.repeat.y) / 2)
+    })
+  }, [textures])
 
   return (
-    <group ref={group}>
-      <mesh position={[0, 0, -1]} scale={[cover * aspect, cover, 1]}>
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={tex} toneMapped={false} />
+    <group>
+      {/* Six scattered cards leave gaps, and a gap shows the clear colour straight through the hole.
+          One dim plane behind them so the window always has a floor. */}
+      <mesh position={[0, 0, -2.5]}>
+        <planeGeometry args={[40, 40]} />
+        <meshBasicMaterial color="#1a1a1a" toneMapped={false} />
       </mesh>
+      {CARDS.map((card, i) => {
+        const tex = textures[i]
+        return tex ? (
+          <mesh key={card.src} position={card.pos}>
+            <planeGeometry args={card.size} />
+            <meshBasicMaterial map={tex} toneMapped={false} />
+          </mesh>
+        ) : null
+      })}
     </group>
   )
 }
@@ -428,11 +458,13 @@ function Rock({ progress }: { progress: Progress }) {
   }, [gltf])
 
   const ref = useRef<THREE.Group>(null)
-  useFrame((_, dt) => {
+  // Scroll-driven, not time-driven. It is a thing you turn by scrolling, not a thing that spins at
+  // you — at rest it holds still, which is what makes the scroll feel connected to it.
+  useFrame(() => {
     const g = ref.current
     if (!g) return
-    g.rotation.y += dt * 0.15
-    g.scale.setScalar(1 + progress.current * 1.5)
+    g.rotation.y = progress.current * Math.PI * 2
+    g.rotation.x = progress.current * 0.6
   })
 
   return (
@@ -458,7 +490,13 @@ class ModelBoundary extends Component<{ children: React.ReactNode }, { failed: b
   }
 }
 
-export function ButterflyScene({ progress, onReady }: { progress: Progress; onReady: () => void }) {
+export function ButterflyScene({
+  progress,
+  onReady,
+}: {
+  progress: Progress
+  onReady: () => void
+}) {
   const trail = useMemo(() => new TouchTexture(), [])
 
   useEffect(() => {
@@ -473,10 +511,11 @@ export function ButterflyScene({ progress, onReady }: { progress: Progress; onRe
     <>
       <ambientLight intensity={1.1} />
       <directionalLight position={[3, 4, 5]} intensity={2.6} />
-      <VideoPlane src="/whoweare/vajra.mp4" progress={progress} />
-      {/* The rock streams in behind the curtain, so there is nothing to show while it does. */}
+      {/* Both stream in behind the curtain, so there is nothing to show while they do. The boundary
+          keeps a failed load from unmounting the canvas and taking the curtain with it. */}
       <ModelBoundary>
         <Suspense fallback={null}>
+          <Cards />
           <Rock progress={progress} />
         </Suspense>
       </ModelBoundary>
