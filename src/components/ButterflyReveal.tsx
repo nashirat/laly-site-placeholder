@@ -1,20 +1,17 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { getLenis } from '@/lib/lenis'
 
 // Full-screen WebGL curtain, replacing the pink slide-up preloader. One quad, one fragment shader,
 // no three.js: the shape is a hole punched out of a solid fill, so you look *through* the curtain at
 // the real DOM site underneath. Sequence is dot -> butterfly -> fly-through -> unmount.
 //
-// NO ANIMATION YET — this is the mouse interaction on its own, so the shape can be tuned in
-// isolation. The layer goes up and stays up: the butterfly hole is fully open from the first frame
-// and the only thing moving is the fluid trail under the cursor.
-//
-// The three animation uniforms are wired but pinned to constants (see PINNED below). Driving them is
-// the whole of the animation work:
-//   uShapeReveal    0 -> 1   dot morphs into the butterfly (entrance)
-//   uPulseReveal    0 -> 1   bloom on the last frames of that morph
-//   uScrollProgress 0 -> 1   barrel warp + zoom-through + fade, i.e. the reveal
+// The butterfly hole is fully open from the first frame; scrolling flies you through it. Two of the
+// three animation uniforms are still pinned — the entrance morph is deferred:
+//   uShapeReveal    pinned 1  dot -> butterfly morph (entrance, not built yet)
+//   uPulseReveal    pinned 0  bloom on the last frames of that morph (same)
+//   uScrollProgress 0 -> 1    barrel warp + zoom-through + fade, driven by scroll
 //
 // It sets `preloader-done` on <html> immediately, because the hero entry animations in styles.css are
 // gated on that class — the site underneath stays in its normal revealed state while this is up.
@@ -30,6 +27,12 @@ const SHAPE_INSET = 0.62 // butterfly occupies this fraction of the square, leav
 // together for a softer outline.
 const EDGE_SOFTNESS = 0.06
 const FILL = '#ff6d6a' // same pink the old curtain used
+// Viewport heights of scroll travel that take uScrollProgress 0 -> 1. The page is frozen for all of
+// it, so this is pure gesture distance, not distance moved — a little over a screen, so the reveal
+// costs a deliberate scroll rather than a flick.
+const REVEAL_TRAVEL = 1.2
+// Exponential smoothing rate for the same, in 1/s. Podium lerps at .08/frame; at 60fps that is this.
+const SCROLL_LERP = 5
 
 // Values lifted from podium.global's hero config — they are already tuned, no reason to re-derive.
 const CFG = {
@@ -247,7 +250,9 @@ function loadShapeCanvas(): Promise<HTMLCanvasElement> {
 }
 export function ButterflyReveal() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
   const [failed, setFailed] = useState(false)
+  const [done, setDone] = useState(false)
 
   useEffect(() => {
     // No entrance to gate on any more, so release the site immediately.
@@ -296,10 +301,10 @@ export function ButterflyReveal() {
     const u = (n: string) => gl.getUniformLocation(program, n)
     const uMeshSize = u('uMeshSize')
 
-    // PINNED — the animation uniforms, set once. Shape fully open, no bloom, no scroll.
+    // Entrance still pinned: shape fully open, no bloom. Scroll is the only thing driving now.
     gl.uniform1f(u('uShapeReveal'), 1)
     gl.uniform1f(u('uPulseReveal'), 0)
-    gl.uniform1f(u('uScrollProgress'), 0)
+    const uScrollProgress = u('uScrollProgress')
 
     const makeTexture = (unit: number) => {
       const t = gl.createTexture()
@@ -352,6 +357,74 @@ export function ButterflyReveal() {
     let disposed = false
     let last = performance.now()
 
+    // The curtain takes the scroll — the site underneath must not move until the butterfly has been
+    // flown through.
+    //
+    // The freeze is `overflow: clip` on <html>, not Lenis. Lenis is the obvious tool (CompoundEffect
+    // stops it to pin its phases) but it cannot be the whole answer here: SmoothScroll publishes the
+    // instance from an effect, this component mounts at first paint, and whoever loses that race
+    // leaves the page scrollable for the frames in between. A non-scrollable document has no race —
+    // Lenis writes real scrollTop, and a clipped root has nowhere to write it to. It also covers the
+    // keyboard and the scrollbar, which a stopped Lenis does not.
+    //
+    // Lenis is still stopped when we can reach it, so it is not animating against a wall the whole
+    // time, and start() resets it on the way out. If it is null the clip alone holds the page.
+    //
+    // Deltas come off a plain wheel/touch listener rather than Lenis' `virtual-scroll` for the same
+    // reason: no instance to subscribe to on frame one. Passive — nothing to preventDefault, the clip
+    // already did it.
+    let travel = 0
+    const onWheel = (e: WheelEvent) => {
+      travel = Math.max(0, travel + e.deltaY)
+    }
+    let touchY = 0
+    const onTouchStart = (e: TouchEvent) => {
+      touchY = e.touches[0]?.clientY ?? 0
+    }
+    const onTouchMove = (e: TouchEvent) => {
+      const y = e.touches[0]?.clientY ?? touchY
+      travel = Math.max(0, travel + (touchY - y) * 2) // a drag covers less distance than a wheel
+      touchY = y
+    }
+
+    // Under prefers-reduced-motion Lenis is never constructed, and freezing the page is exactly the
+    // kind of motion that setting is asking us not to do. The reveal rides real scroll position and
+    // the page is never held.
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let held = false
+
+    const takeScroll = () => {
+      if (reduced || held) return
+      held = true
+      root.style.overflow = 'clip'
+      window.addEventListener('wheel', onWheel, { passive: true })
+      window.addEventListener('touchstart', onTouchStart, { passive: true })
+      window.addEventListener('touchmove', onTouchMove, { passive: true })
+      getLenis()?.stop()
+    }
+    takeScroll()
+
+    const releaseScroll = () => {
+      if (!held) return
+      held = false
+      root.style.removeProperty('overflow')
+      window.removeEventListener('wheel', onWheel)
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      // start() runs Lenis' own reset, so it picks up scrollTop rather than resuming toward a target
+      // it computed before the page was clipped. Called even if stop() never landed — it no-ops.
+      getLenis()?.start()
+    }
+
+    const scrolled = () =>
+      Math.min(
+        reduced
+          ? window.scrollY / window.innerHeight
+          : travel / (window.innerHeight * REVEAL_TRAVEL),
+        1,
+      )
+    let progress = scrolled()
+
     loadShapeCanvas()
       .then((c) => {
         if (disposed) return
@@ -362,7 +435,9 @@ export function ButterflyReveal() {
         shapeReady = true
       })
       .catch((err) => {
+        // No mask means no hole, so the fill would sit there opaque with the page held behind it.
         console.error('[ButterflyReveal] shape', err)
+        releaseScroll()
         if (!disposed) setFailed(true)
       })
 
@@ -371,6 +446,24 @@ export function ButterflyReveal() {
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
       if (!shapeReady) return
+
+      // Frame-rate independent lerp, so 120Hz matches 60Hz instead of arriving twice as fast.
+      progress += (scrolled() - progress) * (1 - Math.exp(-dt * SCROLL_LERP))
+      gl.uniform1f(uScrollProgress, progress)
+
+      // The lerp only approaches 1, and the curtain is already fully transparent well before it gets
+      // there. Hand the scroll back and drop the layer — no reason to keep a full-screen canvas and a
+      // GL context alive over a site you can already see. One-shot: scrolling back up does not put it
+      // back, which would freeze the page again under someone who has finished with it.
+      if (progress > 0.995) {
+        releaseScroll()
+        setDone(true)
+        return
+      }
+      // Copy goes first — it belongs to the curtain, and lingering over the exposed site reads as a
+      // bug. Gone by a third of the way in, well before the shape starts to open out.
+      const overlay = overlayRef.current
+      if (overlay) overlay.style.opacity = String(Math.max(0, 1 - progress * 3))
 
       touch.update(dt)
       upload(1, trailTex, touch.canvas, true)
@@ -386,11 +479,13 @@ export function ButterflyReveal() {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', resize)
       window.removeEventListener('pointermove', onPointer)
+      // never leave the page frozen behind us
+      releaseScroll()
       gl.getExtension('WEBGL_lose_context')?.loseContext()
     }
   }, [])
 
-  if (failed) return null
+  if (failed || done) return null
 
   return (
     <>
@@ -403,7 +498,7 @@ export function ButterflyReveal() {
       {/* Copy sits on the curtain, above the canvas — black on the pink, the way podium runs black on
           their beige. Placeholder text for now. Padding matches the real header (px-5 sm:px-10, h-19)
           so the logo lands exactly where the site's own logo will be when the curtain clears. */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 z-[101] text-black">
+      <div ref={overlayRef} aria-hidden className="pointer-events-none fixed inset-0 z-[101] text-black">
         <div className="flex h-19 items-center justify-between px-5 sm:px-10">
           <img src="/blacklogo.png" alt="" width={120} height={28} className="h-7 w-30" />
           <p className="font-display text-xl leading-none tracking-[-0.02em] sm:text-2xl">
