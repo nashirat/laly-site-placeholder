@@ -33,3 +33,8 @@ next-env.d.ts
 # misc
 *.tsbuildinfo
 .DS_Store
+
+# Local-only spike assets: podium.global's model + shape mask, pulled out of the HAR to decide
+# 3D vs 2D canvas. Third-party art, never shipped — swap for our own before this leaves the branch.
+/public/models/
+/public/draco/
