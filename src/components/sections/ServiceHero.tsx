@@ -153,6 +153,7 @@ export function ServiceHero({
               so it is overridden on the instance exactly like the home hero's CTA. */}
           <Button
             variant="primary"
+            booking
             href={content.button.href}
             className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
           >

@@ -81,6 +81,7 @@ export default function Hero({ content }: { content: HeroContent }) {
               overridden here rather than moving every other button on the page */}
           <Button
             variant="primary"
+            booking
             href={button.href}
             className="md:[&>span]:text-xl md:[&>span]:leading-[25px]"
           >

@@ -890,3 +890,89 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     transition: none;
   }
 }
+
+/* Booking dialog (see src/components/booking/BookingDialog.tsx). A real <dialog> opened with
+   showModal(), so the browser gives us the top layer, the inert page, the focus trap and ESC for
+   free — all four of which NavMenu's sheet has to hand-roll, and the top layer specifically is what
+   lets this paint over <header>'s z-50 stacking context.
+   The element itself is the full-viewport box; the card is its child. That split is what makes
+   "click the backdrop to dismiss" a target check rather than an overlay div. */
+/* Layout lives on the UNQUALIFIED selector and only `display` is keyed to [open]. That split is
+   load-bearing: `display` is the one property allow-discrete holds until the close transition ends,
+   while everything else drops the instant the `open` attribute goes. With the centring inside
+   [open], the closing dialog kept display:flex but lost align-items/justify-content immediately, so
+   the card snapped to the top-left corner and played its whole exit from there. align-items and
+   justify-content are inert on a non-flex box, so they cost nothing while the dialog is shut. */
+.booking-dialog {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  align-items: flex-end; /* phone: the card rises from the bottom edge, like a sheet */
+  justify-content: center;
+}
+.booking-dialog[open] {
+  display: flex;
+}
+@media (min-width: 72rem) {
+  .booking-dialog {
+    align-items: center;
+    padding: 24px;
+  }
+}
+
+/* Entry/exit without a line of JS. @starting-style supplies the "before it was shown" state that a
+   display:none element otherwise has no way to transition out of; allow-discrete on display and
+   overlay keeps the element (and its top-layer membership) alive long enough to animate the close,
+   which is the part a plain transition silently skips.
+   0.35s easeOutQuint — the entry curve the hero copy already uses. NOT the 1.2s curtain easing: this
+   answers a click, and the curtain's pace on a modal reads as lag. */
+.booking-dialog,
+.booking-dialog::backdrop {
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-behavior: allow-discrete;
+}
+.booking-dialog {
+  opacity: 0;
+  translate: 0 24px;
+  transition-property: opacity, translate, display, overlay;
+}
+.booking-dialog[open] {
+  opacity: 1;
+  translate: 0 0;
+}
+.booking-dialog::backdrop {
+  background-color: rgb(21 20 20 / 0);
+  transition-property: background-color, display, overlay;
+}
+.booking-dialog[open]::backdrop {
+  /* #151414 at 45% — the section ink, not a generic black, so the page behind it dims warm */
+  background-color: rgb(21 20 20 / 0.45);
+}
+@starting-style {
+  .booking-dialog[open] {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  .booking-dialog[open]::backdrop {
+    background-color: rgb(21 20 20 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the dim still lands, it just doesn't travel — losing the backdrop entirely would leave the page
+     behind the card at full contrast, which is a legibility problem, not a motion one */
+  .booking-dialog {
+    transition: none;
+    opacity: 1;
+    translate: none;
+  }
+  .booking-dialog::backdrop {
+    transition: none;
+  }
+}

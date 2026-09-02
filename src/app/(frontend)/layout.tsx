@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { fontVariables } from '@/app/(frontend)/components/Fonts'
+import { BookingDialog } from '@/components/booking/BookingDialog'
 import { ButterflyReveal } from '@/components/ButterflyReveal'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
@@ -30,6 +31,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         {children}
         <Footer />
+        {/* One instance for the whole app — every CTA on every page opens this same dialog.
+            Last in the body so it is the last thing in the tab order when shut; showModal() puts it
+            in the top layer anyway, so DOM order has no bearing on what it paints over. */}
+        <BookingDialog />
       </body>
     </html>
   )

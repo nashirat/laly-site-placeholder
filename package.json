@@ -21,6 +21,8 @@
     "seed": "bun scripts/seed-paid.ts",
     "//seed:branding": "Seeds ONLY the branding doc. No uploads — every image on that page is a static import.",
     "seed:branding": "bun scripts/seed-branding.ts",
+    "//check:slots": "Self-check for the booking availability engine (src/lib/slots.ts). Plain asserts, no test framework — run it after touching business hours, slot length or the race guard.",
+    "check:slots": "bun scripts/check-slots.ts",
     "//seed:node": "Fallback runner on Node via Payload's own loader. Needed only if payload.config.ts ever imports @payloadcms/richtext-lexical again — its circular ESM deps break under bun.",
     "seed:node": "payload run scripts/seed-paid.ts"
   },

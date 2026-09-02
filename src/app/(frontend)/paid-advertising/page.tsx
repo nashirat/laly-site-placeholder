@@ -246,6 +246,7 @@ export default async function PaidAdvertisingPage() {
                 so it is overridden on the instance exactly like the home hero's CTA. */}
             <Button
               variant="primary"
+              booking
               href={paid.hero.button.href}
               className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
             >
@@ -465,6 +466,7 @@ export default async function PaidAdvertisingPage() {
                   <div className="flex">
                     {/* Figma sets this label at 18px mobile / 20px desktop; the Button ships 16/18 */}
                     <Button
+                      booking
                       href={paid.pricing.cta.href}
                       className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
                     >

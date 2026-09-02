@@ -78,6 +78,7 @@ export function Pricing({ content }: { content: PricingContent }) {
               <div className="flex">
                 {/* Figma sets this label at 18px mobile / 20px desktop; the Button ships 16/18 */}
                 <Button
+                  booking
                   href={content.cta.href}
                   className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
                 >

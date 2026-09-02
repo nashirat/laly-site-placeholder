@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { MediaImage } from '@/components/Media/Image'
 import { Button } from '@/components/ui/Button'
+import { MaskText, type MaskDir, type MaskPhase } from '@/components/ui/MaskText'
 import type { LinkField, TeamMember } from '@/lib/types'
 import NavArrowIcon from '../../public/arrow_pixel.svg'
 
@@ -20,8 +21,8 @@ import NavArrowIcon from '../../public/arrow_pixel.svg'
 // out of an overflow-hidden box as an incoming layer translates in from the opposite edge, driven by an
 // idle -> exiting -> entering phase machine. Payload later: `members` shape is unchanged.
 
-type Phase = 'idle' | 'exiting' | 'entering'
-type Dir = 'next' | 'prev'
+type Phase = MaskPhase
+type Dir = MaskDir
 
 // per-element mask timings (exit up/in, then enter from the opposite edge)
 const T_NAME = {
@@ -270,55 +271,6 @@ function Photo({ member, eager = false }: { member: TeamMember; eager?: boolean 
     // ponytail: image placeholder — swap for the real headshot upload
     <div className="flex h-full w-full items-center justify-center bg-[#E8E3DE]">
       <span className="font-mono text-sm uppercase tracking-[0.2em] text-[#867A72]">Photo</span>
-    </div>
-  )
-}
-
-// Vertical text mask: outgoing (current) translates out of an overflow-hidden box while the incoming
-// layer translates in from the opposite edge. `direction` next => text rises; prev => text drops.
-function MaskText({
-  current, incoming, phase, direction, className,
-  exitMs, exitDelayMs, exitEasing, enterMs, enterEasing, delayMs,
-}: {
-  current: ReactNode
-  incoming: ReactNode | null
-  phase: Phase
-  direction: Dir
-  className: string
-  exitMs: number
-  exitDelayMs: number
-  exitEasing: string
-  enterMs: number
-  enterEasing: string
-  delayMs: number
-}) {
-  const exitTo = direction === 'next' ? 'translateY(110%)' : 'translateY(-110%)'
-  const enterFrom = direction === 'next' ? 'translateY(-110%)' : 'translateY(110%)'
-  return (
-    <div style={{ overflow: 'hidden', position: 'relative', width: '100%' }}>
-      {incoming !== null && (
-        <div
-          className={className}
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            transform: phase !== 'idle' ? exitTo : 'translateY(0)',
-            transition: phase === 'exiting' ? `transform ${exitMs}ms ${exitEasing} ${exitDelayMs}ms` : 'none',
-          }}
-        >
-          {current}
-        </div>
-      )}
-      <div
-        className={className}
-        style={{
-          transform: incoming !== null ? (phase === 'entering' ? 'translateY(0)' : enterFrom) : 'translateY(0)',
-          transition: phase === 'entering' ? `transform ${enterMs}ms ${enterEasing} ${delayMs}ms` : 'none',
-        }}
-      >
-        {incoming !== null ? incoming : current}
-      </div>
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useScramble } from '@/components/ui/ScrambleText'
+import { openBooking } from '@/lib/booking'
 
 // Presentational button primitive — styling + scramble-on-hover. No CMS logic.
 // Label is Chivo Mono (font-mono): mono keeps the decrypt width-stable, no jitter/overlap, so the
@@ -54,6 +55,12 @@ type Props = {
   onClick?: () => void
   altLabel?: string // second label, masked-swapped in when showAlt flips (MENU <-> CLOSE)
   showAlt?: boolean
+  // Opens the booking dialog. A flag rather than an onClick because every CTA that wants this sits
+  // in a server component, which cannot pass a function across the boundary — so the prop IS the
+  // wiring. Ignored when `href` is set; a link goes to the link.
+  booking?: boolean
+  type?: 'button' | 'submit'
+  disabled?: boolean
 }
 
 export function Button({
@@ -67,10 +74,15 @@ export function Button({
   onClick,
   altLabel,
   showAlt = false,
+  booking = false,
+  type = 'button',
+  disabled = false,
 }: Props) {
   const flash = scrambleColor ?? VARIANTS[variant].flash
   const { ref, run } = useScramble<HTMLSpanElement>(children, flash)
-  const onMouseEnter = scramble ? run : undefined
+  // no decrypt run on a dead button — the label animating under a cursor that can't click reads as
+  // the button working
+  const onMouseEnter = scramble && !disabled ? run : undefined
   const current = altLabel !== undefined && showAlt ? altLabel : children
 
   const label = (
@@ -92,7 +104,8 @@ export function Button({
       )}
     </span>
   )
-  const cls = `${SHELL_BASE} ${VARIANTS[variant].shell} ${className}`.trim()
+  const cls =
+    `${SHELL_BASE} ${VARIANTS[variant].shell} ${disabled ? 'cursor-not-allowed opacity-45' : ''} ${className}`.trim()
 
   return href ? (
     <Link href={href} aria-label={children} className={cls} onMouseEnter={onMouseEnter}>
@@ -100,10 +113,11 @@ export function Button({
     </Link>
   ) : (
     <button
-      type="button"
+      type={type}
       aria-label={current}
       className={cls}
-      onClick={onClick}
+      disabled={disabled}
+      onClick={booking ? openBooking : onClick}
       onMouseEnter={onMouseEnter}
     >
       {label}
