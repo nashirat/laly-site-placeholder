@@ -141,11 +141,17 @@ export function ServiceHero({
           {content.description.before}
           {/* the designer set this phrase in Neue Haas bold at 24 against the 28px serif — a
               deliberate voice change mid-sentence, so the CMS stores the sentence in three parts
-              rather than shipping a markup parser */}
-          <strong className="font-display text-lg font-bold tracking-[0.25px] md:text-2xl">
-            {content.description.emphasis}
-          </strong>
-          {content.description.after}
+              rather than shipping a markup parser.
+              /development (3292:4657) sets no such run — one flat paragraph — so an empty emphasis
+              renders neither the <strong> nor the tail, rather than an empty bold node. */}
+          {content.description.emphasis && (
+            <>
+              <strong className="font-display text-lg font-bold tracking-[0.25px] md:text-2xl">
+                {content.description.emphasis}
+              </strong>
+              {content.description.after}
+            </>
+          )}
         </p>
 
         <div className="hero-cta entry-copy flex justify-center" style={{ animationDelay: '1.2s' }}>

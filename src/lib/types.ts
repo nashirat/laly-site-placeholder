@@ -147,11 +147,21 @@ export type EmphasisedSentence = {
   after: string
 }
 
+// The hero's sentence. /paid-advertising and /branding both set one phrase in the other face, so
+// this is EmphasisedSentence with the switch made optional: /development (Figma 3292:4657) is one
+// flat paragraph with no run in Neue Haas at all, and ServiceHero simply skips the <strong> when
+// `emphasis` is absent rather than the page inventing a phrase to bold.
+export type HeroSentence = {
+  before: string
+  emphasis?: string
+  after?: string // only read when `emphasis` is filled in
+}
+
 export type PaidHeroContent = {
   label: string
   heading: string
   pills: string[] // star tints come from PILL_COLORS by position
-  description: EmphasisedSentence
+  description: HeroSentence
   button: LinkField
 }
 
@@ -239,6 +249,23 @@ export type BrandingContent = {
   // Figma draws Pricing and FAQ identically on both service pages, so these reuse the /paid types.
   // Its own copy of the values, not an import of the paid mock: the two pages are separate docs once
   // the CMS lands, and a fallback that silently tracked the other page's would hide that.
+  pricing: PricingContent
+  faq: FaqContent
+  note: NoteContent
+}
+
+// --- /development --------------------------------------------------------------------------------
+
+// The third service page (Figma 3292:4643), and the shortest of the three: the frame draws the hero,
+// Pricing, FAQ, Contact and the closing band and nothing else — the sections between the hero and
+// Pricing that /paid-advertising and /branding have have not been designed yet. So this is four
+// blocks, every one of them already a shape another page uses. Its own type rather than an alias of
+// a slice of BrandingContent, so the two can diverge as the middle of this page gets drawn.
+//
+// `contact` is deliberately absent here too: that section is read off the home doc so one edit moves
+// all three service pages.
+export type DevelopmentContent = {
+  hero: PaidHeroContent
   pricing: PricingContent
   faq: FaqContent
   note: NoteContent

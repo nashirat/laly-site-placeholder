@@ -471,18 +471,18 @@ export interface PaidHeroBlock {
     id?: string | null;
   }[];
   /**
-   * One sentence set in three parts: the middle one is the bold Neue Haas run the designer put mid-sentence. Mind the spaces and the full stop at the joins.
+   * One sentence set in three parts: the middle one is the bold Neue Haas run the designer put mid-sentence. Mind the spaces and the full stop at the joins. Leave Emphasis blank for one flat paragraph, the way /development sets it — After is then ignored.
    */
   description: {
     before: string;
     /**
-     * Rendered bold and a size down, e.g. "You pay per qualified lead".
+     * Optional. Rendered bold and a size down, e.g. "You pay per qualified lead". Blank = one flat sentence.
      */
-    emphasis: string;
+    emphasis?: string | null;
     /**
-     * Starts with the punctuation that closes the emphasised phrase.
+     * Only read when Emphasis is filled in. Starts with the punctuation that closes the emphasised phrase.
      */
-    after: string;
+    after?: string | null;
   };
   button: {
     label: string;

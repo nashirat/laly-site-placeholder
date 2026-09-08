@@ -48,21 +48,28 @@ export const PaidHeroBlock: Block = {
       type: 'group',
       admin: {
         description:
-          'One sentence set in three parts: the middle one is the bold Neue Haas run the designer put mid-sentence. Mind the spaces and the full stop at the joins.',
+          'One sentence set in three parts: the middle one is the bold Neue Haas run the designer put mid-sentence. Mind the spaces and the full stop at the joins. Leave Emphasis blank for one flat paragraph, the way /development sets it — After is then ignored.',
       },
       fields: [
         { name: 'before', type: 'textarea', required: true },
         {
+          // Not required: /development's hero (Figma 3292:4657) has no run in the other face at all,
+          // so a blank here is a valid design rather than an unfinished field. /paid-advertising and
+          // /branding both fill it, and the section skips the <strong> when it is empty.
           name: 'emphasis',
           type: 'text',
-          required: true,
-          admin: { description: 'Rendered bold and a size down, e.g. "You pay per qualified lead".' },
+          admin: {
+            description:
+              'Optional. Rendered bold and a size down, e.g. "You pay per qualified lead". Blank = one flat sentence.',
+          },
         },
         {
           name: 'after',
           type: 'textarea',
-          required: true,
-          admin: { description: 'Starts with the punctuation that closes the emphasised phrase.' },
+          admin: {
+            description:
+              'Only read when Emphasis is filled in. Starts with the punctuation that closes the emphasised phrase.',
+          },
         },
       ],
     },

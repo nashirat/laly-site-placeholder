@@ -131,7 +131,7 @@ export const home: HomeContent = {
         hook: 'If your marketing efforts feel\ndisconnected from your business,\nthis is for you.',
         hookMobile: 'If your marketing efforts feel\ndisconnected from your\nbusiness, this is for you.',
         body: 'We custom-build digital systems to help you track everything from where your budget is going to how your business is growing across all platforms.',
-        link: { label: 'Explore technology' },
+        link: { label: 'Explore technology', href: '/development' },
         fg: '#B5B449',
       },
     ],

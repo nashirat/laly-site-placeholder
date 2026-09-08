@@ -27,6 +27,7 @@ import type {
   ChannelsContent,
   CompoundContent,
   ContactContent,
+  DevelopmentContent,
   FaqContent,
   GuaranteeContent,
   HeroContent,
@@ -52,6 +53,7 @@ import { BADGE_COLORS, CARD_PALETTES, STRATEGY_ACCENTS } from '@/lib/palettes'
 import { home } from '@/lib/mock/home'
 import { paid } from '@/lib/mock/paid'
 import { branding } from '@/lib/mock/branding'
+import { development } from '@/lib/mock/development'
 
 // Payload's generated types are permissive where our render contract is not: upload relations are
 // `string | Media` depending on query depth, and every non-required scalar is `T | null | undefined`.
@@ -231,15 +233,7 @@ export function toPaidHeroContent(block: PaidHeroBlock): PaidHeroContent | null 
   const pills = (block.pills ?? []).map((p) => p.label).filter(Boolean)
   const d = block.description
 
-  if (
-    !block.label ||
-    !block.heading ||
-    !d?.before ||
-    !d.emphasis ||
-    !d.after ||
-    !block.button?.label ||
-    pills.length === 0
-  ) {
+  if (!block.label || !block.heading || !d?.before || !block.button?.label || pills.length === 0) {
     return null
   }
 
@@ -247,7 +241,13 @@ export function toPaidHeroContent(block: PaidHeroBlock): PaidHeroContent | null 
     label: block.label,
     heading: block.heading,
     pills,
-    description: { before: d.before, emphasis: d.emphasis, after: d.after },
+    // The emphasised run is optional: /development's hero is one flat paragraph and leaves both
+    // halves blank. Same branch the System cards' blurb takes — the emphasised shape only when
+    // there is something to emphasise, so ServiceHero renders on the shape that arrived rather than
+    // on which page it is. '' from an untouched field normalises to undefined here.
+    description: d.emphasis
+      ? { before: d.before, emphasis: d.emphasis, after: d.after ?? '' }
+      : { before: d.before },
     button: { label: block.button.label, href: block.button.href ?? undefined },
   }
 }
@@ -507,5 +507,35 @@ export async function getBranding(): Promise<BrandingContent> {
   } catch (err) {
     console.error('[cms] pages/branding query failed — falling back to mock:', err)
     return branding
+  }
+}
+
+// --- /development --------------------------------------------------------------------------------
+
+// The shortest of the three service docs: four blocks, every one of them a shape another page
+// already uses (paidHero/pricing/faq/note), so there is nothing here to convert that isn't converted
+// above. It exists as its own loader rather than a `getService(slug)` because the three pages do not
+// hold the same set of blocks and each names its own — the slug is the only thing they share.
+//
+// Contact is NOT here — like the other two, it is read off the home doc so one edit moves all three.
+export async function getDevelopment(): Promise<DevelopmentContent> {
+  try {
+    const blocks = await findBlocks('development')
+    // Shares paidHero with the other two service pages: ServiceHero draws all three off it.
+    const hero = blocks.find((b) => b.blockType === 'paidHero')
+    const pricing = blocks.find((b) => b.blockType === 'pricing')
+    const faq = blocks.find((b) => b.blockType === 'faq')
+    const note = blocks.find((b) => b.blockType === 'note')
+
+    const slug = 'development'
+    return {
+      hero: orMock(slug, 'paidHero', hero && toPaidHeroContent(hero), development.hero),
+      pricing: orMock(slug, 'pricing', pricing && toPricingContent(pricing), development.pricing),
+      faq: orMock(slug, 'faq', faq && toFaqContent(faq), development.faq),
+      note: orMock(slug, 'note', note && toNoteContent(note), development.note),
+    }
+  } catch (err) {
+    console.error('[cms] pages/development query failed — falling back to mock:', err)
+    return development
   }
 }
