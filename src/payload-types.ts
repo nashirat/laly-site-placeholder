@@ -170,11 +170,11 @@ export interface Page {
    */
   title: string;
   /**
-   * The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising' and 'branding' are the ones that exist.
+   * The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising', 'branding' and 'development' are the ones that exist.
    */
   slug: string;
   /**
-   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding).
+   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/Pricing/FAQ/Note on development).
    */
   content: (
     | HeroBlock
